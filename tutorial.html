@@ -1,0 +1,1079 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Deckforge Arena — Tutorial</title>
+
+  <style>
+    :root{
+      --bg0:#070a12;
+      --bg1:#0b1020;
+      --card: rgba(255,255,255,.06);
+      --stroke: rgba(255,255,255,.12);
+      --text:#eaf0ff;
+      --muted: rgba(234,240,255,.72);
+      --faint: rgba(234,240,255,.52);
+      --primary:#7c5cff;
+      --primary2:#23d5ff;
+      --good:#3dffb7;
+      --warn:#ffcc66;
+      --bad:#ff5577;
+      --shadow: 0 18px 60px rgba(0,0,0,.45);
+      --radius: 18px;
+      --radius2: 26px;
+      --max: 1200px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: var(--sans);
+      color: var(--text);
+      background: radial-gradient(1200px 800px at 25% 10%, rgba(124,92,255,.16), transparent 55%),
+                  radial-gradient(1200px 800px at 80% 20%, rgba(35,213,255,.13), transparent 55%),
+                  linear-gradient(180deg, var(--bg0), var(--bg1));
+      overflow-x:hidden;
+    }
+    a{ color: inherit; text-decoration:none; }
+    .container{ width: min(var(--max), calc(100% - 40px)); margin-inline:auto; }
+
+    /* Background vibe */
+    .bg{ position:fixed; inset:0; z-index:-1; }
+    .bg__grid{
+      position:absolute; inset:-2px;
+      background-image:
+        linear-gradient(to right, rgba(255,255,255,.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,.05) 1px, transparent 1px);
+      background-size: 70px 70px;
+      mask-image: radial-gradient(circle at 30% 20%, black 0 40%, transparent 70%);
+      opacity:.35;
+    }
+    .bg__glow{
+      position:absolute; width: 560px; height: 560px; border-radius: 999px;
+      filter: blur(40px);
+      opacity:.55;
+    }
+    .bg__glow--a{ left:-160px; top:-160px; background: rgba(124,92,255,.35); }
+    .bg__glow--b{ right:-180px; top:60px; background: rgba(35,213,255,.28); }
+    .bg__noise{
+      position:absolute; inset:0;
+      opacity:.06;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='260' height='260' filter='url(%23n)' opacity='.45'/%3E%3C/svg%3E");
+    }
+
+    /* Nav */
+    .nav{
+      position:sticky; top:0;
+      backdrop-filter: blur(14px);
+      background: rgba(7,10,18,.45);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      z-index:10;
+    }
+    .nav__inner{
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 16px 0;
+      gap: 16px;
+    }
+    .brand{ display:flex; align-items:center; gap: 12px; }
+    .brand__mark{
+      display:grid; place-items:center;
+      width: 36px; height: 36px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(124,92,255,.9), rgba(35,213,255,.75));
+      box-shadow: 0 10px 28px rgba(124,92,255,.22);
+      font-weight: 900;
+    }
+    .brand__name{ font-weight: 800; letter-spacing:.2px; }
+    .nav__right{ display:flex; align-items:center; gap: 10px; flex-wrap:wrap; }
+
+    .chip{
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      color: rgba(234,240,255,.88);
+      font-weight: 750;
+      font-size: 13px;
+      display:inline-flex;
+      gap: 8px;
+      align-items:center;
+    }
+    .chip b{ font-family: var(--mono); font-weight: 800; }
+
+    .btn{
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 14px;
+      font-weight: 750;
+      letter-spacing:.2px;
+      cursor:pointer;
+      transition: transform .15s ease, background .15s ease, border-color .15s ease;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap: 8px;
+    }
+    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.09); }
+    .btn:active{ transform: translateY(0px); }
+    .btn--primary{
+      border-color: rgba(124,92,255,.55);
+      background: linear-gradient(135deg, rgba(124,92,255,.95), rgba(35,213,255,.70));
+      box-shadow: 0 16px 46px rgba(124,92,255,.25);
+    }
+    .btn--ghost{ background: rgba(255,255,255,.04); }
+    .btn--danger{
+      border-color: rgba(255,85,119,.38);
+      background: rgba(255,85,119,.10);
+    }
+
+    /* Layout */
+    .wrap{ padding: 18px 0 48px; }
+    .titleRow{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap: 12px;
+      flex-wrap:wrap;
+      margin: 12px 0 12px;
+    }
+    h1{ margin:0; font-size: clamp(24px, 3.6vw, 38px); letter-spacing:-.6px; }
+    .muted{ color: var(--muted); }
+    .sub{ margin: 6px 0 0; color: var(--muted); line-height:1.6; max-width: 95ch; }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 380px;
+      gap: 12px;
+      align-items:start;
+      margin-top: 14px;
+    }
+
+    .panel{
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .panel__head{
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      background: rgba(0,0,0,.10);
+    }
+    .panel__title{
+      font-weight: 950;
+      letter-spacing: .2px;
+      display:flex;
+      align-items:center;
+      gap: 10px;
+    }
+    .dot{
+      width: 10px; height: 10px; border-radius: 999px;
+      background: var(--good);
+      box-shadow: 0 0 0 5px rgba(61,255,183,.10);
+    }
+    .panel__body{ padding: 12px 14px 14px; }
+
+    /* Story box */
+    .storyBox{
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      border-radius: 18px;
+      padding: 12px 12px;
+      line-height: 1.6;
+      color: rgba(234,240,255,.86);
+      min-height: 120px;
+    }
+    .storyBox b{ color: rgba(234,240,255,.98); }
+    .turnRow{
+      margin-top: 10px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap: 10px;
+      flex-wrap:wrap;
+    }
+    .pill{
+      font-family: var(--mono);
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(7,10,18,.25);
+      color: rgba(234,240,255,.88);
+    }
+
+    /* Cards */
+    .arena{
+      display:grid;
+      grid-template-columns: 1fr 90px 1fr;
+      gap: 12px;
+      align-items:stretch;
+      margin-top: 12px;
+    }
+    .vs{
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      position:relative;
+      overflow:hidden;
+    }
+    .vs::before{
+      content:"";
+      position:absolute; inset:-2px;
+      background:
+        radial-gradient(320px 220px at 50% 15%, rgba(124,92,255,.25), transparent 60%),
+        radial-gradient(320px 220px at 50% 85%, rgba(35,213,255,.18), transparent 60%);
+      opacity:.9;
+    }
+    .vs > *{ position:relative; }
+    .vsTop{ font-weight: 950; font-size: 14px; letter-spacing:.2px; opacity:.9; }
+    .vsBig{ font-weight: 1000; font-size: 34px; letter-spacing:-.8px; margin-top: 6px; }
+
+    .cardBig{
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      border-radius: 22px;
+      padding: 12px;
+      position:relative;
+      overflow:hidden;
+      min-height: 240px;
+      box-shadow: 0 18px 60px rgba(0,0,0,.25);
+    }
+    .cardBig::before{
+      content:"";
+      position:absolute; inset:-2px;
+      background:
+        radial-gradient(420px 260px at 15% 0%, rgba(124,92,255,.22), transparent 60%),
+        radial-gradient(420px 260px at 85% 30%, rgba(35,213,255,.14), transparent 60%);
+      opacity:.9;
+      pointer-events:none;
+    }
+    .cardBig > *{ position:relative; }
+    .cardHeader{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap: 10px;
+      flex-wrap:wrap;
+      margin-bottom: 10px;
+    }
+    .cardName{
+      font-size: 18px;
+      font-weight: 1000;
+      letter-spacing: -.35px;
+      margin: 0;
+    }
+    .cardMeta{ display:flex; gap: 8px; flex-wrap:wrap; }
+    .statButtons{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .statBtn{
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(7,10,18,.25);
+      color: rgba(234,240,255,.92);
+      padding: 10px 10px;
+      border-radius: 16px;
+      cursor:pointer;
+      transition: transform .15s ease, background .15s ease, border-color .15s ease;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap: 10px;
+      font-family: var(--mono);
+      font-weight: 800;
+      letter-spacing:.2px;
+      user-select:none;
+    }
+    .statBtn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.20); }
+    .statBtn:disabled{ opacity:.55; cursor:not-allowed; transform:none; }
+    .statVal{
+      font-family: var(--mono);
+      font-weight: 900;
+      opacity:.95;
+    }
+
+    /* Result FX */
+    .fx{
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      opacity:0;
+      transition: opacity .18s ease;
+    }
+    .fx.win{
+      background: radial-gradient(640px 360px at 50% 50%, rgba(61,255,183,.22), transparent 60%);
+    }
+    .fx.lose{
+      background: radial-gradient(640px 360px at 50% 50%, rgba(255,85,119,.22), transparent 60%);
+    }
+    .fx.show{ opacity:1; }
+
+    .resultBox{
+      margin-top: 12px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      border-radius: 18px;
+      padding: 12px;
+      line-height:1.6;
+    }
+
+    /* Sidebar */
+    .scoreRow{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .score{
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      border-radius: 18px;
+      padding: 12px;
+    }
+    .scoreLabel{
+      font-family: var(--mono);
+      font-size: 12px;
+      color: rgba(234,240,255,.62);
+      text-transform: uppercase;
+      letter-spacing:.4px;
+      font-weight: 900;
+    }
+    .scoreVal{
+      margin-top: 8px;
+      font-size: 28px;
+      font-weight: 1000;
+      letter-spacing: -.6px;
+    }
+
+    .log{
+      margin-top: 10px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(7,10,18,.25);
+      border-radius: 18px;
+      padding: 10px;
+      max-height: 360px;
+      overflow:auto;
+      font-size: 13px;
+      color: rgba(234,240,255,.85);
+      line-height: 1.55;
+    }
+    .log .muted{ color: rgba(234,240,255,.65); }
+
+    .toast{
+      position:fixed;
+      left:50%;
+      transform: translateX(-50%);
+      bottom: 18px;
+      padding: 10px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(15,18,30,.92);
+      backdrop-filter: blur(14px);
+      box-shadow: var(--shadow);
+      color: rgba(234,240,255,.92);
+      display:none;
+      z-index:200;
+      max-width: min(760px, calc(100% - 40px));
+    }
+
+    @media (max-width: 980px){
+      .grid{ grid-template-columns: 1fr; }
+      .arena{ grid-template-columns: 1fr; }
+      .vs{ min-height: 80px; }
+    }
+  </style>
+
+  <!-- Firebase v8 -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+</head>
+
+<body>
+  <div class="bg">
+    <div class="bg__grid"></div>
+    <div class="bg__glow bg__glow--a"></div>
+    <div class="bg__glow bg__glow--b"></div>
+    <div class="bg__noise"></div>
+  </div>
+
+  <header class="nav">
+    <div class="nav__inner container">
+      <a class="brand" href="index.html" aria-label="Deckforge Arena">
+        <span class="brand__mark">?</span>
+        <span class="brand__name">Deckforge Arena</span>
+      </a>
+
+      <div class="nav__right">
+        <div class="chip">Player: <b id="playerName">—</b></div>
+        <button class="btn btn--ghost" id="btnHome">Home</button>
+        <button class="btn btn--danger" id="btnLogout">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container wrap">
+    <div class="titleRow">
+      <div>
+        <h1>Tutorial: The Night the Bones Walked</h1>
+        <p class="sub">
+          We’ll run a 10-turn practice duel. Your deck is shuffled. You draw from the top.
+          Each turn, you must pick a stat to fight with. Higher stat wins.
+        </p>
+      </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="btn btn--primary" id="btnStart">Start Tutorial</button>
+        <button class="btn btn--ghost" id="btnSkip">Skip Tutorial</button>
+      </div>
+    </div>
+
+    <section class="grid">
+      <!-- Main story + arena -->
+      <section class="panel">
+        <div class="panel__head">
+          <div class="panel__title"><span class="dot"></span> Story & Battle</div>
+          <div class="muted" style="font-size:13px;">10 turns</div>
+        </div>
+        <div class="panel__body">
+          <div class="storyBox" id="storyBox">
+            <b>Tonight, the village is peaceful.</b> The lanterns glow warm, the market stalls are closed, and even the dogs are too lazy to bark.
+            <br/><br/>
+            Then… far beyond the wheat fields… something <i>clacks</i> in the dark.
+          </div>
+
+          <div class="turnRow">
+            <span class="pill">Turn: <b id="turn">0</b>/10</span>
+            <span class="pill">Choose a stat to attack with</span>
+            <span class="pill">Enemy: <b>Skeleton Raid</b></span>
+          </div>
+
+          <div class="arena">
+            <!-- Player card -->
+            <div class="cardBig" id="playerCard">
+              <div class="fx win" id="fxWin"></div>
+              <div class="fx lose" id="fxLose"></div>
+
+              <div class="cardHeader">
+                <div>
+                  <p class="cardName" id="pName">—</p>
+                  <div class="cardMeta">
+                    <span class="pill" id="pArche">—</span>
+                    <span class="pill" id="pRole">—</span>
+                    <span class="pill" id="pRarity">—</span>
+                  </div>
+                </div>
+                <span class="pill">You</span>
+              </div>
+
+              <div class="muted" style="font-size:13px; line-height:1.6;">
+                Pick a stat below. Your chosen stat is compared against the enemy’s same stat.
+              </div>
+
+              <div class="statButtons" id="statButtons"></div>
+            </div>
+
+            <!-- VS -->
+            <div class="vs">
+              <div class="vsTop">DUEL</div>
+              <div class="vsBig">VS</div>
+            </div>
+
+            <!-- Enemy card -->
+            <div class="cardBig" id="enemyCard">
+              <div class="cardHeader">
+                <div>
+                  <p class="cardName" id="eName">—</p>
+                  <div class="cardMeta">
+                    <span class="pill" id="eArche">Skeletons</span>
+                    <span class="pill" id="eRole">—</span>
+                    <span class="pill" id="eRarity">—</span>
+                  </div>
+                </div>
+                <span class="pill">Enemy</span>
+              </div>
+
+              <div class="muted" style="font-size:13px; line-height:1.6;">
+                The raiders don’t negotiate. They compare stats and keep marching.
+              </div>
+
+              <div class="resultBox" id="enemyStatsBox">
+                <div class="muted">Enemy stat values are hidden until you choose.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="resultBox" id="resultBox">
+            <b>Ready?</b> Press <b>Start Tutorial</b>. You’ll draw from your deck and face the skeleton raid for 10 turns.
+          </div>
+        </div>
+      </section>
+
+      <!-- Sidebar: score + log -->
+      <aside class="panel">
+        <div class="panel__head">
+          <div class="panel__title"><span class="dot"></span> Tutorial Progress</div>
+          <div class="muted" style="font-size:13px;">Feedback</div>
+        </div>
+        <div class="panel__body">
+          <div class="scoreRow">
+            <div class="score">
+              <div class="scoreLabel">Your Wins</div>
+              <div class="scoreVal" id="wins">0</div>
+            </div>
+            <div class="score">
+              <div class="scoreLabel">Your Losses</div>
+              <div class="scoreVal" id="losses">0</div>
+            </div>
+          </div>
+
+          <div class="score" style="margin-top:10px;">
+            <div class="scoreLabel">Tip</div>
+            <div class="muted" style="margin-top:8px; line-height:1.6;">
+              If you think you’re behind, pick a stat your card is strong at.
+              If you think the enemy is fast, maybe don’t choose <b>SPD</b> unless you’re sure.
+            </div>
+          </div>
+
+          <div class="log" id="log"></div>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // =========================
+    // Firebase config
+    // =========================
+    const firebaseConfig = {
+      apiKey: "AIzaSyDJHl2yCKbiiinesOZ9R_SROC51knmT9TQ",
+      authDomain: "goamica-7190c.firebaseapp.com",
+      databaseURL: "https://goamica-7190c-default-rtdb.firebaseio.com",
+      projectId: "goamica-7190c",
+      storageBucket: "goamica-7190c.firebasestorage.app",
+      messagingSenderId: "612907093027",
+      appId: "1:612907093027:web:2b7106adc9ba6b7b177596",
+      measurementId: "G-8DE8ST7LXR"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // =========================
+    // Session gate
+    // =========================
+    function getSession(){
+      const id = localStorage.getItem("amica_currentUserId") || sessionStorage.getItem("amica_currentUserId");
+      const user = localStorage.getItem("amica_currentUser") || sessionStorage.getItem("amica_currentUser");
+      return { id, user: user ? JSON.parse(user) : null };
+    }
+    function clearSession(){
+      localStorage.removeItem("amica_currentUserId");
+      localStorage.removeItem("amica_currentUser");
+      sessionStorage.removeItem("amica_currentUserId");
+      sessionStorage.removeItem("amica_currentUser");
+    }
+    const session = getSession();
+    if(!session.id || !session.user){
+      window.location.href = "login.html";
+    }
+    document.getElementById("playerName").textContent = session.user?.Username || "—";
+
+    document.getElementById("btnHome").addEventListener("click", () => location.href = "index.html");
+    document.getElementById("btnLogout").addEventListener("click", () => { clearSession(); location.href = "login.html"; });
+    document.getElementById("btnSkip").addEventListener("click", () => location.href = "index.html");
+
+    // =========================
+    // Toast
+    // =========================
+    const toastEl = document.getElementById("toast");
+    let toastTimer = null;
+    function toast(msg){
+      toastEl.textContent = msg;
+      toastEl.style.display = "block";
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toastEl.style.display = "none", 2200);
+    }
+
+    // =========================
+    // WebAudio SFX (no files needed)
+    // =========================
+    let audioCtx = null;
+    function ensureAudio(){
+      if(!audioCtx){
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if(audioCtx.state === "suspended") audioCtx.resume();
+    }
+
+    function playTone(freq, dur=0.12, type="sine", gain=0.06){
+      ensureAudio();
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.type = type;
+      o.frequency.value = freq;
+      g.gain.value = gain;
+      o.connect(g);
+      g.connect(audioCtx.destination);
+      o.start();
+      o.stop(audioCtx.currentTime + dur);
+    }
+
+    function sfxWin(){
+      playTone(740,0.10,"triangle",0.07);
+      setTimeout(()=>playTone(932,0.12,"triangle",0.07), 90);
+      setTimeout(()=>playTone(1174,0.14,"triangle",0.07), 200);
+    }
+
+    function sfxLose(){
+      playTone(220,0.12,"sawtooth",0.06);
+      setTimeout(()=>playTone(185,0.14,"sawtooth",0.06), 90);
+      setTimeout(()=>playTone(155,0.18,"sawtooth",0.06), 190);
+    }
+
+    function sfxDraw(){
+      playTone(440,0.08,"square",0.05);
+      setTimeout(()=>playTone(440,0.08,"square",0.05), 120);
+    }
+
+    // =========================
+    // Card data (same skeleton set as decks page)
+    // =========================
+    const STAT_KEYS = ["HP","ATK","DEF","MAG","SPD","WIS"];
+
+    const CARD_LIBRARY = {
+      // Skeleton core 10 (starter)
+      "SKL_001": {id:"SKL_001", name:"Skeleton Warrior", archetype:"Skeletons", role:"Warrior", rarity:"Common", stats:{HP:66,ATK:72,DEF:58,MAG:12,SPD:54,WIS:34}},
+      "SKL_002": {id:"SKL_002", name:"Skeleton Knight", archetype:"Skeletons", role:"Knight", rarity:"Uncommon", stats:{HP:74,ATK:66,DEF:76,MAG:10,SPD:42,WIS:40}},
+      "SKL_003": {id:"SKL_003", name:"Skeleton Archer", archetype:"Skeletons", role:"Archer", rarity:"Uncommon", stats:{HP:60,ATK:70,DEF:46,MAG:18,SPD:76,WIS:38}},
+      "SKL_004": {id:"SKL_004", name:"Skeleton Wizard", archetype:"Skeletons", role:"Wizard", rarity:"Uncommon", stats:{HP:52,ATK:18,DEF:34,MAG:82,SPD:56,WIS:70}},
+      "SKL_005": {id:"SKL_005", name:"Skeleton Elder Wizard", archetype:"Skeletons", role:"Elder Wizard", rarity:"Rare", stats:{HP:56,ATK:16,DEF:38,MAG:94,SPD:48,WIS:90}},
+      "SKL_006": {id:"SKL_006", name:"Skeleton Necro-Cleric", archetype:"Skeletons", role:"Cleric", rarity:"Rare", stats:{HP:68,ATK:28,DEF:58,MAG:74,SPD:44,WIS:84}},
+      "SKL_007": {id:"SKL_007", name:"Skeleton Lancer", archetype:"Skeletons", role:"Lancer", rarity:"Uncommon", stats:{HP:64,ATK:78,DEF:52,MAG:10,SPD:64,WIS:36}},
+      "SKL_008": {id:"SKL_008", name:"Skeleton Berserker", archetype:"Skeletons", role:"Berserker", rarity:"Rare", stats:{HP:72,ATK:88,DEF:44,MAG:8,SPD:62,WIS:28}},
+      "SKL_009": {id:"SKL_009", name:"Skeleton Guard", archetype:"Skeletons", role:"Guard", rarity:"Common", stats:{HP:78,ATK:52,DEF:82,MAG:6,SPD:36,WIS:42}},
+      "SKL_010": {id:"SKL_010", name:"Skeleton Bonecaster", archetype:"Skeletons", role:"Caster", rarity:"Rare", stats:{HP:58,ATK:20,DEF:42,MAG:86,SPD:60,WIS:82}},
+
+      // Humans core 10 (so we can draw from player deck if needed)
+      "HUM_001": {id:"HUM_001", name:"Human Warrior", archetype:"Humans", role:"Warrior", rarity:"Common", stats:{HP:78,ATK:74,DEF:66,MAG:12,SPD:48,WIS:40}},
+      "HUM_002": {id:"HUM_002", name:"Human Farmer", archetype:"Humans", role:"Farmer", rarity:"Common", stats:{HP:62,ATK:38,DEF:42,MAG:8,SPD:52,WIS:55}},
+      "HUM_003": {id:"HUM_003", name:"Human Archer", archetype:"Humans", role:"Archer", rarity:"Uncommon", stats:{HP:64,ATK:68,DEF:44,MAG:18,SPD:78,WIS:50}},
+      "HUM_004": {id:"HUM_004", name:"Human Wizard", archetype:"Humans", role:"Wizard", rarity:"Uncommon", stats:{HP:55,ATK:22,DEF:36,MAG:80,SPD:54,WIS:74}},
+      "HUM_005": {id:"HUM_005", name:"Human Elder Wizard", archetype:"Humans", role:"Elder Wizard", rarity:"Rare", stats:{HP:58,ATK:20,DEF:40,MAG:92,SPD:46,WIS:92}},
+      "HUM_006": {id:"HUM_006", name:"Human Cleric", archetype:"Humans", role:"Cleric", rarity:"Uncommon", stats:{HP:70,ATK:34,DEF:58,MAG:66,SPD:44,WIS:82}},
+      "HUM_007": {id:"HUM_007", name:"Human Knight", archetype:"Humans", role:"Knight", rarity:"Rare", stats:{HP:84,ATK:70,DEF:84,MAG:14,SPD:42,WIS:58}},
+      "HUM_008": {id:"HUM_008", name:"Human Lancer", archetype:"Humans", role:"Lancer", rarity:"Uncommon", stats:{HP:72,ATK:76,DEF:56,MAG:10,SPD:66,WIS:46}},
+      "HUM_009": {id:"HUM_009", name:"Human Blacksmith", archetype:"Humans", role:"Blacksmith", rarity:"Common", stats:{HP:76,ATK:52,DEF:74,MAG:8,SPD:40,WIS:60}},
+      "HUM_010": {id:"HUM_010", name:"Human Astrologer", archetype:"Humans", role:"Astrologer", rarity:"Rare", stats:{HP:60,ATK:26,DEF:40,MAG:78,SPD:58,WIS:90}},
+    };
+
+    const FALLBACK_SKELETON_DECK = ["SKL_001","SKL_002","SKL_003","SKL_004","SKL_005","SKL_006","SKL_007","SKL_008","SKL_009","SKL_010"];
+
+    // =========================
+    // Tutorial story beats (10 turns)
+    // =========================
+    const STORY_BEATS = [
+      {
+        title: "Village Calm",
+        text: `The village is chilling. Lanterns glow. Someone is roasting something that smells illegal in the best way.
+              Then the night wind carries a dry <b>clack-clack</b>… and the dogs stop barking.`,
+        foe: "Skeleton Scout"
+      },
+      {
+        title: "First Screams",
+        text: `A scream cuts the air. You sprint past the well… and see bone silhouettes moving like they own the place.
+              A raider kicks down a door and drags out supplies. Time to introduce them to math.`,
+        foe: "Skeleton Warrior"
+      },
+      {
+        title: "House Under Attack",
+        text: `You turn a corner and catch it: a skeleton in dented armor hammering a door with a blade.
+              A family is trapped inside. The attacker? <b>Skeleton Knight</b>.`,
+        foe: "Skeleton Knight"
+      },
+      {
+        title: "Arrow in the Dark",
+        text: `An arrow hisses past your ear and thunks into a wooden post.
+              A <b>Skeleton Archer</b> is perched above the rooftops — smug, hollow, and annoying.`,
+        foe: "Skeleton Archer"
+      },
+      {
+        title: "Fire on the Square",
+        text: `The market square erupts with a burst of green flame.
+              A <b>Skeleton Wizard</b> is chanting like it’s a talent show nobody asked for.`,
+        foe: "Skeleton Wizard"
+      },
+      {
+        title: "The Elder Arrives",
+        text: `A colder presence lands behind the raiders.
+              Robes. Staff. Calm arrogance. The air itself seems to hold its breath.
+              <b>Skeleton Elder Wizard</b>.`,
+        foe: "Skeleton Elder Wizard"
+      },
+      {
+        title: "Unholy Blessing",
+        text: `A bone-clad priest raises a cracked symbol and the raiders surge with unnatural focus.
+              The <b>Skeleton Necro-Cleric</b> isn’t healing — it’s rewriting rules.`,
+        foe: "Skeleton Necro-Cleric"
+      },
+      {
+        title: "Charge Line",
+        text: `A spear scrapes the cobblestones and sparks fly.
+              A <b>Skeleton Lancer</b> lowers its weapon and charges straight at you.`,
+        foe: "Skeleton Lancer"
+      },
+      {
+        title: "Rage Made Bone",
+        text: `This one doesn’t sneak or cast.
+              It sprints. It howls. It swings like the universe owes it money.
+              <b>Skeleton Berserker</b>.`,
+        foe: "Skeleton Berserker"
+      },
+      {
+        title: "The Final Push",
+        text: `At the village gate, a massive guard blocks the way while a caster behind it crackles with dark energy.
+              One last turn. One last choice. Win this, and the night breaks.`,
+        foe: "Skeleton Guard + Bonecaster"
+      }
+    ];
+
+    // =========================
+    // Tutorial state
+    // =========================
+    const userId = String(session.id);
+
+    const PATH = {
+      deck: (uid, deckKey) => `Decks/${uid}/${deckKey}`
+    };
+
+    let started = false;
+    let turn = 0;
+    let wins = 0;
+    let losses = 0;
+
+    let playerDeck = [];
+    let enemyDeck = [];
+
+    let playerCard = null;
+    let enemyCard = null;
+
+    const elTurn = document.getElementById("turn");
+    const elWins = document.getElementById("wins");
+    const elLosses = document.getElementById("losses");
+    const elStory = document.getElementById("storyBox");
+    const elLog = document.getElementById("log");
+    const elResult = document.getElementById("resultBox");
+
+    // Card UI refs
+    const pName = document.getElementById("pName");
+    const pArche = document.getElementById("pArche");
+    const pRole = document.getElementById("pRole");
+    const pRarity = document.getElementById("pRarity");
+
+    const eName = document.getElementById("eName");
+    const eRole = document.getElementById("eRole");
+    const eRarity = document.getElementById("eRarity");
+
+    const enemyStatsBox = document.getElementById("enemyStatsBox");
+
+    const statButtons = document.getElementById("statButtons");
+    const fxWin = document.getElementById("fxWin");
+    const fxLose = document.getElementById("fxLose");
+
+    function logLine(html){
+      const div = document.createElement("div");
+      div.innerHTML = html;
+      elLog.prepend(div);
+    }
+
+    function shuffle(arr){
+      const a = arr.slice();
+      for(let i=a.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [a[i],a[j]] = [a[j],a[i]];
+      }
+      return a;
+    }
+
+    function cardFromId(id){
+      return CARD_LIBRARY[id] || null;
+    }
+
+    function renderCards(){
+      // Player
+      pName.textContent = playerCard ? playerCard.name : "—";
+      pArche.textContent = playerCard ? playerCard.archetype : "—";
+      pRole.textContent = playerCard ? playerCard.role : "—";
+      pRarity.textContent = playerCard ? playerCard.rarity : "—";
+
+      // Enemy
+      eName.textContent = enemyCard ? enemyCard.name : "—";
+      eRole.textContent = enemyCard ? enemyCard.role : "—";
+      eRarity.textContent = enemyCard ? enemyCard.rarity : "—";
+
+      // Buttons
+      statButtons.innerHTML = "";
+      for(const k of STAT_KEYS){
+        const btn = document.createElement("button");
+        btn.className = "statBtn";
+        btn.disabled = !started || !playerCard || !enemyCard;
+        const val = playerCard ? playerCard.stats[k] : "—";
+        btn.innerHTML = `<span>${k}</span><span class="statVal">${val}</span>`;
+        btn.addEventListener("click", () => chooseStat(k));
+        statButtons.appendChild(btn);
+      }
+
+      enemyStatsBox.innerHTML = `<div class="muted">Enemy stat values are hidden until you choose.</div>`;
+    }
+
+    function showFX(type){
+      fxWin.classList.remove("show");
+      fxLose.classList.remove("show");
+      if(type === "win"){
+        fxWin.classList.add("show");
+        setTimeout(()=>fxWin.classList.remove("show"), 350);
+      } else if(type === "lose"){
+        fxLose.classList.add("show");
+        setTimeout(()=>fxLose.classList.remove("show"), 350);
+      }
+    }
+
+    function formatEnemyStatsReveal(chosenKey){
+      const lines = STAT_KEYS.map(k => {
+        const pv = playerCard.stats[k];
+        const ev = enemyCard.stats[k];
+        const marker = (k === chosenKey) ? `<b style="color:rgba(234,240,255,.95)">${k}</b>` : k;
+        return `<div class="muted" style="font-family:var(--mono); margin: 2px 0;">
+          ${marker}: <b>${ev}</b>
+        </div>`;
+      }).join("");
+      return `<div style="line-height:1.55;">
+        <div class="muted" style="margin-bottom:8px;">Enemy stats revealed:</div>
+        ${lines}
+      </div>`;
+    }
+
+    function chooseStat(key){
+      if(!started || !playerCard || !enemyCard) return;
+
+      const p = playerCard.stats[key];
+      const e = enemyCard.stats[key];
+
+      // reveal enemy stats box
+      enemyStatsBox.innerHTML = formatEnemyStatsReveal(key);
+
+      // Decide result
+      if(p > e){
+        wins++;
+        elWins.textContent = String(wins);
+        showFX("win");
+        sfxWin();
+        elResult.innerHTML = `<b>You win the exchange.</b> You chose <b>${key}</b>: ${p} vs ${e}. The skeleton staggers back — bones scattering like cheap cutlery.`;
+        logLine(`<b>Turn ${turn}:</b> You chose <span class="pill">${key}</span> — <b style="color:var(--good)">WIN</b> (${p} vs ${e}).`);
+      } else if(p < e){
+        losses++;
+        elLosses.textContent = String(losses);
+        showFX("lose");
+        sfxLose();
+        elResult.innerHTML = `<b>You lose the exchange.</b> You chose <b>${key}</b>: ${p} vs ${e}. The skeleton pushes forward — confident, relentless, annoying.`;
+        logLine(`<b>Turn ${turn}:</b> You chose <span class="pill">${key}</span> — <b style="color:var(--bad)">LOSS</b> (${p} vs ${e}).`);
+      } else {
+        showFX(null);
+        sfxDraw();
+        elResult.innerHTML = `<b>Draw.</b> You chose <b>${key}</b>: ${p} vs ${e}. Two forces lock — neither gives an inch.`;
+        logLine(`<b>Turn ${turn}:</b> You chose <span class="pill">${key}</span> — <b style="color:var(--warn)">DRAW</b> (${p} vs ${e}).`);
+      }
+
+      // Disable buttons briefly then advance
+      [...statButtons.querySelectorAll("button")].forEach(b => b.disabled = true);
+
+      setTimeout(() => {
+        nextTurn();
+      }, 1200);
+    }
+
+    function setStoryBeat(t){
+      const beat = STORY_BEATS[t-1];
+      if(!beat) return;
+
+      // sprinkle a tiny bit of "you"
+      const extra = (t === 3)
+        ? `<br/><br/><b>Nyx Tip:</b> You don’t need to guess perfectly. Choose a stat your card is strongest at, especially in tutorials.`
+        : (t === 6)
+        ? `<br/><br/>The air tastes like old dust and burnt parchment. Something about this one feels… deliberate.`
+        : "";
+
+      elStory.innerHTML = `<b>${beat.title}.</b> ${beat.text}${extra}`;
+    }
+
+    function drawCard(deckArr){
+      while(deckArr.length){
+        const id = deckArr.shift();
+        const c = cardFromId(id);
+        if(c) return c;
+      }
+      return null;
+    }
+
+    function endTutorial(){
+      started = false;
+      renderCards();
+
+      const verdict = wins > losses ? "victory" : (wins < losses ? "a rough lesson" : "a perfect stalemate");
+      elStory.innerHTML = `
+        <b>Dawn breaks.</b> The bones retreat into the fields, their clacking fading like a bad memory.
+        <br/><br/>
+        You’ve finished the tutorial — <b>${verdict}</b>.
+        <br/><br/>
+        <span class="muted">Remember: the strongest deck is useless if you pick the wrong stat at the wrong time.</span>
+      `;
+      elResult.innerHTML = `
+        <b>Tutorial Complete.</b> Final score: <b>${wins}</b> wins, <b>${losses}</b> losses.
+        <br/><br/>
+        <button class="btn btn--primary" onclick="location.href='index.html'">Back to Main Menu</button>
+        <button class="btn btn--ghost" onclick="location.href='decks.html'">Edit Decks</button>
+      `;
+
+      toast("Tutorial complete.");
+      logLine(`<b class="muted">Tutorial ended:</b> ${wins}W / ${losses}L`);
+    }
+
+    function nextTurn(){
+      if(!started) return;
+
+      turn++;
+      elTurn.textContent = String(turn);
+
+      if(turn > 10){
+        endTutorial();
+        return;
+      }
+
+      // story beat for this turn
+      setStoryBeat(turn);
+
+      // draw cards
+      playerCard = drawCard(playerDeck);
+      enemyCard = drawCard(enemyDeck);
+
+      // if for some reason we ran out, reshuffle
+      if(!playerCard){
+        playerDeck = shuffle(playerDeckOriginal);
+        playerCard = drawCard(playerDeck);
+      }
+      if(!enemyCard){
+        enemyDeck = shuffle(enemyDeckOriginal);
+        enemyCard = drawCard(enemyDeck);
+      }
+
+      // last turn special: enemy may be two threats (flavor only)
+      if(turn === 10){
+        // keep enemy card as drawn, but story implies multiple threats
+        logLine(`<span class="muted">Final gate stand — choose carefully.</span>`);
+      }
+
+      renderCards();
+      elResult.innerHTML = `<b>Turn ${turn}:</b> Two cards are drawn. <b>Choose a stat</b> to battle with.`;
+      logLine(`<b>Turn ${turn} draw:</b> You drew <b>${escapeHtml(playerCard.name)}</b> vs <b>${escapeHtml(enemyCard.name)}</b>.`);
+    }
+
+    function escapeHtml(s){
+      return String(s).replace(/[&<>"']/g, (m) => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+      }[m]));
+    }
+
+    // =========================
+    // Load user's saved deck (and skeleton deck)
+    // We'll use user's own saved deck as "player deck".
+    // Enemy deck is skeleton deck (saved) or fallback.
+    // =========================
+    let playerDeckOriginal = [];
+    let enemyDeckOriginal = [];
+
+    async function loadDecks(){
+      const uid = String(session.id);
+
+      // Try to use user's default deck for player
+      const decksSnap = await db.ref(`Decks/${uid}`).once("value");
+      const decks = decksSnap.val() || {};
+      const defaultKey = decks.defaultDeckKey || "humans";
+
+      const playerDeckSnap = await db.ref(PATH.deck(uid, defaultKey)).once("value");
+      const playerDeckData = playerDeckSnap.val();
+
+      // Player deck: take saved cards, filter empties, ensure at least something
+      const playerCards = (playerDeckData && Array.isArray(playerDeckData.cards)) ? playerDeckData.cards.filter(Boolean) : [];
+      playerDeckOriginal = playerCards.length ? playerCards : ["HUM_001","HUM_003","HUM_007","HUM_006","HUM_004","HUM_008","HUM_009","HUM_002","HUM_010","HUM_005"];
+
+      // Enemy deck: skeletons (tutorial theme)
+      const sklSnap = await db.ref(PATH.deck(uid, "skeletons")).once("value");
+      const sklData = sklSnap.val();
+      const sklCards = (sklData && Array.isArray(sklData.cards)) ? sklData.cards.filter(Boolean) : [];
+      enemyDeckOriginal = sklCards.length ? sklCards : FALLBACK_SKELETON_DECK;
+
+      // Ensure IDs exist in library (filter unknowns)
+      playerDeckOriginal = playerDeckOriginal.filter(id => !!CARD_LIBRARY[id]);
+      enemyDeckOriginal = enemyDeckOriginal.filter(id => !!CARD_LIBRARY[id]);
+
+      // If somehow empty, force fallback
+      if(playerDeckOriginal.length === 0) playerDeckOriginal = ["HUM_001","HUM_003","HUM_007","HUM_006","HUM_004","HUM_008","HUM_009","HUM_002","HUM_010","HUM_005"];
+      if(enemyDeckOriginal.length === 0) enemyDeckOriginal = FALLBACK_SKELETON_DECK;
+
+      logLine(`<span class="muted">Loaded your deck:</span> <b>${escapeHtml(defaultKey)}</b> (${playerDeckOriginal.length} cards).`);
+      logLine(`<span class="muted">Tutorial enemy deck:</span> <b>skeletons</b> (${enemyDeckOriginal.length} cards).`);
+    }
+
+    // =========================
+    // Start tutorial
+    // =========================
+    async function startTutorial(){
+      ensureAudio(); // unlock audio on click
+      if(started) return;
+
+      await loadDecks();
+
+      // Shuffle & set working decks
+      playerDeck = shuffle(playerDeckOriginal);
+      enemyDeck = shuffle(enemyDeckOriginal);
+
+      // reset state
+      started = true;
+      turn = 0;
+      wins = 0;
+      losses = 0;
+      elTurn.textContent = "0";
+      elWins.textContent = "0";
+      elLosses.textContent = "0";
+      elLog.innerHTML = "";
+
+      logLine(`<b>Night begins.</b> The village is quiet… until it isn’t.`);
+      toast("Tutorial started: choose stats to win.");
+      nextTurn();
+    }
+
+    document.getElementById("btnStart").addEventListener("click", startTutorial);
+
+    // Initial UI
+    renderCards();
+    logLine(`<span class="muted">Tip:</span> Press <b>Start Tutorial</b>. Then pick a stat each turn.`);
+  </script>
+</body>
+</html>

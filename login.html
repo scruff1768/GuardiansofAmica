@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Deckforge Arena — Login</title>
+
+  <style>
+    :root{
+      --bg0:#070a12;
+      --bg1:#0b1020;
+      --card: rgba(255,255,255,.06);
+      --stroke: rgba(255,255,255,.12);
+      --text:#eaf0ff;
+      --muted: rgba(234,240,255,.72);
+      --faint: rgba(234,240,255,.52);
+      --primary:#7c5cff;
+      --primary2:#23d5ff;
+      --good:#3dffb7;
+      --warn:#ffcc66;
+      --bad:#ff5577;
+      --shadow: 0 18px 60px rgba(0,0,0,.45);
+      --radius: 18px;
+      --radius2: 26px;
+      --max: 1120px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: var(--sans);
+      color: var(--text);
+      background: radial-gradient(1200px 800px at 25% 10%, rgba(124,92,255,.16), transparent 55%),
+                  radial-gradient(1200px 800px at 80% 20%, rgba(35,213,255,.13), transparent 55%),
+                  linear-gradient(180deg, var(--bg0), var(--bg1));
+      overflow-x:hidden;
+    }
+    a{ color: inherit; text-decoration:none; }
+    .container{ width: min(var(--max), calc(100% - 40px)); margin-inline:auto; }
+
+    /* Ambient background */
+    .bg{ position:fixed; inset:0; z-index:-1; }
+    .bg__grid{
+      position:absolute; inset:-2px;
+      background-image:
+        linear-gradient(to right, rgba(255,255,255,.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,.05) 1px, transparent 1px);
+      background-size: 70px 70px;
+      mask-image: radial-gradient(circle at 30% 20%, black 0 40%, transparent 70%);
+      opacity:.35;
+    }
+    .bg__glow{
+      position:absolute; width: 560px; height: 560px; border-radius: 999px;
+      filter: blur(40px);
+      opacity:.55;
+    }
+    .bg__glow--a{ left:-160px; top:-160px; background: rgba(124,92,255,.35); }
+    .bg__glow--b{ right:-180px; top:60px; background: rgba(35,213,255,.28); }
+    .bg__noise{
+      position:absolute; inset:0;
+      opacity:.06;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='260' height='260' filter='url(%23n)' opacity='.45'/%3E%3C/svg%3E");
+    }
+
+    /* Nav */
+    .nav{
+      position:sticky; top:0;
+      backdrop-filter: blur(14px);
+      background: rgba(7,10,18,.45);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      z-index:10;
+    }
+    .nav__inner{
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 16px 0;
+      gap: 16px;
+    }
+    .brand{ display:flex; align-items:center; gap: 12px; }
+    .brand__mark{
+      display:grid; place-items:center;
+      width: 36px; height: 36px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(124,92,255,.9), rgba(35,213,255,.75));
+      box-shadow: 0 10px 28px rgba(124,92,255,.22);
+      font-weight: 900;
+    }
+    .brand__name{ font-weight: 800; letter-spacing:.2px; }
+    .nav__actions{ display:flex; gap: 10px; }
+
+    /* Buttons */
+    .btn{
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 14px;
+      font-weight: 750;
+      letter-spacing:.2px;
+      cursor:pointer;
+      transition: transform .15s ease, background .15s ease, border-color .15s ease;
+    }
+    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.09); }
+    .btn:active{ transform: translateY(0px); }
+
+    .btn--primary{
+      border-color: rgba(124,92,255,.55);
+      background: linear-gradient(135deg, rgba(124,92,255,.95), rgba(35,213,255,.70));
+      box-shadow: 0 16px 46px rgba(124,92,255,.25);
+    }
+    .btn--ghost{ background: rgba(255,255,255,.04); }
+    .btn--full{ width:100%; padding: 12px 16px; border-radius: 16px; }
+
+    /* Card */
+    .wrap{ padding: 34px 0 44px; }
+    .card{
+      display:grid;
+      grid-template-columns: 1fr 1.1fr;
+      gap:0;
+      border-radius: var(--radius2);
+      overflow:hidden;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.04);
+      box-shadow: var(--shadow);
+    }
+    .left{
+      padding: 26px;
+      border-right: 1px solid rgba(255,255,255,.08);
+      background: radial-gradient(600px 300px at 20% 10%, rgba(124,92,255,.18), transparent 60%),
+                  radial-gradient(520px 320px at 85% 18%, rgba(35,213,255,.14), transparent 62%),
+                  rgba(0,0,0,.12);
+    }
+    .pill{
+      display:inline-flex; align-items:center; gap: 10px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      color: var(--muted);
+      font-weight: 650;
+      width: fit-content;
+    }
+    .pill__dot{
+      width: 8px; height: 8px; border-radius: 999px;
+      background: var(--good);
+      box-shadow: 0 0 0 4px rgba(61,255,183,.12);
+    }
+    .title{ margin: 14px 0 8px; font-size: 34px; letter-spacing:-.4px; }
+    .sub{ margin: 0 0 14px; color: var(--muted); line-height: 1.6; }
+
+    .sigil{
+      width: 58px; height:58px;
+      border-radius: 20px;
+      display:grid; place-items:center;
+      font-size: 26px;
+      background: linear-gradient(135deg, rgba(124,92,255,.55), rgba(35,213,255,.40));
+      border: 1px solid rgba(255,255,255,.14);
+      box-shadow: 0 16px 46px rgba(35,213,255,.10);
+      margin: 16px 0 10px;
+    }
+    .leftNote{ color: rgba(234,240,255,.82); line-height: 1.5; }
+
+    .right{ padding: 22px; }
+    .message{
+      margin: 0 0 12px;
+      min-height: 18px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .message.is-good{ color: rgba(61,255,183,.95); }
+    .message.is-bad{ color: rgba(255,85,119,.95); }
+    .message.is-warn{ color: rgba(255,204,102,.95); }
+
+    .field{ display:grid; gap: 6px; margin: 12px 0; }
+    label{ font-size: 12px; color: var(--faint); font-weight: 750; letter-spacing:.3px; text-transform: uppercase; }
+    input{
+      width:100%;
+      padding: 12px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(7,10,18,.35);
+      color: var(--text);
+      outline:none;
+    }
+    input::placeholder{ color: rgba(234,240,255,.40); }
+    input:focus{
+      border-color: rgba(124,92,255,.55);
+      box-shadow: 0 0 0 6px rgba(124,92,255,.12);
+    }
+
+    .rowEnd{
+      margin-top: 12px;
+      display:flex; justify-content:space-between; align-items:center;
+      gap: 12px; flex-wrap:wrap;
+    }
+    .fine{
+      margin: 10px 0 0;
+      color: rgba(234,240,255,.55);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .inlineLink{ color: rgba(35,213,255,.9); font-weight: 800; }
+    .inlineLink:hover{ text-decoration: underline; }
+
+    .divider{
+      margin: 16px 0 10px;
+      height: 1px;
+      background: rgba(255,255,255,.10);
+    }
+
+    .checkRow{
+      display:flex; align-items:center; gap: 10px;
+      margin: 8px 0 12px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .checkRow input{ width: 18px; height: 18px; }
+
+    @media (max-width: 980px){
+      .card{ grid-template-columns: 1fr; }
+      .left{ border-right:none; border-bottom: 1px solid rgba(255,255,255,.08); }
+    }
+  </style>
+
+  <!-- Firebase (v8) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+</head>
+
+<body>
+  <div class="bg">
+    <div class="bg__grid"></div>
+    <div class="bg__glow bg__glow--a"></div>
+    <div class="bg__glow bg__glow--b"></div>
+    <div class="bg__noise"></div>
+  </div>
+
+  <header class="nav">
+    <div class="nav__inner container">
+      <a class="brand" href="index.html" aria-label="Deckforge Arena">
+        <span class="brand__mark">?</span>
+        <span class="brand__name">Deckforge Arena</span>
+      </a>
+      <div class="nav__actions">
+        <a class="btn btn--ghost" href="register.html">Register</a>
+        <a class="btn btn--ghost" href="index.html">Home</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container wrap">
+    <div class="card">
+      <section class="left">
+        <div class="pill">
+          <span class="pill__dot"></span>
+          <span>Login • Load profile • Resume collection</span>
+        </div>
+        <h1 class="title">Welcome back</h1>
+        <p class="sub">
+          Log in with your <b>username</b> or <b>email</b>, then enter the arena.
+        </p>
+        <div class="sigil">?</div>
+        <div class="leftNote">
+          Pro tip: if you lose… it’s not you.<br/>
+          It’s your deck. Definitely your deck. ??
+        </div>
+      </section>
+
+      <section class="right">
+        <div id="authMessage" class="message" aria-live="polite"></div>
+
+        <div class="field">
+          <label for="loginUser">Username or Email</label>
+          <input id="loginUser" type="text" placeholder="Username or email" autocomplete="username" />
+        </div>
+
+        <div class="field">
+          <label for="loginPass">Password</label>
+          <input id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password" />
+        </div>
+
+        <div class="checkRow">
+          <input id="rememberMe" type="checkbox" checked />
+          <label for="rememberMe" style="text-transform:none; letter-spacing:0; font-size:13px; color:var(--muted); font-weight:650;">
+            Remember me on this device
+          </label>
+        </div>
+
+        <button class="btn btn--primary btn--full" type="button" id="loginBtn">
+          Login
+        </button>
+
+        <div class="divider"></div>
+
+        <div class="rowEnd">
+          <span class="fine">No account? <a class="inlineLink" href="register.html">Create one</a></span>
+          <button class="btn btn--ghost" type="button" id="logoutBtn" style="display:none;">Logout</button>
+        </div>
+
+        <p class="fine">
+          Session keys used: <span style="font-family:var(--mono)">amica_currentUser</span> and <span style="font-family:var(--mono)">amica_currentUserId</span>
+        </p>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    // ========= Firebase config (YOUR NEW PROJECT) =========
+    const firebaseConfig = {
+      apiKey: "AIzaSyDJHl2yCKbiiinesOZ9R_SROC51knmT9TQ",
+      authDomain: "goamica-7190c.firebaseapp.com",
+      databaseURL: "https://goamica-7190c-default-rtdb.firebaseio.com",
+      projectId: "goamica-7190c",
+      storageBucket: "goamica-7190c.firebasestorage.app",
+      messagingSenderId: "612907093027",
+      appId: "1:612907093027:web:2b7106adc9ba6b7b177596",
+      measurementId: "G-8DE8ST7LXR"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // ========= UI helper =========
+    function setMsg(msg, type){
+      const el = document.getElementById("authMessage");
+      el.classList.remove("is-good","is-bad","is-warn");
+      if(type === "good") el.classList.add("is-good");
+      if(type === "bad") el.classList.add("is-bad");
+      if(type === "warn") el.classList.add("is-warn");
+      el.textContent = msg || "";
+    }
+
+    // ========= Session helpers =========
+    function setSession(userId, userObj, remember){
+      if(remember){
+        localStorage.setItem("amica_currentUserId", String(userId));
+        localStorage.setItem("amica_currentUser", JSON.stringify(userObj));
+      } else {
+        // If not remembering, use sessionStorage
+        sessionStorage.setItem("amica_currentUserId", String(userId));
+        sessionStorage.setItem("amica_currentUser", JSON.stringify(userObj));
+        // Clear any previous persistent session
+        localStorage.removeItem("amica_currentUserId");
+        localStorage.removeItem("amica_currentUser");
+      }
+    }
+
+    function clearSession(){
+      localStorage.removeItem("amica_currentUserId");
+      localStorage.removeItem("amica_currentUser");
+      sessionStorage.removeItem("amica_currentUserId");
+      sessionStorage.removeItem("amica_currentUser");
+    }
+
+    function getSession(){
+      const id = localStorage.getItem("amica_currentUserId") || sessionStorage.getItem("amica_currentUserId");
+      const user = localStorage.getItem("amica_currentUser") || sessionStorage.getItem("amica_currentUser");
+      return { id, user: user ? JSON.parse(user) : null };
+    }
+
+    // ========= Login logic =========
+    async function login(){
+      try{
+        setMsg("", "");
+        const loginUser = document.getElementById("loginUser").value.trim();
+        const loginPass = document.getElementById("loginPass").value;
+        const remember  = document.getElementById("rememberMe").checked;
+
+        if(!loginUser || !loginPass){
+          setMsg("Please enter your username/email and password.", "warn");
+          return;
+        }
+
+        setMsg("Searching accounts…", "");
+
+        const accountsSnap = await db.ref("Account").once("value");
+        const accounts = accountsSnap.val() || {};
+
+        // Find matching account by Username OR Email (case-insensitive), then check Password
+        let foundId = null;
+        let foundUser = null;
+
+        const needle = loginUser.toLowerCase();
+
+        for(const id in accounts){
+          const acc = accounts[id];
+          if(!acc) continue;
+
+          const u = (acc.Username || "").toString().toLowerCase();
+          const e = (acc.Email || "").toString().toLowerCase();
+
+          if(u === needle || e === needle){
+            // match identity, now validate password
+            if(String(acc.Password || "") === String(loginPass)){
+              foundId = id;
+              foundUser = acc;
+              break;
+            } else {
+              // Identity matched but password incorrect — no need to keep looping
+              setMsg("Incorrect password.", "bad");
+              return;
+            }
+          }
+        }
+
+        if(!foundUser){
+          setMsg("Account not found. Check your username/email or register a new account.", "bad");
+          return;
+        }
+
+        setSession(foundId, foundUser, remember);
+
+        setMsg("Login successful! Entering the arena…", "good");
+
+        // Redirect — change later to hub.html / dashboard.html if needed
+        setTimeout(() => {
+          window.location.href = "index.html";
+        }, 700);
+
+      } catch(err){
+        console.error(err);
+        setMsg("Login failed: " + (err && err.message ? err.message : String(err)), "bad");
+      }
+    }
+
+    // ========= Logout UI (optional) =========
+    function refreshLogoutUI(){
+      const { id } = getSession();
+      const logoutBtn = document.getElementById("logoutBtn");
+      if(id){
+        logoutBtn.style.display = "inline-flex";
+      } else {
+        logoutBtn.style.display = "none";
+      }
+    }
+
+    document.getElementById("loginBtn").addEventListener("click", login);
+    document.getElementById("loginPass").addEventListener("keydown", (e) => {
+      if(e.key === "Enter") login();
+    });
+
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      clearSession();
+      setMsg("Logged out.", "good");
+      refreshLogoutUI();
+    });
+
+    // On load
+    refreshLogoutUI();
+  </script>
+</body>
+</html>

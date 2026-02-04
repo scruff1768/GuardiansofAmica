@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Deckforge Arena — Register</title>
+
+  <style>
+    :root{
+      --bg0:#070a12;
+      --bg1:#0b1020;
+      --text:#eaf0ff;
+      --muted: rgba(234,240,255,.72);
+      --primary:#7c5cff;
+      --primary2:#23d5ff;
+      --good:#3dffb7;
+      --bad:#ff5577;
+      --stroke: rgba(255,255,255,.14);
+      --card: rgba(255,255,255,.06);
+      --shadow: 0 18px 60px rgba(0,0,0,.45);
+      --r18:18px;
+      --r22:22px;
+      --r26:26px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      --max: 1050px;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: var(--sans);
+      color: var(--text);
+      background:
+        radial-gradient(1200px 800px at 25% 10%, rgba(124,92,255,.16), transparent 55%),
+        radial-gradient(1200px 800px at 80% 20%, rgba(35,213,255,.13), transparent 55%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 24px;
+    }
+    .wrap{ width:min(var(--max), 100%); display:grid; grid-template-columns: 1.1fr .9fr; gap: 16px; }
+    @media (max-width: 980px){ .wrap{ grid-template-columns: 1fr; } }
+
+    .panel{
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      border-radius: var(--r26);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .panel__head{
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.12);
+      display:flex; align-items:center; justify-content:space-between; gap: 10px; flex-wrap:wrap;
+    }
+    .brand{
+      display:flex; align-items:center; gap: 12px; font-weight:1000;
+      letter-spacing:-.3px;
+    }
+    .mark{
+      width: 38px; height: 38px;
+      border-radius: 14px;
+      display:grid; place-items:center;
+      background: linear-gradient(135deg, rgba(124,92,255,.92), rgba(35,213,255,.72));
+      box-shadow: 0 10px 28px rgba(124,92,255,.22);
+      font-weight:1000;
+    }
+    .pill{
+      font-family: var(--mono);
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(7,10,18,.25);
+      color: rgba(234,240,255,.90);
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      user-select:none;
+    }
+    .panel__body{ padding: 16px; }
+
+    h1{ margin:0; font-size: 22px; letter-spacing:-.4px; }
+    .sub{ margin: 8px 0 0; color: var(--muted); line-height: 1.6; }
+
+    form{ display:flex; flex-direction:column; gap: 12px; margin-top: 14px; }
+    .row{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 560px){ .row{ grid-template-columns: 1fr; } }
+
+    label{ font-weight: 900; font-size: 13px; color: rgba(234,240,255,.92); }
+    .field{
+      display:flex; flex-direction:column; gap: 6px;
+    }
+    input, select{
+      width:100%;
+      padding: 12px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.05);
+      color: var(--text);
+      outline:none;
+    }
+    input:focus, select:focus{
+      border-color: rgba(124,92,255,.55);
+      box-shadow: 0 0 0 5px rgba(124,92,255,.12);
+    }
+    .hint{ font-size: 12px; color: rgba(234,240,255,.70); line-height: 1.5; }
+
+    .checkRow{
+      display:flex; align-items:flex-start; gap: 10px;
+      padding: 10px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+    }
+    .checkRow input{ width:auto; margin-top: 3px; }
+
+    .btnRow{ display:flex; gap: 10px; flex-wrap:wrap; margin-top: 6px; }
+    .btn{
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      padding: 12px 14px;
+      border-radius: 16px;
+      font-weight: 1000;
+      cursor:pointer;
+      transition: transform .15s ease, background .15s ease, border-color .15s ease;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap: 8px;
+      user-select:none;
+      text-decoration:none;
+    }
+    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.09); }
+    .btn--primary{
+      border-color: rgba(124,92,255,.55);
+      background: linear-gradient(135deg, rgba(124,92,255,.95), rgba(35,213,255,.70));
+      box-shadow: 0 16px 46px rgba(124,92,255,.22);
+    }
+    .btn--ghost{ background: rgba(0,0,0,.10); }
+    .btn:disabled{ opacity:.55; cursor:not-allowed; transform:none; }
+
+    .side{
+      padding: 16px;
+      display:flex;
+      flex-direction:column;
+      gap: 12px;
+    }
+    .sideCard{
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      border-radius: var(--r22);
+      padding: 14px;
+      box-shadow: 0 18px 60px rgba(0,0,0,.25);
+    }
+    .sideCard h3{ margin:0; font-size: 15px; }
+    .sideCard p{ margin:8px 0 0; color: rgba(234,240,255,.78); line-height:1.6; }
+
+    .toast{
+      position:fixed;
+      left:50%;
+      transform: translateX(-50%);
+      bottom: 18px;
+      padding: 10px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(15,18,30,.92);
+      backdrop-filter: blur(14px);
+      box-shadow: var(--shadow);
+      color: rgba(234,240,255,.92);
+      display:none;
+      z-index:200;
+      max-width: min(980px, calc(100% - 40px));
+      white-space:pre-wrap;
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+  </style>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+</head>
+
+<body>
+  <div class="wrap">
+    <section class="panel">
+      <div class="panel__head">
+        <div class="brand">
+          <div class="mark">?</div>
+          <div>
+            <div style="font-size:15px;">Deckforge Arena</div>
+            <div style="font-size:12px; color:rgba(234,240,255,.72); font-family:var(--mono);">Create Account</div>
+          </div>
+        </div>
+        <span class="pill" id="statusPill">Status: ready</span>
+      </div>
+
+      <div class="panel__body">
+        <h1>Register</h1>
+        <p class="sub">
+          Start with <b>2 decks</b> unlocked (Humans + Skeletons). Demons + Ice Dwarfs unlock in Story Mode.
+        </p>
+
+        <form id="regForm" autocomplete="off">
+          <div class="row">
+            <div class="field">
+              <label for="firstname">First name</label>
+              <input id="firstname" type="text" placeholder="e.g. Yubeshin" />
+            </div>
+            <div class="field">
+              <label for="lastname">Last name</label>
+              <input id="lastname" type="text" placeholder="e.g. Moodley" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label for="email">Email</label>
+              <input id="email" type="email" placeholder="you@example.com" />
+            </div>
+            <div class="field">
+              <label for="username">Username</label>
+              <input id="username" type="text" placeholder="Choose a username" />
+              <div class="hint">No duplicates allowed.</div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label for="password">Password</label>
+              <input id="password" type="password" placeholder="Create a password" />
+              <div class="hint">For MVP this is stored in DB (later we’ll move to Firebase Auth).</div>
+            </div>
+            <div class="field">
+              <label for="Gender">Gender</label>
+              <select id="Gender">
+                <option value="">Select</option>
+                <option>Male</option>
+                <option>Female</option>
+                <option>Other</option>
+                <option>Prefer not to say</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label for="contactnumber">Contact number</label>
+              <input id="contactnumber" type="text" placeholder="+27..." />
+            </div>
+            <div class="field">
+              <label for="country">Country</label>
+              <input id="country" type="text" placeholder="South Africa" />
+            </div>
+          </div>
+
+          <div class="checkRow">
+            <input id="terms" type="checkbox" />
+            <div>
+              <div style="font-weight:1000;">I agree to the Terms & Conditions</div>
+              <div class="hint">You must accept to create an account.</div>
+            </div>
+          </div>
+
+          <div class="btnRow">
+            <button type="submit" class="btn btn--primary">Create Account</button>
+            <a class="btn btn--ghost" href="login.html">Back to Login</a>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <aside class="side">
+      <div class="sideCard">
+        <h3>What gets created in Firebase</h3>
+        <p>
+          <b>Account/&lt;id&gt;</b> (profile + stats),<br/>
+          <b>Collection/&lt;id&gt;</b> (unlocked cards map),<br/>
+          <b>Decks/&lt;id&gt;</b> (humans + skeletons starter decks).
+        </p>
+      </div>
+      <div class="sideCard">
+        <h3>Why this fixes “everything unlocked”</h3>
+        <p>
+          Your Deck Editor will now read a consistent unlock source:
+          <b>Collection/&lt;id&gt;/CARD_ID === true</b>.
+          Demons/Ice start as <b>false</b>.
+        </p>
+      </div>
+      <div class="sideCard">
+        <h3>Image naming rule</h3>
+        <p>
+          Put card images in <b>images/</b> named exactly like the card name:
+          <br/><b>images/Human Warrior.png</b>
+        </p>
+      </div>
+    </aside>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    /* =========================
+       FIREBASE INIT
+       ========================= */
+    const firebaseConfig = {
+      apiKey: "AIzaSyDJHl2yCKbiiinesOZ9R_SROC51knmT9TQ",
+      authDomain: "goamica-7190c.firebaseapp.com",
+      databaseURL: "https://goamica-7190c-default-rtdb.firebaseio.com",
+      projectId: "goamica-7190c",
+      storageBucket: "goamica-7190c.firebasestorage.app",
+      messagingSenderId: "612907093027",
+      appId: "1:612907093027:web:2b7106adc9ba6b7b177596",
+      measurementId: "G-8DE8ST7LXR"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    /* =========================
+       STARTER CARD IDS
+       ========================= */
+    const START_UNLOCKED = [
+      "HUM_001","HUM_002","HUM_003","HUM_004","HUM_005","HUM_006","HUM_007","HUM_008","HUM_009","HUM_010",
+      "SKL_001","SKL_002","SKL_003","SKL_004","SKL_005","SKL_006","SKL_007","SKL_008","SKL_009","SKL_010"
+    ];
+
+    const LOCKED_START = [
+      "DEM_001","DEM_002","DEM_003","DEM_004","DEM_005","DEM_006","DEM_007","DEM_008","DEM_009","DEM_010",
+      "ICE_001","ICE_002","ICE_003","ICE_004","ICE_005","ICE_006","ICE_007","ICE_008","ICE_009","ICE_010"
+    ];
+
+    const STARTER_DECKS = {
+      humans: ["HUM_001","HUM_002","HUM_003","HUM_004","HUM_005","HUM_006","HUM_007","HUM_008","HUM_009","HUM_010"],
+      skeletons: ["SKL_001","SKL_002","SKL_003","SKL_004","SKL_005","SKL_006","SKL_007","SKL_008","SKL_009","SKL_010"]
+    };
+
+    /* =========================
+       UI HELPERS
+       ========================= */
+    const toastEl = document.getElementById("toast");
+    const statusPill = document.getElementById("statusPill");
+    let toastTimer = null;
+
+    function toast(msg){
+      toastEl.textContent = msg;
+      toastEl.style.display = "block";
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toastEl.style.display = "none", 3200);
+    }
+    function setStatus(msg){
+      statusPill.textContent = "Status: " + msg;
+    }
+
+    /* =========================
+       REGISTER LOGIC
+       ========================= */
+    document.getElementById("regForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const firstname = document.getElementById("firstname").value.trim();
+      const lastname = document.getElementById("lastname").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value;
+      const terms = document.getElementById("terms").checked;
+      const gender = document.getElementById("Gender").value;
+      const contactnumber = document.getElementById("contactnumber").value.trim();
+      const country = document.getElementById("country").value.trim();
+
+      if(!firstname || !lastname || !email || !username || !password){
+        toast("Please fill in all required fields.");
+        return;
+      }
+      if(!terms){
+        toast("You must agree to the Terms and Conditions.");
+        return;
+      }
+
+      try{
+        setStatus("checking username…");
+
+        // 1) Check username uniqueness
+        const accountsSnap = await db.ref("Account").once("value");
+        const accounts = accountsSnap.val() || {};
+        for(const id in accounts){
+          const u = accounts[id]?.Username;
+          if(u && String(u).toLowerCase() === username.toLowerCase()){
+            toast("Username already exists. Choose a different one.");
+            setStatus("ready");
+            return;
+          }
+        }
+
+        setStatus("creating account id…");
+
+        // 2) Get nextId from Information/NumberofAccounts (create Information if missing)
+        const infoRef = db.ref("Information");
+        const infoSnap = await infoRef.once("value");
+        const info = infoSnap.val() || {};
+
+        let nextId = parseInt(info.NumberofAccounts, 10);
+        if(Number.isNaN(nextId)) nextId = 0;
+
+        setStatus("writing account…");
+
+        // 3) Write Account/<nextId>
+        await db.ref("Account/" + nextId).set({
+          ID: nextId,
+          Username: username,
+          Password: password, // MVP only — replace later with Firebase Auth
+          FirstName: firstname,
+          LastName: lastname,
+          Email: email,
+          TermsAccepted: true,
+          NumberofDecks: 2,
+          Sleeves: "",
+          Exp: "0",
+          DefaultDeck: "humans",
+          Unrankedwins: "0",
+          Unrankedlosses: "0",
+          Unrankedgames: "0",
+          Rankedwins: "0",
+          Rankedlosses: "0",
+          Rankedgames: "0",
+          MMR: "1000",
+          Gender: gender || "",
+          ContactNumber: contactnumber || "",
+          Country: country || ""
+        });
+
+        setStatus("creating collection…");
+
+        // 4) Create Collection/<nextId>
+        const collection = {};
+        START_UNLOCKED.forEach(id => collection[id] = true);
+        LOCKED_START.forEach(id => collection[id] = false);
+        await db.ref("Collection/" + nextId).set(collection);
+
+        setStatus("creating starter decks…");
+
+        // 5) Create Decks/<nextId>
+        await db.ref("Decks/" + nextId).set({
+          defaultDeckKey: "humans",
+          selectedDeckKey: "humans",
+          humans: { name: "Humans", cards: STARTER_DECKS.humans },
+          skeletons: { name: "Skeletons", cards: STARTER_DECKS.skeletons }
+        });
+
+        setStatus("updating counters…");
+
+        // 6) Update Information/NumberofAccounts
+        await infoRef.update({
+          NumberofAccounts: nextId + 1
+        });
+
+        toast("Account created successfully! Redirecting to login…");
+        setStatus("done");
+
+        setTimeout(() => window.location.href = "login.html", 900);
+
+      }catch(err){
+        console.error(err);
+        toast("Register failed: " + (err.message || err));
+        setStatus("error");
+      }
+    });
+  </script>
+</body>
+</html>

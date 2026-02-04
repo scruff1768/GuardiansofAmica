@@ -1,0 +1,820 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Deckforge Arena — Battle</title>
+
+  <style>
+    :root{
+      --bg0:#070a12;
+      --bg1:#0b1020;
+      --text:#eaf0ff;
+      --muted: rgba(234,240,255,.72);
+      --stroke: rgba(255,255,255,.14);
+      --card: rgba(255,255,255,.06);
+      --primary:#7c5cff;
+      --primary2:#23d5ff;
+      --good:#3dffb7;
+      --warn:#ffcc66;
+      --bad:#ff5577;
+      --shadow: 0 18px 60px rgba(0,0,0,.55);
+      --r18: 18px;
+      --r22: 22px;
+      --r26: 26px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      --max: 1280px;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: var(--sans);
+      color: var(--text);
+      background:
+        radial-gradient(1200px 800px at 25% 10%, rgba(124,92,255,.16), transparent 55%),
+        radial-gradient(1200px 800px at 80% 20%, rgba(35,213,255,.13), transparent 55%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      overflow-x:hidden;
+    }
+    .container{ width:min(var(--max), calc(100% - 40px)); margin-inline:auto; }
+
+    .nav{
+      position:sticky; top:0; z-index:10;
+      backdrop-filter: blur(14px);
+      background: rgba(7,10,18,.45);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .nav__inner{
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 14px 0; gap: 12px; flex-wrap:wrap;
+    }
+    .brand{ display:flex; align-items:center; gap: 12px; text-decoration:none; color:inherit; }
+    .mark{
+      width:36px; height:36px; border-radius:12px;
+      display:grid; place-items:center; font-weight:1000;
+      background: linear-gradient(135deg, rgba(124,92,255,.9), rgba(35,213,255,.75));
+      box-shadow: 0 10px 28px rgba(124,92,255,.22);
+    }
+    .brandName{ font-weight:1000; letter-spacing:.2px; }
+    .right{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+
+    .btn{
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 14px;
+      font-weight: 1000;
+      cursor:pointer;
+      transition: transform .15s ease, background .15s ease;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap: 8px;
+      text-decoration:none;
+      user-select:none;
+    }
+    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.09); }
+    .btn--primary{
+      border-color: rgba(124,92,255,.55);
+      background: linear-gradient(135deg, rgba(124,92,255,.95), rgba(35,213,255,.70));
+      box-shadow: 0 16px 46px rgba(124,92,255,.22);
+    }
+    .btn--danger{
+      border-color: rgba(255,85,119,.35);
+      background: rgba(255,85,119,.10);
+    }
+    .btn:disabled{ opacity:.55; cursor:not-allowed; transform:none; }
+
+    .pill{
+      font-family: var(--mono);
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(7,10,18,.25);
+      color: rgba(234,240,255,.90);
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      user-select:none;
+    }
+
+    .wrap{ padding: 18px 0 48px; }
+    h1{ margin:0; font-size: clamp(20px, 3vw, 34px); letter-spacing:-.6px; }
+    .sub{ margin: 10px 0 0; color: var(--muted); line-height:1.6; max-width: 110ch; }
+
+    .stageBanner{
+      margin-top: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: var(--r26);
+      overflow:hidden;
+      box-shadow: var(--shadow);
+      position:relative;
+      background: rgba(255,255,255,.03);
+    }
+    .stageBg{
+      position:absolute; inset:0;
+      background-size: cover;
+      background-position: center;
+      filter: saturate(1.05) contrast(1.02);
+      opacity: .55;
+    }
+    .stageOverlay{
+      position:absolute; inset:0;
+      background: linear-gradient(180deg, rgba(7,10,18,.65), rgba(7,10,18,.85));
+    }
+    .stageTop{
+      position:relative;
+      padding: 14px 14px 10px;
+      display:flex; justify-content:space-between; align-items:center; gap: 10px; flex-wrap:wrap;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .stageInfo{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    .scoreRow{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+
+    .battleGrid{
+      position:relative;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      padding: 14px;
+    }
+    @media (max-width: 980px){ .battleGrid{ grid-template-columns: 1fr; } }
+
+    .panel{
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      border-radius: var(--r22);
+      box-shadow: 0 18px 60px rgba(0,0,0,.25);
+      overflow:hidden;
+    }
+    .panelHead{
+      padding: 12px 12px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.12);
+      display:flex; justify-content:space-between; align-items:center; gap: 10px; flex-wrap:wrap;
+    }
+    .panelTitle{ font-weight:1000; display:flex; align-items:center; gap: 10px; }
+    .dot{ width:10px; height:10px; border-radius:999px; background: var(--good); box-shadow: 0 0 0 5px rgba(61,255,183,.10); }
+    .panelBody{ padding: 12px; }
+
+    .cardBig{
+      display:grid;
+      grid-template-columns: 140px 1fr;
+      gap: 12px;
+      align-items:center;
+    }
+    @media (max-width: 520px){ .cardBig{ grid-template-columns: 1fr; } }
+
+    .imgBox{
+      width: 140px; height: 140px;
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.18);
+      overflow:hidden;
+      display:grid;
+      place-items:center;
+    }
+    .imgBox img{ width:100%; height:100%; object-fit: cover; }
+    .name{ font-weight:1000; font-size: 18px; letter-spacing:-.3px; }
+    .meta{ display:flex; gap:6px; flex-wrap:wrap; margin-top: 6px; }
+    .badge{
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 5px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.10);
+      color: rgba(234,240,255,.9);
+      white-space:nowrap;
+    }
+
+    .statGrid{
+      margin-top: 10px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    @media (max-width: 520px){ .statGrid{ grid-template-columns: 1fr; } }
+
+    .statBtn{
+      padding: 10px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.05);
+      color: var(--text);
+      cursor:pointer;
+      font-weight:1000;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap: 10px;
+      transition: transform .15s ease, background .15s ease;
+      user-select:none;
+    }
+    .statBtn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.08); }
+    .statBtn:disabled{ opacity:.55; cursor:not-allowed; transform:none; }
+
+    .log{
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.14);
+      border-radius: 18px;
+      padding: 10px;
+      max-height: 220px;
+      overflow:auto;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: rgba(234,240,255,.82);
+      line-height: 1.55;
+    }
+
+    .toast{
+      position:fixed;
+      left:50%;
+      transform: translateX(-50%);
+      bottom: 18px;
+      padding: 10px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(15,18,30,.92);
+      backdrop-filter: blur(14px);
+      box-shadow: var(--shadow);
+      color: rgba(234,240,255,.92);
+      display:none;
+      z-index:200;
+      max-width: min(980px, calc(100% - 40px));
+      white-space:pre-wrap;
+    }
+
+    .resultOverlay{
+      position:fixed; inset:0;
+      background: rgba(0,0,0,.65);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding: 20px;
+      z-index: 999;
+    }
+    .resultCard{
+      width:min(760px, 100%);
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(15,18,30,.92);
+      border-radius: 26px;
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .resultHead{
+      padding: 14px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap: 10px;
+    }
+    .resultBody{ padding: 14px; }
+    .bigWin{ font-weight: 1000; font-size: 24px; letter-spacing:-.4px; }
+    .resultActions{ display:flex; gap:10px; flex-wrap:wrap; margin-top: 12px; }
+  </style>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+</head>
+
+<body>
+  <header class="nav">
+    <div class="nav__inner container">
+      <a class="brand" href="play.html">
+        <span class="mark">?</span>
+        <span class="brandName">Deckforge Arena</span>
+      </a>
+
+      <div class="right">
+        <span class="pill" id="pillStage">Loading…</span>
+        <a class="btn" id="btnBackChapters" href="play.html">Back to Chapters</a>
+        <a class="btn" href="mainmenu.html">Main Menu</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container wrap">
+    <h1 id="title">Battle</h1>
+    <p class="sub" id="subtitle">Loading battle…</p>
+
+    <section class="stageBanner">
+      <div class="stageBg" id="stageBg"></div>
+      <div class="stageOverlay"></div>
+
+      <div class="stageTop">
+        <div class="stageInfo">
+          <span class="pill" id="pillCampaign">—</span>
+          <span class="pill" id="pillChapter">—</span>
+          <span class="pill" id="pillTurn">Turn 1 / 10</span>
+        </div>
+        <div class="scoreRow">
+          <span class="pill">You: <b id="scoreYou">0</b></span>
+          <span class="pill">Enemy: <b id="scoreEnemy">0</b></span>
+        </div>
+      </div>
+
+      <div class="battleGrid">
+        <section class="panel">
+          <div class="panelHead">
+            <div class="panelTitle"><span class="dot"></span> Your Card</div>
+            <span class="pill" id="pillDeck">Deck: —</span>
+          </div>
+          <div class="panelBody">
+            <div class="cardBig">
+              <div class="imgBox" id="youImgBox"><img id="youImg" alt=""/></div>
+              <div>
+                <div class="name" id="youName">—</div>
+                <div class="meta" id="youMeta"></div>
+                <div class="statGrid" id="statButtons"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panelHead">
+            <div class="panelTitle"><span class="dot"></span> Enemy Card</div>
+            <span class="pill" id="pillEnemy">—</span>
+          </div>
+          <div class="panelBody">
+            <div class="cardBig">
+              <div class="imgBox" id="enemyImgBox"><img id="enemyImg" alt=""/></div>
+              <div>
+                <div class="name" id="enemyName">—</div>
+                <div class="meta" id="enemyMeta"></div>
+                <div class="sub" style="margin-top:10px;">
+                  Choose a stat on your card. Highest stat wins the round.
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" style="grid-column: 1 / -1;">
+          <div class="panelHead">
+            <div class="panelTitle"><span class="dot"></span> Battle Log</div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <button class="btn btn--primary" id="btnNextRound" disabled>Next Round</button>
+            </div>
+          </div>
+          <div class="panelBody">
+            <div class="log" id="log"></div>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <div class="resultOverlay" id="resultOverlay">
+    <div class="resultCard">
+      <div class="resultHead">
+        <div class="bigWin" id="resultTitle">Result</div>
+        <span class="pill" id="resultPill">—</span>
+      </div>
+      <div class="resultBody">
+        <div class="sub" id="resultText"></div>
+        <div class="resultActions">
+          <button class="btn btn--primary" id="btnReturnToPlay">Return to Chapters</button>
+          <a class="btn" href="mainmenu.html">Main Menu</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <audio id="sfxWin" src="images/sfx_win.mp3" preload="auto"></audio>
+  <audio id="sfxLose" src="images/sfx_lose.mp3" preload="auto"></audio>
+
+  <script>
+    /* =========================
+       FIREBASE INIT
+       ========================= */
+    const firebaseConfig = {
+      apiKey: "AIzaSyDJHl2yCKbiiinesOZ9R_SROC51knmT9TQ",
+      authDomain: "goamica-7190c.firebaseapp.com",
+      databaseURL: "https://goamica-7190c-default-rtdb.firebaseio.com",
+      projectId: "goamica-7190c",
+      storageBucket: "goamica-7190c.firebasestorage.app",
+      messagingSenderId: "612907093027",
+      appId: "1:612907093027:web:2b7106adc9ba6b7b177596",
+      measurementId: "G-8DE8ST7LXR"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    /* =========================
+       HELPERS
+       ========================= */
+    const toastEl = document.getElementById("toast");
+    let toastTimer = null;
+    function toast(msg){
+      toastEl.textContent = msg;
+      toastEl.style.display = "block";
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(()=> toastEl.style.display="none", 2600);
+    }
+    function pad2(n){ n = parseInt(n,10); return (n<10 ? "0"+n : ""+n); }
+    function imgPath(cardName){ return `images/${cardName}.png`; }
+
+    /* =========================
+       CARD CATALOG (must match your IDs)
+       Stats: power, defense, speed, magic
+       ========================= */
+    const CARDS = [
+      // Humans (starter)
+      {id:"HUM_001", name:"Human Warrior", archetype:"Humans", role:"Warrior", rarity:"Common", stats:{power:78, defense:62, speed:55, magic:20}},
+      {id:"HUM_002", name:"Human Farmer", archetype:"Humans", role:"Farmer", rarity:"Common", stats:{power:35, defense:45, speed:42, magic:15}},
+      {id:"HUM_003", name:"Human Archer", archetype:"Humans", role:"Archer", rarity:"Uncommon", stats:{power:58, defense:42, speed:72, magic:18}},
+      {id:"HUM_004", name:"Human Wizard", archetype:"Humans", role:"Wizard", rarity:"Rare", stats:{power:40, defense:35, speed:52, magic:80}},
+      {id:"HUM_005", name:"Human Elder Wizard", archetype:"Humans", role:"Elder Wizard", rarity:"Epic", stats:{power:52, defense:44, speed:49, magic:92}},
+      {id:"HUM_006", name:"Human Cleric", archetype:"Humans", role:"Cleric", rarity:"Rare", stats:{power:42, defense:60, speed:48, magic:76}},
+      {id:"HUM_007", name:"Human Knight", archetype:"Humans", role:"Knight", rarity:"Uncommon", stats:{power:68, defense:76, speed:46, magic:24}},
+      {id:"HUM_008", name:"Human Lancer", archetype:"Humans", role:"Lancer", rarity:"Uncommon", stats:{power:66, defense:56, speed:62, magic:20}},
+      {id:"HUM_009", name:"Human Blacksmith", archetype:"Humans", role:"Blacksmith", rarity:"Common", stats:{power:54, defense:64, speed:40, magic:10}},
+      {id:"HUM_010", name:"Human Astrologer", archetype:"Humans", role:"Astrologer", rarity:"Rare", stats:{power:38, defense:40, speed:50, magic:84}},
+
+      // Skeletons (starter)
+      {id:"SKL_001", name:"Skeleton Warrior", archetype:"Skeletons", role:"Warrior", rarity:"Common", stats:{power:70, defense:55, speed:58, magic:18}},
+      {id:"SKL_002", name:"Skeleton Knight", archetype:"Skeletons", role:"Knight", rarity:"Uncommon", stats:{power:64, defense:78, speed:45, magic:18}},
+      {id:"SKL_003", name:"Skeleton Archer", archetype:"Skeletons", role:"Archer", rarity:"Uncommon", stats:{power:54, defense:38, speed:74, magic:16}},
+      {id:"SKL_004", name:"Skeleton Wizard", archetype:"Skeletons", role:"Wizard", rarity:"Rare", stats:{power:36, defense:34, speed:50, magic:82}},
+      {id:"SKL_005", name:"Skeleton Elder Wizard", archetype:"Skeletons", role:"Elder Wizard", rarity:"Epic", stats:{power:48, defense:42, speed:48, magic:94}},
+      {id:"SKL_006", name:"Skeleton Cleric", archetype:"Skeletons", role:"Cleric", rarity:"Rare", stats:{power:40, defense:58, speed:46, magic:78}},
+      {id:"SKL_007", name:"Skeleton Lancer", archetype:"Skeletons", role:"Lancer", rarity:"Uncommon", stats:{power:62, defense:54, speed:60, magic:16}},
+      {id:"SKL_008", name:"Skeleton Blacksmith", archetype:"Skeletons", role:"Blacksmith", rarity:"Common", stats:{power:52, defense:62, speed:38, magic:10}},
+      {id:"SKL_009", name:"Skeleton Assassin", archetype:"Skeletons", role:"Assassin", rarity:"Rare", stats:{power:60, defense:40, speed:86, magic:20}},
+      {id:"SKL_010", name:"Skeleton Warden", archetype:"Skeletons", role:"Warden", rarity:"Rare", stats:{power:58, defense:72, speed:44, magic:26}},
+
+      // Demons (story)
+      {id:"DEM_01", name:"Demon Imp", archetype:"Demons", role:"Imp", rarity:"Common", stats:{power:46, defense:34, speed:70, magic:44}},
+      {id:"DEM_02", name:"Demon Brute", archetype:"Demons", role:"Brute", rarity:"Uncommon", stats:{power:86, defense:60, speed:42, magic:20}},
+      {id:"DEM_03", name:"Demon Hellhound", archetype:"Demons", role:"Beast", rarity:"Uncommon", stats:{power:72, defense:44, speed:78, magic:24}},
+      {id:"DEM_04", name:"Demon Warlock", archetype:"Demons", role:"Warlock", rarity:"Rare", stats:{power:52, defense:38, speed:50, magic:88}},
+      {id:"DEM_05", name:"Demon Succubus", archetype:"Demons", role:"Enchantress", rarity:"Rare", stats:{power:48, defense:40, speed:66, magic:84}},
+      {id:"DEM_06", name:"Demon Infernal Knight", archetype:"Demons", role:"Knight", rarity:"Epic", stats:{power:78, defense:86, speed:50, magic:42}},
+      {id:"DEM_07", name:"Demon Flame Lancer", archetype:"Demons", role:"Lancer", rarity:"Rare", stats:{power:74, defense:56, speed:70, magic:36}},
+      {id:"DEM_08", name:"Demon Ash Archer", archetype:"Demons", role:"Archer", rarity:"Uncommon", stats:{power:60, defense:40, speed:84, magic:30}},
+      {id:"DEM_09", name:"Demon Elder Warlock", archetype:"Demons", role:"Elder Warlock", rarity:"Epic", stats:{power:60, defense:48, speed:52, magic:96}},
+      {id:"DEM_10", name:"Demon Lord’s Herald", archetype:"Demons", role:"Herald", rarity:"Epic", stats:{power:70, defense:60, speed:58, magic:88}},
+
+      // Ice Dwarfs (story)
+      {id:"ICE_01", name:"Ice Dwarf Miner", archetype:"Ice Dwarfs", role:"Miner", rarity:"Common", stats:{power:44, defense:56, speed:38, magic:18}},
+      {id:"ICE_02", name:"Ice Dwarf Shieldbearer", archetype:"Ice Dwarfs", role:"Tank", rarity:"Uncommon", stats:{power:52, defense:86, speed:34, magic:16}},
+      {id:"ICE_03", name:"Ice Dwarf Axeguard", archetype:"Ice Dwarfs", role:"Warrior", rarity:"Uncommon", stats:{power:74, defense:70, speed:40, magic:12}},
+      {id:"ICE_04", name:"Ice Dwarf Runecaster", archetype:"Ice Dwarfs", role:"Runecaster", rarity:"Rare", stats:{power:50, defense:54, speed:44, magic:82}},
+      {id:"ICE_05", name:"Ice Dwarf Frost Archer", archetype:"Ice Dwarfs", role:"Archer", rarity:"Uncommon", stats:{power:56, defense:42, speed:78, magic:28}},
+      {id:"ICE_06", name:"Ice Dwarf Engineer", archetype:"Ice Dwarfs", role:"Engineer", rarity:"Rare", stats:{power:48, defense:60, speed:46, magic:74}},
+      {id:"ICE_07", name:"Ice Dwarf Hammer Knight", archetype:"Ice Dwarfs", role:"Knight", rarity:"Rare", stats:{power:72, defense:82, speed:40, magic:22}},
+      {id:"ICE_08", name:"Ice Dwarf Glacier Lancer", archetype:"Ice Dwarfs", role:"Lancer", rarity:"Rare", stats:{power:68, defense:62, speed:60, magic:26}},
+      {id:"ICE_09", name:"Ice Dwarf Elder Runelord", archetype:"Ice Dwarfs", role:"Elder", rarity:"Epic", stats:{power:58, defense:66, speed:48, magic:94}},
+      {id:"ICE_10", name:"Ice Dwarf Warden", archetype:"Ice Dwarfs", role:"Warden", rarity:"Epic", stats:{power:64, defense:84, speed:38, magic:36}},
+    ];
+
+    const CARD_BY_ID = Object.fromEntries(CARDS.map(c => [c.id, c]));
+
+    /* =========================
+       LOAD PAYLOAD FROM PLAY PAGE
+       ========================= */
+    const payloadRaw = sessionStorage.getItem("amica_battlePayload");
+    const payload = payloadRaw ? JSON.parse(payloadRaw) : null;
+
+    if(!payload || !payload.userId || !payload.deckCards || !payload.story){
+      document.getElementById("subtitle").textContent = "Battle payload missing. Go back to Play and pick a stage.";
+      toast("Missing battle payload. Returning to Play…");
+      setTimeout(() => window.location.href = "play.html?refresh="+Date.now(), 1200);
+      throw new Error("Missing payload");
+    }
+
+    const userId = String(payload.userId);
+    const deckKey = payload.deckKey || "humans";
+    const playerDeckIds = payload.deckCards; // MUST be 10 IDs
+    const story = payload.story;
+
+    // UI labels
+    document.getElementById("pillDeck").textContent = `Deck: ${deckKey}`;
+    document.getElementById("pillCampaign").textContent = story.campaignName || story.campaign;
+    document.getElementById("pillChapter").textContent = `Chapter ${story.chapter} • Stage ${story.stage}`;
+    document.getElementById("pillStage").textContent = `${(story.campaignName || story.campaign)} — C${story.chapter} S${story.stage}`;
+    document.getElementById("title").textContent = `${story.campaignName} — Chapter ${story.chapter}, Stage ${story.stage}`;
+    document.getElementById("subtitle").textContent =
+      `A patrol blocks your path. Choose your best stat each round. Win more rounds than the enemy to clear this stage.`;
+
+    // Background
+    const stageBg = document.getElementById("stageBg");
+    stageBg.style.backgroundImage = `url("${story.background || ""}")`;
+    // If missing, fallback to themed gradient look
+    stageBg.onerror = () => {};
+
+    // Make Back to Chapters always reload play page
+    document.getElementById("btnBackChapters").href = `play.html?refresh=${Date.now()}`;
+    document.getElementById("btnReturnToPlay").addEventListener("click", () => {
+      window.location.href = `play.html?refresh=${Date.now()}`;
+    });
+
+    /* =========================
+       BUILD ENEMY DECK (themed)
+       ========================= */
+    function buildEnemyDeck(){
+      const ch = parseInt(story.chapter,10);
+      const stage = parseInt(story.stage,10);
+
+      // Use campaign-specific pool
+      const pool = [];
+      if(story.campaign === "ice"){
+        for(let i=1;i<=10;i++) pool.push(`ICE_${pad2(i)}`);
+      }else if(story.campaign === "demon"){
+        for(let i=1;i<=10;i++) pool.push(`DEM_${pad2(i)}`);
+      }else{
+        // fallback: skeletons
+        for(let i=1;i<=10;i++) pool.push(`SKL_${pad2(i)}`);
+      }
+
+      // Make it feel like it escalates: bias towards higher IDs later chapters/stages
+      const bias = Math.min(9, Math.floor((ch-1) + (stage-1)/2));
+      const weighted = pool.flatMap((id, idx) => {
+        const w = 1 + Math.max(0, idx - (4 - bias)); // later cards appear more often
+        return Array(w).fill(id);
+      });
+
+      // Create 10 enemy cards
+      const enemy = [];
+      while(enemy.length < 10){
+        enemy.push(weighted[Math.floor(Math.random()*weighted.length)]);
+      }
+      return enemy;
+    }
+
+    const enemyDeckIds = buildEnemyDeck();
+
+    /* =========================
+       SHUFFLE + DRAW
+       ========================= */
+    function shuffle(arr){
+      const a = arr.slice();
+      for(let i=a.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    let playerDraw = shuffle(playerDeckIds);
+    let enemyDraw = shuffle(enemyDeckIds);
+
+    let turn = 1;
+    const maxTurns = 10;
+
+    let scoreYou = 0;
+    let scoreEnemy = 0;
+
+    let currentPlayerCard = null;
+    let currentEnemyCard = null;
+
+    let awaitingNext = false;
+
+    const youImg = document.getElementById("youImg");
+    const enemyImg = document.getElementById("enemyImg");
+    const youName = document.getElementById("youName");
+    const enemyName = document.getElementById("enemyName");
+    const youMeta = document.getElementById("youMeta");
+    const enemyMeta = document.getElementById("enemyMeta");
+    const statButtons = document.getElementById("statButtons");
+    const log = document.getElementById("log");
+
+    const pillTurn = document.getElementById("pillTurn");
+    const scoreYouEl = document.getElementById("scoreYou");
+    const scoreEnemyEl = document.getElementById("scoreEnemy");
+    const btnNextRound = document.getElementById("btnNextRound");
+
+    const sfxWin = document.getElementById("sfxWin");
+    const sfxLose = document.getElementById("sfxLose");
+
+    function safePlay(audio){
+      try{ audio.currentTime = 0; audio.play(); }catch(e){}
+    }
+
+    function setCardUI(card, side){
+      const metaHtml = `
+        <span class="badge">${card.archetype}</span>
+        <span class="badge">${card.rarity}</span>
+        <span class="badge">${card.role}</span>
+      `;
+      if(side === "you"){
+        youName.textContent = card.name;
+        youMeta.innerHTML = metaHtml;
+        const src = imgPath(card.name);
+        youImg.src = src;
+        youImg.onerror = () => {
+          youImg.removeAttribute("src");
+          document.getElementById("youImgBox").textContent = "—";
+          document.getElementById("youImgBox").style.fontFamily = "var(--mono)";
+          document.getElementById("youImgBox").style.color = "rgba(234,240,255,.75)";
+        };
+      }else{
+        enemyName.textContent = card.name;
+        enemyMeta.innerHTML = metaHtml;
+        const src = imgPath(card.name);
+        enemyImg.src = src;
+        enemyImg.onerror = () => {
+          enemyImg.removeAttribute("src");
+          document.getElementById("enemyImgBox").textContent = "—";
+          document.getElementById("enemyImgBox").style.fontFamily = "var(--mono)";
+          document.getElementById("enemyImgBox").style.color = "rgba(234,240,255,.75)";
+        };
+      }
+    }
+
+    function renderStatButtons(card){
+      statButtons.innerHTML = "";
+
+      const stats = card.stats;
+      const labels = [
+        {k:"power", name:"Power"},
+        {k:"defense", name:"Defense"},
+        {k:"speed", name:"Speed"},
+        {k:"magic", name:"Magic"}
+      ];
+
+      labels.forEach(({k,name}) => {
+        const btn = document.createElement("button");
+        btn.className = "statBtn";
+        btn.innerHTML = `<span>${name}</span><span class="pill">${stats[k]}</span>`;
+        btn.addEventListener("click", () => chooseStat(k, name));
+        statButtons.appendChild(btn);
+      });
+    }
+
+    function setButtonsLocked(locked){
+      const btns = statButtons.querySelectorAll("button.statBtn");
+      btns.forEach(b => b.disabled = locked);
+    }
+
+    function appendLog(line){
+      log.textContent += line + "\n";
+      log.scrollTop = log.scrollHeight;
+    }
+
+    function drawTurn(){
+      pillTurn.textContent = `Turn ${turn} / ${maxTurns}`;
+      btnNextRound.disabled = true;
+      awaitingNext = false;
+
+      const pid = playerDraw.shift();
+      const eid = enemyDraw.shift();
+
+      currentPlayerCard = CARD_BY_ID[pid];
+      currentEnemyCard = CARD_BY_ID[eid];
+
+      if(!currentPlayerCard){
+        toast("Player card missing in catalog: " + pid);
+        currentPlayerCard = {id:pid, name:pid, archetype:"Unknown", rarity:"?", role:"?", stats:{power:50,defense:50,speed:50,magic:50}};
+      }
+      if(!currentEnemyCard){
+        toast("Enemy card missing in catalog: " + eid);
+        currentEnemyCard = {id:eid, name:eid, archetype:"Unknown", rarity:"?", role:"?", stats:{power:50,defense:50,speed:50,magic:50}};
+      }
+
+      setCardUI(currentPlayerCard, "you");
+      setCardUI(currentEnemyCard, "enemy");
+      renderStatButtons(currentPlayerCard);
+
+      setButtonsLocked(false);
+
+      appendLog(`— Turn ${turn}: ${currentPlayerCard.name} vs ${currentEnemyCard.name}`);
+      appendLog(`Choose a stat…`);
+    }
+
+    function chooseStat(key, label){
+      if(awaitingNext) return;
+
+      // lock stat buttons for this round only
+      setButtonsLocked(true);
+
+      const p = currentPlayerCard.stats[key];
+      const e = currentEnemyCard.stats[key];
+
+      appendLog(`You chose ${label}: You ${p} vs Enemy ${e}`);
+
+      if(p > e){
+        scoreYou++;
+        appendLog(`Result: YOU WIN the round.`);
+      }else if(e > p){
+        scoreEnemy++;
+        appendLog(`Result: ENEMY wins the round.`);
+      }else{
+        appendLog(`Result: DRAW.`);
+      }
+
+      scoreYouEl.textContent = scoreYou;
+      scoreEnemyEl.textContent = scoreEnemy;
+
+      awaitingNext = true;
+      btnNextRound.disabled = false;
+    }
+
+    btnNextRound.addEventListener("click", async () => {
+      if(!awaitingNext) return;
+
+      turn++;
+      if(turn <= maxTurns){
+        drawTurn();
+        return;
+      }
+
+      // Battle ends after 10 turns
+      await endBattle();
+    });
+
+    /* =========================
+       STAGE COMPLETE -> SAVE PROGRESS
+       ========================= */
+    async function markStageComplete(){
+      const campaignKey = story.campaign;
+      const chapter = String(story.chapter);
+      const stage = String(story.stage);
+
+      const stageRef = db.ref(`Progress/${userId}/story/${campaignKey}/chapters/${chapter}/stages/${stage}`);
+      await stageRef.set(true);
+
+      // After writing current stage, check if chapter is complete (all 10 true)
+      const stagesSnap = await db.ref(`Progress/${userId}/story/${campaignKey}/chapters/${chapter}/stages`).once("value");
+      const stages = stagesSnap.val() || {};
+
+      let allDone = true;
+      for(let i=1;i<=10;i++){
+        if(stages[String(i)] !== true){ allDone = false; break; }
+      }
+
+      if(allDone){
+        await db.ref(`Progress/${userId}/story/${campaignKey}/chapters/${chapter}/completed`).set(true);
+
+        // unlock 1 card per chapter (ICE_0n or DEM_0n)
+        const unlockId = (campaignKey === "ice")
+          ? `ICE_${pad2(parseInt(chapter,10))}`
+          : `DEM_${pad2(parseInt(chapter,10))}`;
+
+        await db.ref(`Collection/${userId}/${unlockId}`).set(true);
+        appendLog(`Chapter cleared! Unlocked card: ${unlockId}`);
+      }
+    }
+
+    async function endBattle(){
+      const won = scoreYou > scoreEnemy;
+
+      // Show result overlay
+      const overlay = document.getElementById("resultOverlay");
+      const resultTitle = document.getElementById("resultTitle");
+      const resultPill = document.getElementById("resultPill");
+      const resultText = document.getElementById("resultText");
+
+      overlay.style.display = "flex";
+
+      if(won){
+        safePlay(sfxWin);
+        resultTitle.textContent = "Stage Cleared!";
+        resultPill.textContent = `WIN • ${scoreYou}–${scoreEnemy}`;
+        resultText.textContent =
+          `You drive the enemy back. The village breathes again.\n\n`+
+          `Progress is being recorded. Return to Chapters to see your stage marked as cleared.`;
+
+        try{
+          await markStageComplete();
+        }catch(err){
+          console.error(err);
+          toast("Could not save stage progress (check rules/console).");
+          resultText.textContent =
+            `You won, but progress could not be saved.\n`+
+            `Check Firebase rules / console errors, then try again.`;
+        }
+
+      }else{
+        safePlay(sfxLose);
+        resultTitle.textContent = "Defeat…";
+        resultPill.textContent = `LOSE • ${scoreYou}–${scoreEnemy}`;
+        resultText.textContent =
+          `The enemy overpowers you this time. Regroup, sharpen your deck, and return stronger.\n\n`+
+          `No progress was recorded for this stage.`;
+      }
+
+      // Return button always refreshes play page so it re-renders progress
+      document.getElementById("btnReturnToPlay").onclick = () => {
+        window.location.href = `play.html?refresh=${Date.now()}`;
+      };
+    }
+
+    /* =========================
+       START
+       ========================= */
+    appendLog(`Battle begins…`);
+    appendLog(`Campaign: ${story.campaignName} | Chapter ${story.chapter} | Stage ${story.stage}`);
+    appendLog(`Your deck: ${deckKey} (10 cards)`);
+    appendLog("");
+
+    // initial draw
+    drawTurn();
+  </script>
+</body>
+</html>

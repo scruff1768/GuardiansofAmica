@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Deckforge Arena — Ranked Battle</title>
+
+  <style>
+    :root{
+      --bg0:#070a12;
+      --bg1:#0b1020;
+      --text:#eaf0ff;
+      --muted: rgba(234,240,255,.72);
+      --primary:#7c5cff;
+      --primary2:#23d5ff;
+      --good:#3dffb7;
+      --shadow: 0 18px 60px rgba(0,0,0,.45);
+      --r26: 26px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      --max: 1280px;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: var(--sans);
+      color: var(--text);
+      background:
+        radial-gradient(1200px 800px at 25% 10%, rgba(124,92,255,.16), transparent 55%),
+        radial-gradient(1200px 800px at 80% 20%, rgba(35,213,255,.13), transparent 55%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      overflow-x:hidden;
+    }
+    .container{ width:min(var(--max), calc(100% - 40px)); margin-inline:auto; }
+
+    .nav{
+      position:sticky; top:0; z-index:10;
+      backdrop-filter: blur(14px);
+      background: rgba(7,10,18,.45);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .nav__inner{
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 16px 0; gap: 14px; flex-wrap:wrap;
+    }
+    .brand{ display:flex; align-items:center; gap: 12px; text-decoration:none; color:inherit; }
+    .brand__mark{
+      width:36px; height:36px; border-radius:12px;
+      display:grid; place-items:center; font-weight:1000;
+      background: linear-gradient(135deg, rgba(124,92,255,.9), rgba(35,213,255,.75));
+      box-shadow: 0 10px 28px rgba(124,92,255,.22);
+    }
+    .brand__name{ font-weight:1000; letter-spacing:.2px; }
+    .nav__right{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+
+    .chip{
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      color: rgba(234,240,255,.88);
+      font-weight: 800;
+      font-size: 13px;
+      display:inline-flex;
+      gap: 8px;
+      align-items:center;
+    }
+    .chip b{ font-family: var(--mono); font-weight: 1000; }
+
+    .btn{
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 14px;
+      font-weight: 1000;
+      cursor:pointer;
+      transition: transform .15s ease, background .15s ease, border-color .15s ease;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap: 8px;
+      text-decoration:none;
+      user-select:none;
+    }
+    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.09); }
+    .btn--primary{
+      border-color: rgba(124,92,255,.55);
+      background: linear-gradient(135deg, rgba(124,92,255,.95), rgba(35,213,255,.70));
+      box-shadow: 0 16px 46px rgba(124,92,255,.22);
+    }
+    .btn:disabled{ opacity:.55; cursor:not-allowed; transform:none; }
+
+    .wrap{ padding: 18px 0 46px; }
+    h1{ margin:0; font-size: clamp(22px, 3vw, 36px); letter-spacing:-.6px; }
+    .sub{ margin: 10px 0 0; color: var(--muted); line-height:1.6; max-width: 110ch; }
+
+    .panel{
+      margin-top: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      border-radius: var(--r26);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .panel__head{
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      display:flex; align-items:center; justify-content:space-between; gap: 10px;
+      background: rgba(0,0,0,.12);
+      flex-wrap:wrap;
+    }
+    .panel__title{ font-weight: 1000; display:flex; align-items:center; gap: 10px; }
+    .dot{ width:10px; height:10px; border-radius:999px; background: var(--good); box-shadow: 0 0 0 5px rgba(61,255,183,.10); }
+    .panel__body{ padding: 12px 14px 14px; }
+
+    .pill{
+      font-family: var(--mono);
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(7,10,18,.25);
+      color: rgba(234,240,255,.90);
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      user-select:none;
+    }
+
+    .banner{
+      padding: 10px 12px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      color: rgba(234,240,255,.86);
+      line-height: 1.5;
+    }
+
+    .row{
+      display:flex; gap: 10px; flex-wrap:wrap; align-items:center;
+    }
+
+    .toast{
+      position:fixed;
+      left:50%;
+      transform: translateX(-50%);
+      bottom: 18px;
+      padding: 10px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(15,18,30,.92);
+      backdrop-filter: blur(14px);
+      box-shadow: var(--shadow);
+      color: rgba(234,240,255,.92);
+      display:none;
+      z-index:200;
+      max-width: min(980px, calc(100% - 40px));
+      white-space:pre-wrap;
+    }
+  </style>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+</head>
+
+<body>
+<header class="nav">
+  <div class="nav__inner container">
+    <a class="brand" href="index.html">
+      <span class="brand__mark">?</span>
+      <span class="brand__name">Deckforge Arena</span>
+    </a>
+
+    <div class="nav__right">
+      <div class="chip">You: <b id="meName">—</b></div>
+      <div class="chip">Match: <b id="matchIdLabel">—</b></div>
+      <a class="btn" href="play.html">Back to Play</a>
+    </div>
+  </div>
+</header>
+
+<main class="container wrap">
+  <h1>Ranked Battle Lobby</h1>
+  <p class="sub" id="subLine">Connecting…</p>
+
+  <div class="panel">
+    <div class="panel__head">
+      <div class="panel__title"><span class="dot"></span> Lobby Ready Check</div>
+      <div class="row">
+        <span class="pill" id="phasePill">Phase: —</span>
+        <span class="pill" id="rolePill">role: —</span>
+      </div>
+    </div>
+    <div class="panel__body">
+      <div class="banner" id="statusBanner">Loading lobby state…</div>
+
+      <div class="row" style="margin-top:12px;">
+        <button class="btn btn--primary" id="btnReady" disabled>Ready</button>
+        <button class="btn" id="btnForceStart" disabled>Start Match (Host)</button>
+      </div>
+
+      <div class="row" style="margin-top:12px;">
+        <span class="pill" id="hostReadyPill">host ready: false</span>
+        <span class="pill" id="guestReadyPill">guest ready: false</span>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  /* =========================
+     FIREBASE INIT
+     ========================= */
+  const firebaseConfig = {
+    apiKey: "AIzaSyDJHl2yCKbiiinesOZ9R_SROC51knmT9TQ",
+    authDomain: "goamica-7190c.firebaseapp.com",
+    databaseURL: "https://goamica-7190c-default-rtdb.firebaseio.com",
+    projectId: "goamica-7190c",
+    storageBucket: "goamica-7190c.firebasestorage.app",
+    messagingSenderId: "612907093027",
+    appId: "1:612907093027:web:2b7106adc9ba6b7b177596",
+    measurementId: "G-8DE8ST7LXR"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  /* =========================
+     SESSION + MATCH ID
+     ========================= */
+  function getParam(name){
+    const url = new URL(window.location.href);
+    return url.searchParams.get(name);
+  }
+  function getSession(){
+    const id = localStorage.getItem("amica_currentUserId") || sessionStorage.getItem("amica_currentUserId");
+    const user = localStorage.getItem("amica_currentUser") || sessionStorage.getItem("amica_currentUser");
+    return { id, user: user ? JSON.parse(user) : null };
+  }
+
+  const session = getSession();
+  if(!session.id || !session.user){
+    window.location.href = "login.html";
+  }
+
+  const userId = String(session.id);
+  document.getElementById("meName").textContent = session.user.Username || "—";
+
+  const matchId = String(getParam("matchId") || "");
+  if(!matchId){
+    alert("Missing matchId.");
+    window.location.href = "play.html";
+  }
+  document.getElementById("matchIdLabel").textContent = matchId;
+
+  const matchRef = db.ref(`RankedMatches/${matchId}`);
+
+  /* =========================
+     UI
+     ========================= */
+  const toastEl = document.getElementById("toast");
+  let toastTimer = null;
+  function toast(msg){
+    toastEl.textContent = msg;
+    toastEl.style.display = "block";
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toastEl.style.display = "none", 2600);
+  }
+
+  const btnReady = document.getElementById("btnReady");
+  const btnForceStart = document.getElementById("btnForceStart");
+
+  const phasePill = document.getElementById("phasePill");
+  const rolePill = document.getElementById("rolePill");
+  const hostReadyPill = document.getElementById("hostReadyPill");
+  const guestReadyPill = document.getElementById("guestReadyPill");
+  const statusBanner = document.getElementById("statusBanner");
+  const subLine = document.getElementById("subLine");
+
+  function setPhase(p){ phasePill.textContent = `Phase: ${p}`; }
+  function setRole(r){ rolePill.textContent = `role: ${r}`; }
+  function setBanner(t){ statusBanner.textContent = t; }
+
+  /* =========================
+     READY MODEL (explicit)
+     ========================= */
+  let hostId = null;
+  let guestId = null;
+  let isHost = false;
+
+  async function pressReady(){
+    btnReady.disabled = true;
+
+    if(isHost){
+      await matchRef.update({ readyHost: true });
+      toast("Host ready ?");
+    } else {
+      await matchRef.update({ readyGuest: true });
+      toast("Guest ready ?");
+    }
+  }
+
+  async function startMatch(){
+    if(!isHost) return;
+
+    // only allow if both ready
+    const snap = await matchRef.once("value");
+    const m = snap.val() || {};
+    const readyHost = !!m.readyHost;
+    const readyGuest = !!m.readyGuest;
+
+    if(!(readyHost && readyGuest)){
+      toast("Both players must be ready first.");
+      return;
+    }
+
+    // move into actual battle page now
+    // IMPORTANT: your real ranked battle gameplay page can be "rankedbattle_play.html" later.
+    // For now, we keep rankedbattle.html as lobby; so we redirect into "rankedbattle_play.html".
+    // If you want to keep the same filename, tell me and I’ll merge lobby+battle.
+    window.location.href = `rankedbattle_play.html?matchId=${encodeURIComponent(matchId)}`;
+  }
+
+  btnReady.addEventListener("click", pressReady);
+  btnForceStart.addEventListener("click", startMatch);
+
+  /* =========================
+     INIT / LISTEN
+     ========================= */
+  async function init(){
+    const snap = await matchRef.once("value");
+    const m = snap.val();
+
+    if(!m){
+      alert("Match not found.");
+      window.location.href = "play.html";
+      return;
+    }
+
+    hostId = String(m.hostId);
+    guestId = String(m.guestId);
+    isHost = (userId === hostId);
+
+    setRole(isHost ? "host" : "guest");
+    subLine.textContent = "Lobby connected. Waiting for readiness…";
+
+    // Ensure explicit ready fields exist
+    const updates = {};
+    if(typeof m.readyHost === "undefined") updates.readyHost = false;
+    if(typeof m.readyGuest === "undefined") updates.readyGuest = false;
+    if(typeof m.phase === "undefined") updates.phase = "lobby";
+    if(Object.keys(updates).length) await matchRef.update(updates);
+
+    // Live listener
+    matchRef.on("value", (snap2) => {
+      const live = snap2.val() || {};
+      const phase = live.phase || "lobby";
+      setPhase(phase);
+
+      const readyHost = !!live.readyHost;
+      const readyGuest = !!live.readyGuest;
+
+      hostReadyPill.textContent = `host ready: ${readyHost}`;
+      guestReadyPill.textContent = `guest ready: ${readyGuest}`;
+
+      // Button rules:
+      // - ready is enabled if I haven't ready'd yet AND phase is lobby
+      // - host can start match only if both ready
+      if(isHost){
+        btnReady.disabled = readyHost || (phase !== "lobby");
+        btnForceStart.disabled = !(readyHost && readyGuest) || (phase !== "lobby");
+      } else {
+        btnReady.disabled = readyGuest || (phase !== "lobby");
+        btnForceStart.disabled = true;
+      }
+
+      if(readyHost && readyGuest){
+        setBanner("Both players ready ? Host can start the match.");
+      } else if(readyHost && !readyGuest){
+        setBanner("Host is ready ? Waiting for guest…");
+      } else if(!readyHost && readyGuest){
+        setBanner("Guest is ready ? Waiting for host…");
+      } else {
+        setBanner("Waiting for both players to press Ready…");
+      }
+    });
+  }
+
+  init();
+</script>
+</body>
+</html>

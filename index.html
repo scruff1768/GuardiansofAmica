@@ -1,0 +1,780 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Deckforge Arena — Main Menu</title>
+
+  <style>
+    :root{
+      --bg0:#070a12;
+      --bg1:#0b1020;
+      --card: rgba(255,255,255,.06);
+      --stroke: rgba(255,255,255,.12);
+      --text:#eaf0ff;
+      --muted: rgba(234,240,255,.72);
+      --faint: rgba(234,240,255,.52);
+      --primary:#7c5cff;
+      --primary2:#23d5ff;
+      --good:#3dffb7;
+      --warn:#ffcc66;
+      --bad:#ff5577;
+      --shadow: 0 18px 60px rgba(0,0,0,.45);
+      --radius: 18px;
+      --radius2: 26px;
+      --max: 1200px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: var(--sans);
+      color: var(--text);
+      background: radial-gradient(1200px 800px at 25% 10%, rgba(124,92,255,.16), transparent 55%),
+                  radial-gradient(1200px 800px at 80% 20%, rgba(35,213,255,.13), transparent 55%),
+                  linear-gradient(180deg, var(--bg0), var(--bg1));
+      overflow-x:hidden;
+    }
+
+    a{ color: inherit; text-decoration:none; }
+    .container{ width: min(var(--max), calc(100% - 40px)); margin-inline:auto; }
+
+    /* Ambient background */
+    .bg{ position:fixed; inset:0; z-index:-1; }
+    .bg__grid{
+      position:absolute; inset:-2px;
+      background-image:
+        linear-gradient(to right, rgba(255,255,255,.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,.05) 1px, transparent 1px);
+      background-size: 70px 70px;
+      mask-image: radial-gradient(circle at 30% 20%, black 0 40%, transparent 70%);
+      opacity:.35;
+    }
+    .bg__glow{
+      position:absolute; width: 560px; height: 560px; border-radius: 999px;
+      filter: blur(40px);
+      opacity:.55;
+    }
+    .bg__glow--a{ left:-160px; top:-160px; background: rgba(124,92,255,.35); }
+    .bg__glow--b{ right:-180px; top:60px; background: rgba(35,213,255,.28); }
+    .bg__noise{
+      position:absolute; inset:0;
+      opacity:.06;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='260' height='260' filter='url(%23n)' opacity='.45'/%3E%3C/svg%3E");
+    }
+
+    /* Nav */
+    .nav{
+      position:sticky; top:0;
+      backdrop-filter: blur(14px);
+      background: rgba(7,10,18,.45);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      z-index:10;
+    }
+    .nav__inner{
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 16px 0;
+      gap: 16px;
+    }
+    .brand{ display:flex; align-items:center; gap: 12px; }
+    .brand__mark{
+      display:grid; place-items:center;
+      width: 36px; height: 36px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(124,92,255,.9), rgba(35,213,255,.75));
+      box-shadow: 0 10px 28px rgba(124,92,255,.22);
+      font-weight: 900;
+    }
+    .brand__name{ font-weight: 800; letter-spacing:.2px; }
+    .nav__right{
+      display:flex; align-items:center; gap: 12px; flex-wrap:wrap;
+    }
+
+    .chip{
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      color: rgba(234,240,255,.88);
+      font-weight: 750;
+      font-size: 13px;
+    }
+    .chip b{ font-family: var(--mono); font-weight: 800; }
+
+    /* Buttons */
+    .btn{
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 14px;
+      font-weight: 750;
+      letter-spacing:.2px;
+      cursor:pointer;
+      transition: transform .15s ease, background .15s ease, border-color .15s ease;
+    }
+    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.09); }
+    .btn:active{ transform: translateY(0px); }
+    .btn--primary{
+      border-color: rgba(124,92,255,.55);
+      background: linear-gradient(135deg, rgba(124,92,255,.95), rgba(35,213,255,.70));
+      box-shadow: 0 16px 46px rgba(124,92,255,.25);
+    }
+    .btn--ghost{ background: rgba(255,255,255,.04); }
+    .btn--danger{
+      border-color: rgba(255,85,119,.38);
+      background: rgba(255,85,119,.10);
+    }
+
+    /* Layout */
+    .wrap{ padding: 26px 0 48px; }
+    .hero{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap: 18px;
+      margin-top: 14px;
+    }
+    .hero h1{
+      margin: 0 0 6px;
+      font-size: clamp(28px, 4.2vw, 44px);
+      letter-spacing: -0.6px;
+      line-height: 1.05;
+    }
+    .muted{ color: var(--muted); }
+    .hero p{ margin:0; max-width: 70ch; line-height: 1.6; }
+    .textGlow{
+      background: linear-gradient(90deg, rgba(124,92,255,1), rgba(35,213,255,1));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 24px rgba(124,92,255,.22);
+    }
+
+    .grid{
+      margin-top: 18px;
+      display:grid;
+      grid-template-columns: 1.25fr .75fr;
+      gap: 14px;
+      align-items:start;
+    }
+
+    .panel{
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .panel__head{
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      background: rgba(0,0,0,.10);
+    }
+    .panel__title{
+      font-weight: 900;
+      letter-spacing: .2px;
+      display:flex; align-items:center; gap: 10px;
+    }
+    .panel__title .dot{
+      width: 10px; height: 10px; border-radius: 999px;
+      background: var(--good);
+      box-shadow: 0 0 0 5px rgba(61,255,183,.10);
+    }
+    .panel__body{ padding: 14px 16px 16px; }
+
+    /* Menu cards */
+    .menuGrid{
+      display:grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    .menuCard{
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      border-radius: 18px;
+      padding: 14px;
+      cursor:pointer;
+      transition: transform .15s ease, background .15s ease, border-color .15s ease;
+      position:relative;
+      overflow:hidden;
+      min-height: 120px;
+    }
+    .menuCard:hover{
+      transform: translateY(-2px);
+      background: rgba(255,255,255,.07);
+      border-color: rgba(255,255,255,.18);
+    }
+    .menuCard::before{
+      content:"";
+      position:absolute; inset:-2px;
+      background:
+        radial-gradient(500px 220px at 20% 0%, rgba(124,92,255,.20), transparent 60%),
+        radial-gradient(520px 260px at 85% 30%, rgba(35,213,255,.14), transparent 60%);
+      opacity:.9;
+      pointer-events:none;
+    }
+    .menuCard > *{ position:relative; }
+    .menuCard__top{
+      display:flex; align-items:center; justify-content:space-between; gap: 10px;
+    }
+    .icon{
+      width: 40px; height: 40px;
+      border-radius: 14px;
+      display:grid; place-items:center;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.12);
+      font-size: 18px;
+    }
+    .menuCard__title{
+      margin: 10px 0 6px;
+      font-weight: 950;
+      letter-spacing: -0.2px;
+    }
+    .menuCard__desc{
+      margin:0;
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 13.5px;
+      max-width: 52ch;
+    }
+    .tagRow{
+      display:flex; gap: 8px; flex-wrap:wrap;
+      margin-top: 10px;
+    }
+    .tag{
+      font-family: var(--mono);
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(7,10,18,.25);
+      color: rgba(234,240,255,.88);
+    }
+
+    /* Sidebar */
+    .statList{ display:grid; gap: 10px; }
+    .statBox{
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      border-radius: 18px;
+      padding: 12px 14px;
+    }
+    .statLabel{
+      color: var(--faint);
+      font-size: 12px;
+      letter-spacing:.4px;
+      text-transform: uppercase;
+      font-weight: 800;
+    }
+    .statValue{
+      margin-top: 6px;
+      font-weight: 900;
+      display:flex; align-items:baseline; justify-content:space-between; gap: 10px;
+    }
+    .statValue span{ color: var(--muted); font-weight: 750; font-size: 13px; }
+    .bar{
+      margin-top: 10px;
+      height: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(7,10,18,.35);
+      overflow:hidden;
+    }
+    .bar > i{
+      display:block;
+      height:100%;
+      width: 55%;
+      background: linear-gradient(90deg, rgba(124,92,255,.95), rgba(35,213,255,.8));
+      border-radius: 999px;
+      box-shadow: 0 0 18px rgba(124,92,255,.20);
+    }
+
+    .smallActions{
+      margin-top: 12px;
+      display:flex; gap: 10px; flex-wrap:wrap;
+    }
+
+    /* Modal */
+    .modalOverlay{
+      position:fixed; inset:0;
+      background: rgba(0,0,0,.55);
+      display:none;
+      align-items:center; justify-content:center;
+      padding: 20px;
+      z-index:100;
+    }
+    .modal{
+      width: min(640px, 100%);
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(15,18,30,.92);
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .modal__head{
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255,255,255,.10);
+      display:flex; justify-content:space-between; align-items:center;
+      background: rgba(0,0,0,.12);
+      gap: 10px;
+    }
+    .modal__title{ font-weight: 950; }
+    .modal__body{ padding: 14px 16px 16px; color: var(--muted); line-height: 1.6; }
+    .modal__footer{
+      padding: 14px 16px;
+      border-top: 1px solid rgba(255,255,255,.10);
+      display:flex; gap: 10px; justify-content:flex-end; flex-wrap:wrap;
+      background: rgba(0,0,0,.10);
+    }
+
+    @media (max-width: 980px){
+      .grid{ grid-template-columns: 1fr; }
+      .menuGrid{ grid-template-columns: 1fr; }
+      .hero{ align-items:flex-start; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bg">
+    <div class="bg__grid"></div>
+    <div class="bg__glow bg__glow--a"></div>
+    <div class="bg__glow bg__glow--b"></div>
+    <div class="bg__noise"></div>
+  </div>
+
+  <header class="nav">
+    <div class="nav__inner container">
+      <div class="brand" aria-label="Deckforge Arena">
+        <span class="brand__mark">?</span>
+        <span class="brand__name">Deckforge Arena</span>
+      </div>
+
+      <div class="nav__right">
+        <div class="chip">Player: <b id="playerName">—</b></div>
+        <div class="chip">MMR: <b id="playerMMR">—</b></div>
+        <button class="btn btn--ghost" id="btnProfile">Profile</button>
+        <button class="btn btn--danger" id="btnLogout">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container wrap">
+    <section class="hero">
+      <div>
+        <h1>Welcome, <span class="textGlow" id="welcomeName">Champion</span>.</h1>
+        <p class="muted">
+          Choose your next move: build decks, manage your collection, or jump straight into a duel.
+          Remember… you don’t need luck. You need <b>better stat picks</b>.
+        </p>
+      </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="btn btn--primary" id="btnQuickPlay">Quick Play</button>
+        <button class="btn btn--ghost" id="btnDecks">Edit Decks</button>
+      </div>
+    </section>
+
+    <section class="grid">
+      <!-- MAIN MENU -->
+      <div class="panel">
+        <div class="panel__head">
+          <div class="panel__title"><span class="dot"></span> Main Menu</div>
+          <div class="muted" style="font-size:13px;">Logged-in Hub</div>
+        </div>
+        <div class="panel__body">
+          <div class="menuGrid">
+            <div class="menuCard" data-go="play">
+              <div class="menuCard__top">
+                <div class="icon">??</div>
+                <div class="tag">Recommended</div>
+              </div>
+              <div class="menuCard__title">Play</div>
+              <p class="menuCard__desc">Jump into Ranked, Unranked, or a Friend Duel. Choose stats. Win rounds.</p>
+              <div class="tagRow">
+                <span class="tag">Ranked</span><span class="tag">Unranked</span><span class="tag">Friend</span>
+              </div>
+            </div>
+
+            <div class="menuCard" data-go="decks">
+              <div class="menuCard__top">
+                <div class="icon">??</div>
+                <div class="tag">Core</div>
+              </div>
+              <div class="menuCard__title">Deck Builder</div>
+              <p class="menuCard__desc">Create decks, set a default, and tune archetype synergy.</p>
+              <div class="tagRow">
+                <span class="tag">Create</span><span class="tag">Edit</span><span class="tag">Default</span>
+              </div>
+            </div>
+
+            <div class="menuCard" data-go="collection">
+              <div class="menuCard__top">
+                <div class="icon">??</div>
+                <div class="tag">Loot</div>
+              </div>
+              <div class="menuCard__title">Collection</div>
+              <p class="menuCard__desc">View your cards. Filter by archetype, rarity, and stat strengths.</p>
+              <div class="tagRow">
+                <span class="tag">Archetypes</span><span class="tag">Rarity</span><span class="tag">Stats</span>
+              </div>
+            </div>
+
+            <div class="menuCard" data-go="tutorial">
+              <div class="menuCard__top">
+                <div class="icon">??</div>
+                <div class="tag">Learn</div>
+              </div>
+              <div class="menuCard__title">Tutorial</div>
+              <p class="menuCard__desc">Learn the duel rules, stat-pick strategy, and archetype basics.</p>
+              <div class="tagRow">
+                <span class="tag">How to Play</span><span class="tag">Strategy</span><span class="tag">Tips</span>
+              </div>
+            </div>
+
+            <div class="menuCard" data-go="shop">
+              <div class="menuCard__top">
+                <div class="icon">??</div>
+                <div class="tag">Soon</div>
+              </div>
+              <div class="menuCard__title">Packs & Shop</div>
+              <p class="menuCard__desc">Open packs, earn rewards, and expand your collection. (Placeholder for now.)</p>
+              <div class="tagRow">
+                <span class="tag">Packs</span><span class="tag">Rewards</span><span class="tag">Cosmetics</span>
+              </div>
+            </div>
+
+            <div class="menuCard" data-go="settings">
+              <div class="menuCard__top">
+                <div class="icon">??</div>
+                <div class="tag">Options</div>
+              </div>
+              <div class="menuCard__title">Settings</div>
+              <p class="menuCard__desc">Controls, audio, display, and account options. (Basic for now.)</p>
+              <div class="tagRow">
+                <span class="tag">Audio</span><span class="tag">UI</span><span class="tag">Account</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="smallActions">
+            <button class="btn btn--ghost" id="btnDaily">Daily Reward</button>
+            <button class="btn btn--ghost" id="btnNews">Patch Notes</button>
+            <button class="btn btn--ghost" id="btnSupport">Support</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SIDEBAR -->
+      <aside class="panel">
+        <div class="panel__head">
+          <div class="panel__title"><span class="dot"></span> Your Stats</div>
+          <div class="muted" style="font-size:13px;">Snapshot</div>
+        </div>
+        <div class="panel__body">
+          <div class="statList">
+            <div class="statBox">
+              <div class="statLabel">Ranked</div>
+              <div class="statValue">
+                <div><b id="rankedWL">0W / 0L</b></div>
+                <span id="rankedGames">0 games</span>
+              </div>
+              <div class="bar"><i id="rankedBar" style="width:55%"></i></div>
+            </div>
+
+            <div class="statBox">
+              <div class="statLabel">Unranked</div>
+              <div class="statValue">
+                <div><b id="unrankedWL">0W / 0L</b></div>
+                <span id="unrankedGames">0 games</span>
+              </div>
+              <div class="bar"><i id="unrankedBar" style="width:55%"></i></div>
+            </div>
+
+            <div class="statBox">
+              <div class="statLabel">Decks</div>
+              <div class="statValue">
+                <div><b id="deckCount">1</b></div>
+                <span>saved</span>
+              </div>
+              <div class="bar"><i id="deckBar" style="width:45%"></i></div>
+            </div>
+          </div>
+
+          <div class="smallActions">
+            <button class="btn btn--primary" id="btnPlayRanked">Play Ranked</button>
+            <button class="btn btn--ghost" id="btnPlayUnranked">Play Unranked</button>
+          </div>
+
+          <p class="muted" style="margin:12px 0 0; font-size:12px; line-height:1.5;">
+            Tip: If you’re losing consistently, it’s not “bad cards”. It’s your stat selection timing.
+          </p>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <!-- MODAL -->
+  <div class="modalOverlay" id="modalOverlay" role="dialog" aria-modal="true">
+    <div class="modal">
+      <div class="modal__head">
+        <div class="modal__title" id="modalTitle">Title</div>
+        <button class="btn btn--ghost" id="modalClose">Close</button>
+      </div>
+      <div class="modal__body" id="modalBody"></div>
+      <div class="modal__footer" id="modalFooter"></div>
+    </div>
+  </div>
+
+  <script>
+    // ========= Auth gate =========
+    function getSession(){
+      const id = localStorage.getItem("amica_currentUserId") || sessionStorage.getItem("amica_currentUserId");
+      const user = localStorage.getItem("amica_currentUser") || sessionStorage.getItem("amica_currentUser");
+      return { id, user: user ? JSON.parse(user) : null };
+    }
+
+    function requireLogin(){
+      const { id, user } = getSession();
+      if(!id || !user){
+        // Not logged in -> go login
+        window.location.href = "login.html";
+        return null;
+      }
+      return { id, user };
+    }
+
+    function clearSession(){
+      localStorage.removeItem("amica_currentUserId");
+      localStorage.removeItem("amica_currentUser");
+      sessionStorage.removeItem("amica_currentUserId");
+      sessionStorage.removeItem("amica_currentUser");
+    }
+
+    // ========= Modal =========
+    const overlay = document.getElementById("modalOverlay");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalBody = document.getElementById("modalBody");
+    const modalFooter = document.getElementById("modalFooter");
+
+    function openModal(title, bodyHtml, footerButtonsHtml){
+      modalTitle.textContent = title;
+      modalBody.innerHTML = bodyHtml || "";
+      modalFooter.innerHTML = footerButtonsHtml || "";
+      overlay.style.display = "flex";
+    }
+    function closeModal(){ overlay.style.display = "none"; }
+    document.getElementById("modalClose").addEventListener("click", closeModal);
+    overlay.addEventListener("click", (e) => { if(e.target === overlay) closeModal(); });
+
+    // ========= Populate UI =========
+    const session = requireLogin();
+    if(session){
+      const user = session.user;
+
+      const displayName = user.Username || user.FirstName || "Champion";
+      const mmr = user.MMR || "1000";
+
+      document.getElementById("playerName").textContent = displayName;
+      document.getElementById("welcomeName").textContent = displayName;
+      document.getElementById("playerMMR").textContent = mmr;
+
+      // Stats
+      const rw = parseInt(user.Rankedwins || "0", 10);
+      const rl = parseInt(user.Rankedlosses || "0", 10);
+      const rg = parseInt(user.Rankedgames || "0", 10);
+
+      const uw = parseInt(user.Unrankedwins || "0", 10);
+      const ul = parseInt(user.Unrankedlosses || "0", 10);
+      const ug = parseInt(user.Unrankedgames || "0", 10);
+
+      const decks = parseInt(user.NumberofDecks || "1", 10);
+
+      document.getElementById("rankedWL").textContent = `${rw}W / ${rl}L`;
+      document.getElementById("rankedGames").textContent = `${rg} games`;
+
+      document.getElementById("unrankedWL").textContent = `${uw}W / ${ul}L`;
+      document.getElementById("unrankedGames").textContent = `${ug} games`;
+
+      document.getElementById("deckCount").textContent = String(decks);
+
+      // Simple progress visuals (just for vibe)
+      function pct(w,l){
+        const total = w + l;
+        if(total <= 0) return 50;
+        return Math.max(10, Math.min(90, Math.round((w/total)*100)));
+      }
+      document.getElementById("rankedBar").style.width = pct(rw, rl) + "%";
+      document.getElementById("unrankedBar").style.width = pct(uw, ul) + "%";
+      document.getElementById("deckBar").style.width = Math.max(15, Math.min(90, decks * 15)) + "%";
+    }
+
+    // ========= Navigation handlers =========
+    function go(page){
+      // These pages can be created next. For now, show modal placeholders.
+      const map = {
+        play: {
+          title: "Play",
+          body: `
+            <p><b>Choose a mode:</b></p>
+            <ul>
+              <li><b>Ranked:</b> MMR changes, tougher opponents.</li>
+              <li><b>Unranked:</b> practice & test decks.</li>
+              <li><b>Friend Duel:</b> challenge a friend code (later).</li>
+            </ul>
+            <p class="muted">We’ll build the actual matchmaking page next.</p>
+          `,
+          footer: `
+            <button class="btn btn--primary" onclick="location.href='play.html?mode=ranked'">Ranked</button>
+            <button class="btn btn--ghost" onclick="location.href='play.html?mode=unranked'">Unranked</button>
+            <button class="btn btn--ghost" onclick="location.href='play.html?mode=friend'">Friend Duel</button>
+          `
+        },
+        decks: {
+          title: "Deck Builder",
+          body: `
+            <p><b>Deck management:</b></p>
+            <ul>
+              <li>Create a new deck</li>
+              <li>Edit cards and archetype</li>
+              <li>Set default deck for duels</li>
+            </ul>
+            <p class="muted">Next step: we’ll create <b>decks.html</b> and write DB structure: <code>Decks/{userId}/{deckId}</code>.</p>
+          `,
+          footer: `
+            <button class="btn btn--primary" onclick="location.href='decks.html'">Open Deck Builder</button>
+            <button class="btn btn--ghost" onclick="closeModal()">Later</button>
+          `
+        },
+        collection: {
+          title: "Collection",
+          body: `
+            <p>View your owned cards and filter by:</p>
+            <ul>
+              <li>Archetype</li>
+              <li>Rarity</li>
+              <li>Highest stat focus</li>
+            </ul>
+            <p class="muted">Next step: we’ll create <b>collection.html</b> and store cards under <code>Collection/{userId}</code>.</p>
+          `,
+          footer: `
+            <button class="btn btn--primary" onclick="location.href='collection.html'">Open Collection</button>
+            <button class="btn btn--ghost" onclick="closeModal()">Close</button>
+          `
+        },
+        tutorial: {
+          title: "Tutorial",
+          body: `
+            <p><b>How the duel works:</b></p>
+            <ol>
+              <li>Each round: both players reveal a card.</li>
+              <li>The current player chooses which stat to battle.</li>
+              <li>Higher stat wins the round (ties can be “draw” or “replay”).</li>
+              <li>Win enough rounds to win the match.</li>
+            </ol>
+            <p class="muted">Next step: tutorial.html with visuals and examples.</p>
+          `,
+          footer: `
+            <button class="btn btn--primary" onclick="location.href='tutorial.html'">Open Tutorial</button>
+            <button class="btn btn--ghost" onclick="closeModal()">Close</button>
+          `
+        },
+        shop: {
+          title: "Packs & Shop",
+          body: `
+            <p>This will handle:</p>
+            <ul>
+              <li>Packs (common/rare/epic)</li>
+              <li>Daily rewards</li>
+              <li>Cosmetics (sleeves, avatars)</li>
+            </ul>
+            <p class="muted">We’ll build this after Collection + Deck Builder.</p>
+          `,
+          footer: `
+            <button class="btn btn--ghost" onclick="closeModal()">Okay</button>
+          `
+        },
+        settings: {
+          title: "Settings",
+          body: `
+            <p>Planned settings:</p>
+            <ul>
+              <li>Audio (music/sfx)</li>
+              <li>UI density</li>
+              <li>Account options</li>
+            </ul>
+            <p class="muted">We’ll create settings.html next if you want.</p>
+          `,
+          footer: `
+            <button class="btn btn--primary" onclick="location.href='settings.html'">Open Settings</button>
+            <button class="btn btn--ghost" onclick="closeModal()">Close</button>
+          `
+        }
+      };
+
+      if(map[page]){
+        openModal(map[page].title, map[page].body, map[page].footer);
+      } else {
+        openModal("Not wired yet", "<p class='muted'>This option isn’t wired yet.</p>", `<button class="btn btn--ghost" onclick="closeModal()">Close</button>`);
+      }
+    }
+
+    // Menu card click
+    document.querySelectorAll(".menuCard").forEach(card => {
+      card.addEventListener("click", () => go(card.dataset.go));
+    });
+
+    // Quick buttons
+    document.getElementById("btnQuickPlay").addEventListener("click", () => go("play"));
+    document.getElementById("btnDecks").addEventListener("click", () => go("decks"));
+    document.getElementById("btnPlayRanked").addEventListener("click", () => go("play"));
+    document.getElementById("btnPlayUnranked").addEventListener("click", () => go("play"));
+
+    // Top bar profile button (simple modal for now)
+    document.getElementById("btnProfile").addEventListener("click", () => {
+      const s = getSession();
+      const u = s.user || {};
+      openModal(
+        "Profile",
+        `
+          <p><b>Username:</b> ${u.Username || "—"}</p>
+          <p><b>Email:</b> ${u.Email || "—"}</p>
+          <p><b>MMR:</b> ${u.MMR || "1000"}</p>
+          <p><b>Ranked:</b> ${u.Rankedwins || "0"}W / ${u.Rankedlosses || "0"}L (${u.Rankedgames || "0"} games)</p>
+          <p><b>Unranked:</b> ${u.Unrankedwins || "0"}W / ${u.Unrankedlosses || "0"}L (${u.Unrankedgames || "0"} games)</p>
+          <p class="muted" style="font-size:12px;">Later we’ll load fresh stats from Firebase in realtime.</p>
+        `,
+        `<button class="btn btn--ghost" onclick="closeModal()">Close</button>`
+      );
+    });
+
+    // Small extras (placeholders)
+    document.getElementById("btnDaily").addEventListener("click", () => {
+      openModal("Daily Reward", "<p>Daily rewards will live here (coins, pack, cosmetic). For now: <b>+0</b> because we haven’t implemented the economy yet ??</p>", `<button class="btn btn--ghost" onclick="closeModal()">Close</button>`);
+    });
+    document.getElementById("btnNews").addEventListener("click", () => {
+      openModal("Patch Notes", "<p>Patch notes page coming soon. We’ll store them under <code>News/</code> in the database later.</p>", `<button class="btn btn--ghost" onclick="closeModal()">Close</button>`);
+    });
+    document.getElementById("btnSupport").addEventListener("click", () => {
+      openModal("Support", "<p>Support page coming soon. We can add a contact form and store support tickets under <code>SupportTickets/</code>.</p>", `<button class="btn btn--ghost" onclick="closeModal()">Close</button>`);
+    });
+
+    // Logout
+    document.getElementById("btnLogout").addEventListener("click", () => {
+      clearSession();
+      window.location.href = "login.html";
+    });
+
+    // Expose closeModal for inline modal buttons
+    window.closeModal = closeModal;
+  </script>
+</body>
+</html>

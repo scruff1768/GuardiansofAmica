@@ -1,0 +1,853 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Deckforge Arena — Decks</title>
+
+  <style>
+    :root{
+      --bg0:#070a12;
+      --bg1:#0b1020;
+      --card: rgba(255,255,255,.06);
+      --stroke: rgba(255,255,255,.14);
+      --text:#eaf0ff;
+      --muted: rgba(234,240,255,.72);
+      --primary:#7c5cff;
+      --primary2:#23d5ff;
+      --good:#3dffb7;
+      --warn:#ffcc66;
+      --bad:#ff5577;
+      --shadow: 0 18px 60px rgba(0,0,0,.45);
+      --r14: 14px;
+      --r18: 18px;
+      --r22: 22px;
+      --r26: 26px;
+      --max: 1280px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: var(--sans);
+      color: var(--text);
+      background:
+        radial-gradient(1200px 800px at 25% 10%, rgba(124,92,255,.16), transparent 55%),
+        radial-gradient(1200px 800px at 80% 20%, rgba(35,213,255,.13), transparent 55%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      overflow-x:hidden;
+    }
+    .container{ width:min(var(--max), calc(100% - 40px)); margin-inline:auto; }
+
+    .nav{
+      position:sticky; top:0; z-index:10;
+      backdrop-filter: blur(14px);
+      background: rgba(7,10,18,.45);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .nav__inner{
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 16px 0; gap: 14px; flex-wrap:wrap;
+    }
+    .brand{ display:flex; align-items:center; gap: 12px; text-decoration:none; color:inherit; }
+    .brand__mark{
+      width:36px; height:36px; border-radius:12px;
+      display:grid; place-items:center; font-weight:1000;
+      background: linear-gradient(135deg, rgba(124,92,255,.9), rgba(35,213,255,.75));
+      box-shadow: 0 10px 28px rgba(124,92,255,.22);
+    }
+    .brand__name{ font-weight:1000; letter-spacing:.2px; }
+    .nav__right{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+
+    .chip{
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      color: rgba(234,240,255,.88);
+      font-weight: 800;
+      font-size: 13px;
+      display:inline-flex;
+      gap: 8px;
+      align-items:center;
+    }
+    .chip b{ font-family: var(--mono); font-weight: 1000; }
+
+    .btn{
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 14px;
+      font-weight: 1000;
+      cursor:pointer;
+      transition: transform .15s ease, background .15s ease, border-color .15s ease;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap: 8px;
+      text-decoration:none;
+      user-select:none;
+    }
+    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.09); }
+    .btn--primary{
+      border-color: rgba(124,92,255,.55);
+      background: linear-gradient(135deg, rgba(124,92,255,.95), rgba(35,213,255,.70));
+      box-shadow: 0 16px 46px rgba(124,92,255,.22);
+    }
+    .btn--danger{
+      border-color: rgba(255,85,119,.38);
+      background: rgba(255,85,119,.10);
+    }
+    .btn:disabled{ opacity:.55; cursor:not-allowed; transform:none; }
+
+    .wrap{ padding: 18px 0 46px; }
+    h1{ margin:0; font-size: clamp(22px, 3vw, 36px); letter-spacing:-.6px; }
+    .sub{ margin: 10px 0 0; color: var(--muted); line-height:1.6; max-width: 110ch; }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 14px;
+      margin-top: 16px;
+      align-items:start;
+    }
+    @media (max-width: 980px){ .grid{ grid-template-columns: 1fr; } }
+
+    .panel{
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      border-radius: var(--r26);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .panel__head{
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      display:flex; align-items:center; justify-content:space-between; gap: 10px;
+      background: rgba(0,0,0,.12);
+      flex-wrap:wrap;
+    }
+    .panel__title{ font-weight: 1000; display:flex; align-items:center; gap: 10px; }
+    .dot{ width:10px; height:10px; border-radius:999px; background: var(--good); box-shadow: 0 0 0 5px rgba(61,255,183,.10); }
+    .panel__body{ padding: 12px 14px 14px; }
+
+    .pill{
+      font-family: var(--mono);
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(7,10,18,.25);
+      color: rgba(234,240,255,.90);
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      user-select:none;
+    }
+
+    .deckTabs{
+      display:flex; gap:10px; flex-wrap:wrap;
+      margin-bottom: 10px;
+    }
+    .tab{
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.05);
+      cursor:pointer;
+      font-weight: 1000;
+    }
+    .tab.active{
+      border-color: rgba(124,92,255,.55);
+      background: rgba(124,92,255,.16);
+    }
+
+    .twoCol{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 760px){ .twoCol{ grid-template-columns:1fr; } }
+
+    .cardGrid{
+      display:grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+    @media (max-width: 520px){ .cardGrid{ grid-template-columns:1fr; } }
+
+    .cardTile{
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      border-radius: 18px;
+      padding: 10px;
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      cursor:pointer;
+      transition: transform .15s ease, background .15s ease, border-color .15s ease;
+      position:relative;
+      overflow:hidden;
+    }
+    .cardTile:hover{ transform: translateY(-1px); background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.18); }
+    .cardTile.locked{ opacity:.5; cursor:not-allowed; }
+    .thumb{
+      width: 58px; height: 58px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.12);
+      display:grid;
+      place-items:center;
+      overflow:hidden;
+      flex: 0 0 auto;
+    }
+    .thumb img{ width: 100%; height: 100%; object-fit: cover; }
+    .tileInfo{ display:flex; flex-direction:column; gap: 4px; }
+    .tileName{ font-weight: 1000; letter-spacing:-.2px; }
+    .tileMeta{ display:flex; gap: 6px; flex-wrap:wrap; }
+    .small{
+      font-size: 12px;
+      color: rgba(234,240,255,.78);
+      font-family: var(--mono);
+    }
+
+    .deckSlot{
+      border: 1px dashed rgba(255,255,255,.18);
+      background: rgba(255,255,255,.03);
+      border-radius: 18px;
+      padding: 10px;
+      min-height: 92px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+    }
+    .deckSlot.filled{
+      border-style: solid;
+      background: rgba(255,255,255,.05);
+    }
+    .deckSlot .left{ display:flex; gap:10px; align-items:center; }
+    .slotNum{
+      width:32px; height:32px;
+      border-radius: 12px;
+      display:grid; place-items:center;
+      font-family: var(--mono);
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.12);
+      font-weight:1000;
+    }
+    .slotName{ font-weight: 1000; }
+    .slotBtns{ display:flex; gap:8px; }
+    .miniBtn{
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      padding: 8px 10px;
+      border-radius: 12px;
+      font-weight: 1000;
+      cursor:pointer;
+    }
+    .miniBtn:hover{ background: rgba(255,255,255,.08); }
+    .miniBtn:disabled{ opacity:.55; cursor:not-allowed; }
+
+    .viewer{
+      display:flex; flex-direction:column; gap: 10px;
+    }
+    .viewerImg{
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.10);
+      border-radius: 22px;
+      height: 280px;
+      overflow:hidden;
+      display:grid; place-items:center;
+    }
+    .viewerImg img{ width: 95%; height: 95%; object-fit: contain; filter: drop-shadow(0 18px 26px rgba(0,0,0,.35)); }
+    .stats{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .stat{
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      border-radius: 16px;
+      padding: 10px;
+      display:flex;
+      justify-content:space-between;
+      font-family: var(--mono);
+      font-weight: 1000;
+    }
+    .toast{
+      position:fixed;
+      left:50%;
+      transform: translateX(-50%);
+      bottom: 18px;
+      padding: 10px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(15,18,30,.92);
+      backdrop-filter: blur(14px);
+      box-shadow: var(--shadow);
+      color: rgba(234,240,255,.92);
+      display:none;
+      z-index:200;
+      max-width: min(980px, calc(100% - 40px));
+      white-space:pre-wrap;
+    }
+  </style>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+</head>
+
+<body>
+  <header class="nav">
+    <div class="nav__inner container">
+      <a class="brand" href="main.html">
+        <span class="brand__mark">?</span>
+        <span class="brand__name">Deckforge Arena</span>
+      </a>
+
+      <div class="nav__right">
+        <div class="chip">Player: <b id="playerName">—</b></div>
+        <a class="btn" href="index.html">Main Menu</a>
+        <button class="btn btn--danger" id="btnLogout">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container wrap">
+    <h1>Deck Editor</h1>
+    <p class="sub">
+      Pick a deck, build it to <b>exactly 10 cards</b>, and save. Only <b>Humans</b> and <b>Skeletons</b> are unlocked at the start.
+      Demons and Ice Dwarfs unlock through Story Mode.
+    </p>
+
+    <div class="grid">
+      <!-- LEFT: Deck Builder -->
+      <section class="panel">
+        <div class="panel__head">
+          <div class="panel__title"><span class="dot"></span> Build Your Deck</div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+            <span class="pill" id="deckStatus">Deck: —</span>
+            <button class="btn" id="btnSetDefault">Set as Default</button>
+            <button class="btn btn--primary" id="btnSave" disabled>Save Deck</button>
+          </div>
+        </div>
+
+        <div class="panel__body">
+          <div class="deckTabs">
+            <button class="tab active" id="tabHumans">Humans</button>
+            <button class="tab" id="tabSkeletons">Skeletons</button>
+          </div>
+
+          <div class="twoCol">
+            <!-- Collection -->
+            <div>
+              <div class="pill">Collection</div>
+              <div class="cardGrid" id="collectionGrid"></div>
+            </div>
+
+            <!-- Current Deck Slots -->
+            <div>
+              <div class="pill">Current Deck (10 cards)</div>
+              <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
+                <span class="pill" id="countPill">0 / 10</span>
+                <span class="pill" id="defaultPill">Default: —</span>
+              </div>
+
+              <div style="display:flex; flex-direction:column; gap:10px; margin-top:10px;" id="slots"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT: Card Viewer -->
+      <aside class="panel">
+        <div class="panel__head">
+          <div class="panel__title"><span class="dot"></span> Card Viewer</div>
+          <span class="pill" id="viewerPill">Click a card</span>
+        </div>
+        <div class="panel__body viewer">
+          <div class="viewerImg">
+            <img id="viewerImg" alt="Selected card" />
+          </div>
+          <div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+              <span class="pill" id="viewerName">—</span>
+              <span class="pill" id="viewerArche">—</span>
+              <span class="pill" id="viewerRole">—</span>
+              <span class="pill" id="viewerRarity">—</span>
+            </div>
+            <div class="stats">
+              <div class="stat"><span>HP</span><span id="sHP">—</span></div>
+              <div class="stat"><span>ATK</span><span id="sATK">—</span></div>
+              <div class="stat"><span>DEF</span><span id="sDEF">—</span></div>
+              <div class="stat"><span>MAG</span><span id="sMAG">—</span></div>
+              <div class="stat"><span>SPD</span><span id="sSPD">—</span></div>
+              <div class="stat"><span>WIS</span><span id="sWIS">—</span></div>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    /* =========================
+       FIREBASE CONFIG
+       ========================= */
+    const firebaseConfig = {
+      apiKey: "AIzaSyDJHl2yCKbiiinesOZ9R_SROC51knmT9TQ",
+      authDomain: "goamica-7190c.firebaseapp.com",
+      databaseURL: "https://goamica-7190c-default-rtdb.firebaseio.com",
+      projectId: "goamica-7190c",
+      storageBucket: "goamica-7190c.firebasestorage.app",
+      messagingSenderId: "612907093027",
+      appId: "1:612907093027:web:2b7106adc9ba6b7b177596",
+      measurementId: "G-8DE8ST7LXR"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    /* =========================
+       SESSION
+       ========================= */
+    function getSession(){
+      const id = localStorage.getItem("amica_currentUserId") || sessionStorage.getItem("amica_currentUserId");
+      const user = localStorage.getItem("amica_currentUser") || sessionStorage.getItem("amica_currentUser");
+      return { id, user: user ? JSON.parse(user) : null };
+    }
+    function clearSession(){
+      localStorage.removeItem("amica_currentUserId");
+      localStorage.removeItem("amica_currentUser");
+      sessionStorage.removeItem("amica_currentUserId");
+      sessionStorage.removeItem("amica_currentUser");
+    }
+    const session = getSession();
+    if(!session.id || !session.user){ window.location.href = "login.html"; }
+    document.getElementById("playerName").textContent = session.user?.Username || "—";
+    document.getElementById("btnLogout").addEventListener("click", () => { clearSession(); location.href="login.html"; });
+
+    const userId = String(session.id);
+
+    /* =========================
+       DB PATHS (STABLE FORMAT)
+       ========================= */
+    const PATH = {
+      decksRoot: (uid) => `Decks/${uid}`,
+      deckCards: (uid, deckKey) => `Decks/${uid}/${deckKey}/cards`,
+      defaultDeckKey: (uid) => `Decks/${uid}/defaultDeckKey`,
+      selectedDeckKey: (uid) => `Decks/${uid}/selectedDeckKey`,
+      accountDefaultDeck: (uid) => `Account/${uid}/DefaultDeck`,
+      collection: (uid) => `Collection/${uid}`
+    };
+
+    /* =========================
+       TOAST
+       ========================= */
+    const toastEl = document.getElementById("toast");
+    let toastTimer = null;
+    function toast(msg){
+      toastEl.textContent = msg;
+      toastEl.style.display = "block";
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toastEl.style.display = "none", 2800);
+    }
+
+    /* =========================
+       CARD LIBRARY (40)
+       IDs are what we save to Firebase (battle.html reads these).
+       Images must be: images/<Card Name>.png
+       ========================= */
+    const STAT_KEYS = ["HP","ATK","DEF","MAG","SPD","WIS"];
+    const CARDS = [
+      // Humans (10 unlocked)
+      {id:"HUM_001", name:"Human Warrior", archetype:"Humans", role:"Warrior", rarity:"Common", stats:{HP:80,ATK:72,DEF:64,MAG:10,SPD:44,WIS:40}},
+      {id:"HUM_002", name:"Human Farmer", archetype:"Humans", role:"Farmer", rarity:"Common", stats:{HP:70,ATK:44,DEF:50,MAG:8,SPD:48,WIS:54}},
+      {id:"HUM_003", name:"Human Archer", archetype:"Humans", role:"Archer", rarity:"Uncommon", stats:{HP:62,ATK:68,DEF:42,MAG:12,SPD:78,WIS:52}},
+      {id:"HUM_004", name:"Human Wizard", archetype:"Humans", role:"Wizard", rarity:"Rare", stats:{HP:56,ATK:18,DEF:40,MAG:86,SPD:52,WIS:80}},
+      {id:"HUM_005", name:"Human Elder Wizard", archetype:"Humans", role:"Elder Wizard", rarity:"Epic", stats:{HP:62,ATK:16,DEF:44,MAG:96,SPD:46,WIS:94}},
+      {id:"HUM_006", name:"Human Cleric", archetype:"Humans", role:"Cleric", rarity:"Rare", stats:{HP:72,ATK:30,DEF:60,MAG:72,SPD:40,WIS:88}},
+      {id:"HUM_007", name:"Human Knight", archetype:"Humans", role:"Knight", rarity:"Uncommon", stats:{HP:88,ATK:70,DEF:82,MAG:10,SPD:38,WIS:52}},
+      {id:"HUM_008", name:"Human Lancer", archetype:"Humans", role:"Lancer", rarity:"Uncommon", stats:{HP:76,ATK:78,DEF:58,MAG:10,SPD:58,WIS:44}},
+      {id:"HUM_009", name:"Human Blacksmith", archetype:"Humans", role:"Blacksmith", rarity:"Common", stats:{HP:82,ATK:56,DEF:78,MAG:6,SPD:34,WIS:58}},
+      {id:"HUM_010", name:"Human Astrologer", archetype:"Humans", role:"Astrologer", rarity:"Rare", stats:{HP:60,ATK:22,DEF:44,MAG:84,SPD:56,WIS:90}},
+
+      // Skeletons (10 unlocked)
+      {id:"SKL_001", name:"Skeleton Warrior", archetype:"Skeletons", role:"Warrior", rarity:"Common", stats:{HP:64,ATK:66,DEF:52,MAG:8,SPD:50,WIS:36}},
+      {id:"SKL_002", name:"Skeleton Knight", archetype:"Skeletons", role:"Knight", rarity:"Uncommon", stats:{HP:78,ATK:70,DEF:76,MAG:8,SPD:40,WIS:40}},
+      {id:"SKL_003", name:"Skeleton Archer", archetype:"Skeletons", role:"Archer", rarity:"Uncommon", stats:{HP:56,ATK:68,DEF:40,MAG:8,SPD:80,WIS:34}},
+      {id:"SKL_004", name:"Skeleton Wizard", archetype:"Skeletons", role:"Wizard", rarity:"Rare", stats:{HP:52,ATK:16,DEF:38,MAG:84,SPD:54,WIS:72}},
+      {id:"SKL_005", name:"Skeleton Elder Wizard", archetype:"Skeletons", role:"Elder Wizard", rarity:"Epic", stats:{HP:58,ATK:14,DEF:42,MAG:94,SPD:48,WIS:90}},
+      {id:"SKL_006", name:"Skeleton Cleric", archetype:"Skeletons", role:"Cleric", rarity:"Rare", stats:{HP:68,ATK:24,DEF:58,MAG:72,SPD:42,WIS:82}},
+      {id:"SKL_007", name:"Skeleton Lancer", archetype:"Skeletons", role:"Lancer", rarity:"Uncommon", stats:{HP:66,ATK:76,DEF:50,MAG:8,SPD:62,WIS:36}},
+      {id:"SKL_008", name:"Skeleton Blacksmith", archetype:"Skeletons", role:"Blacksmith", rarity:"Common", stats:{HP:74,ATK:50,DEF:72,MAG:6,SPD:36,WIS:46}},
+      {id:"SKL_009", name:"Skeleton Assassin", archetype:"Skeletons", role:"Assassin", rarity:"Rare", stats:{HP:54,ATK:74,DEF:36,MAG:10,SPD:92,WIS:40}},
+      {id:"SKL_010", name:"Skeleton Warden", archetype:"Skeletons", role:"Warden", rarity:"Rare", stats:{HP:86,ATK:60,DEF:86,MAG:8,SPD:30,WIS:52}},
+
+      // Demons (10 locked)
+      {id:"DEM_001", name:"Demon Imp", archetype:"Demons", role:"Imp", rarity:"Common", stats:{HP:54,ATK:58,DEF:32,MAG:44,SPD:88,WIS:40}},
+      {id:"DEM_002", name:"Demon Brute", archetype:"Demons", role:"Brute", rarity:"Uncommon", stats:{HP:86,ATK:84,DEF:60,MAG:10,SPD:44,WIS:30}},
+      {id:"DEM_003", name:"Demon Hellhound", archetype:"Demons", role:"Beast", rarity:"Uncommon", stats:{HP:72,ATK:78,DEF:46,MAG:18,SPD:82,WIS:36}},
+      {id:"DEM_004", name:"Demon Warlock", archetype:"Demons", role:"Warlock", rarity:"Rare", stats:{HP:60,ATK:24,DEF:40,MAG:90,SPD:58,WIS:80}},
+      {id:"DEM_005", name:"Demon Succubus", archetype:"Demons", role:"Enchantress", rarity:"Rare", stats:{HP:62,ATK:40,DEF:44,MAG:78,SPD:74,WIS:72}},
+      {id:"DEM_006", name:"Demon Infernal Knight", archetype:"Demons", role:"Knight", rarity:"Epic", stats:{HP:92,ATK:82,DEF:88,MAG:22,SPD:46,WIS:58}},
+      {id:"DEM_007", name:"Demon Flame Lancer", archetype:"Demons", role:"Lancer", rarity:"Rare", stats:{HP:74,ATK:86,DEF:52,MAG:26,SPD:66,WIS:44}},
+      {id:"DEM_008", name:"Demon Ash Archer", archetype:"Demons", role:"Archer", rarity:"Uncommon", stats:{HP:58,ATK:72,DEF:40,MAG:28,SPD:80,WIS:46}},
+      {id:"DEM_009", name:"Demon Elder Warlock", archetype:"Demons", role:"Elder Warlock", rarity:"Epic", stats:{HP:68,ATK:22,DEF:46,MAG:98,SPD:52,WIS:94}},
+      {id:"DEM_010", name:"Demon Lord’s Herald", archetype:"Demons", role:"Herald", rarity:"Epic", stats:{HP:80,ATK:70,DEF:62,MAG:92,SPD:60,WIS:88}},
+
+      // Ice Dwarfs (10 locked)
+      {id:"ICE_001", name:"Ice Dwarf Miner", archetype:"Ice Dwarfs", role:"Miner", rarity:"Common", stats:{HP:78,ATK:54,DEF:76,MAG:10,SPD:34,WIS:58}},
+      {id:"ICE_002", name:"Ice Dwarf Shieldbearer", archetype:"Ice Dwarfs", role:"Tank", rarity:"Uncommon", stats:{HP:90,ATK:46,DEF:92,MAG:8,SPD:28,WIS:54}},
+      {id:"ICE_003", name:"Ice Dwarf Axeguard", archetype:"Ice Dwarfs", role:"Warrior", rarity:"Uncommon", stats:{HP:84,ATK:74,DEF:70,MAG:10,SPD:36,WIS:48}},
+      {id:"ICE_004", name:"Ice Dwarf Runecaster", archetype:"Ice Dwarfs", role:"Runecaster", rarity:"Rare", stats:{HP:70,ATK:28,DEF:56,MAG:84,SPD:40,WIS:86}},
+      {id:"ICE_005", name:"Ice Dwarf Frost Archer", archetype:"Ice Dwarfs", role:"Archer", rarity:"Uncommon", stats:{HP:66,ATK:68,DEF:50,MAG:30,SPD:70,WIS:52}},
+      {id:"ICE_006", name:"Ice Dwarf Engineer", archetype:"Ice Dwarfs", role:"Engineer", rarity:"Rare", stats:{HP:72,ATK:40,DEF:72,MAG:42,SPD:44,WIS:80}},
+      {id:"ICE_007", name:"Ice Dwarf Hammer Knight", archetype:"Ice Dwarfs", role:"Knight", rarity:"Rare", stats:{HP:92,ATK:76,DEF:84,MAG:12,SPD:32,WIS:56}},
+      {id:"ICE_008", name:"Ice Dwarf Glacier Lancer", archetype:"Ice Dwarfs", role:"Lancer", rarity:"Rare", stats:{HP:80,ATK:78,DEF:62,MAG:18,SPD:56,WIS:52}},
+      {id:"ICE_009", name:"Ice Dwarf Elder Runelord", archetype:"Ice Dwarfs", role:"Elder", rarity:"Epic", stats:{HP:82,ATK:30,DEF:66,MAG:92,SPD:38,WIS:96}},
+      {id:"ICE_010", name:"Ice Dwarf Warden", archetype:"Ice Dwarfs", role:"Warden", rarity:"Epic", stats:{HP:96,ATK:70,DEF:96,MAG:14,SPD:26,WIS:60}},
+    ];
+
+    const CARD_BY_ID = Object.fromEntries(CARDS.map(c => [c.id, c]));
+    const imageFor = (name) => `images/${name}.png`;
+
+    /* =========================
+       UNLOCK RULES
+       - Humans + Skeletons unlocked initially
+       - Demons + Ice locked unless in Collection/<uid>/<cardId> = true
+       ========================= */
+    function isBaseUnlocked(card){
+      return (card.archetype === "Humans" || card.archetype === "Skeletons");
+    }
+
+    /* =========================
+       STATE
+       ========================= */
+    let activeDeckKey = "humans"; // "humans" | "skeletons"
+    let defaultDeckKey = "humans";
+
+    let deckCards = {
+      humans: [],
+      skeletons: []
+    };
+
+    let owned = {}; // Collection map: { CARD_ID: true }
+
+    // Viewer refs
+    const viewerImg = document.getElementById("viewerImg");
+    const viewerPill = document.getElementById("viewerPill");
+    const viewerName = document.getElementById("viewerName");
+    const viewerArche = document.getElementById("viewerArche");
+    const viewerRole = document.getElementById("viewerRole");
+    const viewerRarity = document.getElementById("viewerRarity");
+    const sHP = document.getElementById("sHP");
+    const sATK = document.getElementById("sATK");
+    const sDEF = document.getElementById("sDEF");
+    const sMAG = document.getElementById("sMAG");
+    const sSPD = document.getElementById("sSPD");
+    const sWIS = document.getElementById("sWIS");
+
+    // UI refs
+    const collectionGrid = document.getElementById("collectionGrid");
+    const slotsEl = document.getElementById("slots");
+    const btnSave = document.getElementById("btnSave");
+    const btnSetDefault = document.getElementById("btnSetDefault");
+    const deckStatus = document.getElementById("deckStatus");
+    const countPill = document.getElementById("countPill");
+    const defaultPill = document.getElementById("defaultPill");
+
+    const tabHumans = document.getElementById("tabHumans");
+    const tabSkeletons = document.getElementById("tabSkeletons");
+
+    function setActiveTab(key){
+      activeDeckKey = key;
+      tabHumans.classList.toggle("active", key === "humans");
+      tabSkeletons.classList.toggle("active", key === "skeletons");
+      renderAll();
+    }
+    tabHumans.addEventListener("click", () => setActiveTab("humans"));
+    tabSkeletons.addEventListener("click", () => setActiveTab("skeletons"));
+
+    function setViewer(card){
+      viewerPill.textContent = "Selected";
+      viewerName.textContent = card.name;
+      viewerArche.textContent = card.archetype;
+      viewerRole.textContent = card.role;
+      viewerRarity.textContent = card.rarity;
+
+      sHP.textContent = card.stats.HP;
+      sATK.textContent = card.stats.ATK;
+      sDEF.textContent = card.stats.DEF;
+      sMAG.textContent = card.stats.MAG;
+      sSPD.textContent = card.stats.SPD;
+      sWIS.textContent = card.stats.WIS;
+
+      viewerImg.src = imageFor(card.name);
+      viewerImg.onerror = () => {
+        viewerImg.removeAttribute("src");
+        viewerPill.textContent = "Missing image: " + imageFor(card.name);
+      };
+    }
+
+    function canUseCard(card){
+      if(isBaseUnlocked(card)) return true;
+      return !!owned[card.id];
+    }
+
+    function getActiveDeckArr(){
+      return deckCards[activeDeckKey];
+    }
+
+    function updateSaveButton(){
+      const count = getActiveDeckArr().length;
+      countPill.textContent = `${count} / 10`;
+      deckStatus.textContent = `Deck: ${activeDeckKey}`;
+      defaultPill.textContent = `Default: ${defaultDeckKey}`;
+
+      btnSave.disabled = (count !== 10);
+    }
+
+    function addToDeck(cardId){
+      const arr = getActiveDeckArr();
+      if(arr.includes(cardId)){ toast("That card is already in this deck."); return; }
+      if(arr.length >= 10){ toast("Deck is full (10/10). Remove a card first."); return; }
+      arr.push(cardId);
+      renderAll();
+    }
+
+    function removeFromDeck(index){
+      const arr = getActiveDeckArr();
+      arr.splice(index,1);
+      renderAll();
+    }
+
+    function moveDeckCard(index, dir){
+      const arr = getActiveDeckArr();
+      const ni = index + dir;
+      if(ni < 0 || ni >= arr.length) return;
+      const temp = arr[index];
+      arr[index] = arr[ni];
+      arr[ni] = temp;
+      renderAll();
+    }
+
+    function renderCollection(){
+      collectionGrid.innerHTML = "";
+
+      // Show all 40 cards in collection panel (locked shown as locked)
+      for(const card of CARDS){
+        const usable = canUseCard(card);
+
+        const tile = document.createElement("div");
+        tile.className = "cardTile" + (usable ? "" : " locked");
+
+        tile.innerHTML = `
+          <div class="thumb"><img src="${imageFor(card.name)}" alt=""></div>
+          <div class="tileInfo">
+            <div class="tileName">${card.name}</div>
+            <div class="tileMeta">
+              <span class="pill">${card.archetype}</span>
+              <span class="pill">${card.rarity}</span>
+              ${usable ? `<span class="pill" style="border-color:rgba(61,255,183,.35); background: rgba(61,255,183,.10)">UNLOCKED</span>`
+                      : `<span class="pill" style="border-color:rgba(255,204,102,.35); background: rgba(255,204,102,.10)">LOCKED</span>`}
+            </div>
+            <div class="small">Click to view • Double-click to add</div>
+          </div>
+        `;
+
+        // images might not exist yet, that's fine
+        const img = tile.querySelector("img");
+        img.onerror = () => img.style.opacity = "0";
+
+        tile.addEventListener("click", () => setViewer(card));
+        tile.addEventListener("dblclick", () => {
+          if(!usable){ toast("This card is locked. Unlock it in Story Mode."); return; }
+          addToDeck(card.id);
+        });
+
+        collectionGrid.appendChild(tile);
+      }
+    }
+
+    function renderDeckSlots(){
+      slotsEl.innerHTML = "";
+      const arr = getActiveDeckArr();
+
+      for(let i=0;i<10;i++){
+        const cardId = arr[i] || null;
+        const card = cardId ? CARD_BY_ID[cardId] : null;
+
+        const slot = document.createElement("div");
+        slot.className = "deckSlot" + (card ? " filled" : "");
+
+        if(card){
+          slot.innerHTML = `
+            <div class="left">
+              <div class="slotNum">${i+1}</div>
+              <div>
+                <div class="slotName">${card.name}</div>
+                <div class="small">${card.archetype} • ${card.rarity} • ${card.role}</div>
+              </div>
+            </div>
+            <div class="slotBtns">
+              <button class="miniBtn" data-act="up">?</button>
+              <button class="miniBtn" data-act="down">?</button>
+              <button class="miniBtn" data-act="remove">Remove</button>
+            </div>
+          `;
+
+          slot.querySelector('[data-act="up"]').addEventListener("click", () => moveDeckCard(i, -1));
+          slot.querySelector('[data-act="down"]').addEventListener("click", () => moveDeckCard(i, +1));
+          slot.querySelector('[data-act="remove"]').addEventListener("click", () => removeFromDeck(i));
+
+          slot.addEventListener("click", () => setViewer(card));
+        } else {
+          slot.innerHTML = `
+            <div class="left">
+              <div class="slotNum">${i+1}</div>
+              <div>
+                <div class="slotName" style="opacity:.75;">Empty slot</div>
+                <div class="small">Double-click a card in Collection to add</div>
+              </div>
+            </div>
+            <div class="slotBtns">
+              <button class="miniBtn" disabled>—</button>
+            </div>
+          `;
+        }
+
+        slotsEl.appendChild(slot);
+      }
+    }
+
+    function renderAll(){
+      renderCollection();
+      renderDeckSlots();
+      updateSaveButton();
+    }
+
+    /* =========================
+       INIT DEFAULT DECKS
+       - If none exist in DB, create starter Humans + Skeletons decks
+       ========================= */
+    const STARTER = {
+      humans: ["HUM_001","HUM_002","HUM_003","HUM_004","HUM_005","HUM_006","HUM_007","HUM_008","HUM_009","HUM_010"],
+      skeletons: ["SKL_001","SKL_002","SKL_003","SKL_004","SKL_005","SKL_006","SKL_007","SKL_008","SKL_009","SKL_010"],
+    };
+
+    async function ensureStarterDecks(){
+      const rootRef = db.ref(PATH.decksRoot(userId));
+      const snap = await rootRef.once("value");
+      const root = snap.val();
+
+      if(!root){
+        // create decks root with starter decks + default
+        await rootRef.set({
+          defaultDeckKey: "humans",
+          selectedDeckKey: "humans",
+          humans: { name: "Humans", cards: STARTER.humans },
+          skeletons: { name: "Skeletons", cards: STARTER.skeletons }
+        });
+
+        // Also store on Account for convenience (matches your register object field)
+        await db.ref(PATH.accountDefaultDeck(userId)).set("humans");
+
+        toast("Starter decks created (Humans + Skeletons).");
+        return;
+      }
+
+      // If decks exist but missing these, add them safely
+      const updates = {};
+      if(!root.humans) updates[`Decks/${userId}/humans`] = { name:"Humans", cards: STARTER.humans };
+      if(!root.skeletons) updates[`Decks/${userId}/skeletons`] = { name:"Skeletons", cards: STARTER.skeletons };
+      if(!root.defaultDeckKey) updates[`Decks/${userId}/defaultDeckKey`] = "humans";
+      if(!root.selectedDeckKey) updates[`Decks/${userId}/selectedDeckKey`] = root.selectedDeckKey || root.defaultDeckKey || "humans";
+
+      if(Object.keys(updates).length){
+        await db.ref().update(updates);
+        toast("Missing starter data repaired.");
+      }
+    }
+
+    async function loadDeckData(){
+      const rootSnap = await db.ref(PATH.decksRoot(userId)).once("value");
+      const root = rootSnap.val() || {};
+
+      defaultDeckKey = root.defaultDeckKey || "humans";
+      const selected = root.selectedDeckKey || defaultDeckKey;
+
+      deckCards.humans = (root.humans && Array.isArray(root.humans.cards)) ? root.humans.cards.slice(0,10) : STARTER.humans.slice();
+      deckCards.skeletons = (root.skeletons && Array.isArray(root.skeletons.cards)) ? root.skeletons.cards.slice(0,10) : STARTER.skeletons.slice();
+
+      // Ensure max 10 and no nulls
+      deckCards.humans = deckCards.humans.filter(Boolean).slice(0,10);
+      deckCards.skeletons = deckCards.skeletons.filter(Boolean).slice(0,10);
+
+      setActiveTab(selected === "skeletons" ? "skeletons" : "humans");
+    }
+
+    async function loadCollection(){
+      const snap = await db.ref(PATH.collection(userId)).once("value");
+      owned = snap.val() || {};
+    }
+
+    async function saveActiveDeck(){
+      const arr = getActiveDeckArr();
+      if(arr.length !== 10){
+        toast("Deck must have exactly 10 cards.");
+        return;
+      }
+
+      const updates = {};
+      updates[PATH.deckCards(userId, activeDeckKey)] = arr;
+      updates[PATH.selectedDeckKey(userId)] = activeDeckKey;
+
+      await db.ref().update(updates);
+      toast("Deck saved.");
+    }
+
+    async function setDefaultDeck(){
+      const updates = {};
+      updates[PATH.defaultDeckKey(userId)] = activeDeckKey;
+      updates[PATH.selectedDeckKey(userId)] = activeDeckKey;
+      updates[PATH.accountDefaultDeck(userId)] = activeDeckKey;
+
+      await db.ref().update(updates);
+      defaultDeckKey = activeDeckKey;
+      toast("Default deck set.");
+      renderAll();
+    }
+
+    btnSave.addEventListener("click", saveActiveDeck);
+    btnSetDefault.addEventListener("click", setDefaultDeck);
+
+    /* =========================
+       BOOT
+       ========================= */
+    async function init(){
+      await ensureStarterDecks();
+      await loadCollection();
+      await loadDeckData();
+
+      // Preselect first card in active deck for viewer
+      const firstId = getActiveDeckArr()[0];
+      if(firstId && CARD_BY_ID[firstId]) setViewer(CARD_BY_ID[firstId]);
+
+      renderAll();
+    }
+
+    init().catch(err => {
+      console.error(err);
+      toast("Decks load failed. Check console / DB rules.");
+    });
+  </script>
+</body>
+</html>
