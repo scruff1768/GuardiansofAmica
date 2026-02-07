@@ -7,31 +7,17 @@
 
   <style>
     :root{
-      --bg0:#070a12;
-      --bg1:#0b1020;
-      --card: rgba(255,255,255,.06);
-      --stroke: rgba(255,255,255,.14);
-      --text:#eaf0ff;
-      --muted: rgba(234,240,255,.72);
-      --primary:#7c5cff;
-      --primary2:#23d5ff;
-      --good:#3dffb7;
-      --warn:#ffcc66;
-      --bad:#ff5577;
+      --bg0:#070a12; --bg1:#0b1020; --text:#eaf0ff; --muted: rgba(234,240,255,.72);
+      --primary:#7c5cff; --primary2:#23d5ff; --good:#3dffb7; --bad:#ff4d6d;
       --shadow: 0 18px 60px rgba(0,0,0,.45);
-      --r14: 14px;
-      --r18: 18px;
-      --r22: 22px;
-      --r26: 26px;
+      --r14:14px; --r18:18px; --r22:22px; --r26:26px;
       --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
       --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-      --max: 1280px;
+      --max: 1240px;
     }
     *{ box-sizing:border-box; }
     body{
-      margin:0;
-      font-family: var(--sans);
-      color: var(--text);
+      margin:0; font-family:var(--sans); color:var(--text);
       background:
         radial-gradient(1200px 800px at 25% 10%, rgba(124,92,255,.16), transparent 55%),
         radial-gradient(1200px 800px at 80% 20%, rgba(35,213,255,.13), transparent 55%),
@@ -39,7 +25,6 @@
       overflow-x:hidden;
     }
     .container{ width:min(var(--max), calc(100% - 40px)); margin-inline:auto; }
-
     .nav{
       position:sticky; top:0; z-index:10;
       backdrop-filter: blur(14px);
@@ -50,30 +35,23 @@
       display:flex; align-items:center; justify-content:space-between;
       padding: 16px 0; gap: 14px; flex-wrap:wrap;
     }
-    .brand{ display:flex; align-items:center; gap: 12px; text-decoration:none; color:inherit; }
+    .brand{ display:flex; align-items:center; gap:12px; text-decoration:none; color:inherit; }
     .brand__mark{
-      width:36px; height:36px; border-radius:12px;
-      display:grid; place-items:center; font-weight:1000;
+      width:36px; height:36px; border-radius:12px; display:grid; place-items:center;
+      font-weight:1000;
       background: linear-gradient(135deg, rgba(124,92,255,.9), rgba(35,213,255,.75));
       box-shadow: 0 10px 28px rgba(124,92,255,.22);
     }
-    .brand__name{ font-weight:1000; letter-spacing:.2px; }
+    .brand__name{ font-weight:1000; }
     .nav__right{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
-
     .chip{
-      padding: 8px 12px;
-      border-radius: 999px;
+      padding: 8px 12px; border-radius:999px;
       border: 1px solid rgba(255,255,255,.12);
       background: rgba(255,255,255,.05);
-      color: rgba(234,240,255,.88);
-      font-weight: 800;
-      font-size: 13px;
-      display:inline-flex;
-      gap: 8px;
-      align-items:center;
+      font-weight: 900; font-size: 13px;
+      display:inline-flex; gap:8px; align-items:center;
     }
-    .chip b{ font-family: var(--mono); font-weight: 1000; }
-
+    .chip b{ font-family: var(--mono); }
     .btn{
       border: 1px solid rgba(255,255,255,.14);
       background: rgba(255,255,255,.06);
@@ -82,29 +60,23 @@
       border-radius: 14px;
       font-weight: 1000;
       cursor:pointer;
-      transition: transform .15s ease, background .15s ease, border-color .15s ease;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap: 8px;
+      transition: transform .15s ease, background .15s ease;
       text-decoration:none;
-      user-select:none;
+      display:inline-flex; align-items:center; gap:10px;
     }
-    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.09); }
+    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.10); }
+    .btn:disabled{ opacity:.55; cursor:not-allowed; transform:none; }
     .btn--primary{
       border-color: rgba(124,92,255,.55);
       background: linear-gradient(135deg, rgba(124,92,255,.95), rgba(35,213,255,.70));
       box-shadow: 0 16px 46px rgba(124,92,255,.22);
     }
-    .btn--danger{
-      border-color: rgba(255,85,119,.38);
-      background: rgba(255,85,119,.10);
-    }
-    .btn:disabled{ opacity:.55; cursor:not-allowed; transform:none; }
+    .wrap{ padding: 18px 0 52px; }
+    h1{ margin:0; font-size: clamp(22px, 3vw, 38px); letter-spacing:-.7px; }
+    .sub{ margin: 10px 0 0; color: var(--muted); line-height:1.6; }
 
-    .wrap{ padding: 18px 0 46px; }
-    h1{ margin:0; font-size: clamp(22px, 3vw, 36px); letter-spacing:-.6px; }
-    .sub{ margin: 10px 0 0; color: var(--muted); line-height:1.6; max-width: 110ch; }
+    .grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
+    @media (max-width: 980px){ .grid{ grid-template-columns: 1fr; } }
 
     .panel{
       border: 1px solid rgba(255,255,255,.12);
@@ -116,164 +88,38 @@
     .panel__head{
       padding: 12px 14px;
       border-bottom: 1px solid rgba(255,255,255,.08);
-      display:flex; align-items:center; justify-content:space-between; gap: 10px;
+      display:flex; align-items:center; justify-content:space-between; gap: 10px; flex-wrap:wrap;
       background: rgba(0,0,0,.12);
-      flex-wrap:wrap;
     }
     .panel__title{ font-weight: 1000; display:flex; align-items:center; gap: 10px; }
     .dot{ width:10px; height:10px; border-radius:999px; background: var(--good); box-shadow: 0 0 0 5px rgba(61,255,183,.10); }
     .panel__body{ padding: 12px 14px 14px; }
-
+    .banner{
+      padding: 10px 12px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      line-height: 1.5;
+      white-space:pre-wrap;
+    }
+    .row{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-top: 12px; }
     .pill{
-      font-family: var(--mono);
-      font-size: 12px;
+      font-family: var(--mono); font-size: 12px;
       padding: 6px 10px;
       border-radius: 999px;
       border: 1px solid rgba(255,255,255,.12);
       background: rgba(7,10,18,.25);
-      color: rgba(234,240,255,.90);
-      display:inline-flex;
-      align-items:center;
-      gap: 8px;
+      display:inline-flex; gap: 8px; align-items:center;
       user-select:none;
     }
-
-    .grid2{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      margin-top: 14px;
-    }
-    @media (max-width: 900px){ .grid2{ grid-template-columns:1fr; } }
-
-    .tiles{
-      display:grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 12px;
-      margin-top: 12px;
-    }
-    @media (max-width: 1100px){ .tiles{ grid-template-columns: repeat(4, 1fr); } }
-    @media (max-width: 860px){ .tiles{ grid-template-columns: repeat(3, 1fr); } }
-    @media (max-width: 580px){ .tiles{ grid-template-columns: repeat(2, 1fr); } }
-
-    .tile{
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.05);
-      border-radius: 22px;
-      padding: 14px;
-      min-height: 150px;
-      cursor:pointer;
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
-      gap: 10px;
-      transition: transform .15s ease, background .15s ease, border-color .15s ease;
-      position:relative;
-      overflow:hidden;
-    }
-    .tile:hover{ transform: translateY(-2px); background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.18); }
-    .tile.locked{ opacity:.55; cursor:not-allowed; }
-    .tileTop{ display:flex; align-items:center; justify-content:space-between; gap: 10px; }
-    .tileTitle{ font-weight:1000; letter-spacing:-.3px; }
-    .tileMeta{ display:flex; gap:6px; flex-wrap:wrap; }
-    .badge{
-      font-family: var(--mono);
-      font-size: 11px;
-      padding: 5px 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.10);
-      color: rgba(234,240,255,.9);
-      white-space:nowrap;
-    }
-    .tileBar{
-      height: 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.15);
-      overflow:hidden;
-    }
-    .tileBar > div{
-      height:100%;
-      width:0%;
-      background: linear-gradient(90deg, rgba(61,255,183,.85), rgba(35,213,255,.70));
-    }
-
-    .deckList{ display:flex; flex-direction:column; gap:10px; margin-top:10px; }
-    .deckCard{
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.05);
-      border-radius: 18px;
-      padding: 10px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 10px;
-    }
-    .deckLeft{ display:flex; align-items:center; gap: 10px; min-width: 0; }
-    .thumb{
-      width: 54px; height: 54px;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.16);
-      overflow:hidden;
-      flex: 0 0 auto;
-      display:grid;
-      place-items:center;
-    }
-    .thumb img{ width:100%; height:100%; object-fit: cover; }
-    .deckText{ display:flex; flex-direction:column; gap: 4px; min-width: 0; }
-    .deckName{
-      font-weight:1000;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-    .mono{ font-family: var(--mono); font-size: 12px; color: rgba(234,240,255,.80); }
-    .rowBadges{ display:flex; gap:6px; flex-wrap:wrap; }
-
-    .note{
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.04);
-      border-radius: 18px;
-      padding: 12px;
-      margin-top: 12px;
-      color: rgba(234,240,255,.85);
-      line-height: 1.5;
-      font-size: 13px;
-    }
-
-    .smallList{
-      margin-top:10px;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.14);
-      border-radius: 18px;
-      padding: 10px;
-      max-height: 180px;
-      overflow:auto;
-      font-family: var(--mono);
-      font-size: 12px;
-      color: rgba(234,240,255,.80);
-      white-space: pre-wrap;
-      line-height: 1.5;
-    }
-
     .toast{
-      position:fixed;
-      left:50%;
-      transform: translateX(-50%);
-      bottom: 18px;
-      padding: 10px 14px;
-      border-radius: 14px;
+      position:fixed; left:50%; transform: translateX(-50%); bottom: 18px;
+      padding: 10px 14px; border-radius: 14px;
       border: 1px solid rgba(255,255,255,.14);
-      background: rgba(15,18,30,.92);
-      backdrop-filter: blur(14px);
+      background: rgba(15,18,30,.92); backdrop-filter: blur(14px);
       box-shadow: var(--shadow);
-      color: rgba(234,240,255,.92);
-      display:none;
-      z-index:200;
-      max-width: min(980px, calc(100% - 40px));
-      white-space:pre-wrap;
+      display:none; z-index:200;
+      max-width: min(980px, calc(100% - 40px)); white-space:pre-wrap;
     }
   </style>
 
@@ -282,696 +128,260 @@
 </head>
 
 <body>
-  <header class="nav">
-    <div class="nav__inner container">
-      <a class="brand" href="index.html">
-        <span class="brand__mark">?</span>
-        <span class="brand__name">Deckforge Arena</span>
-      </a>
+<header class="nav">
+  <div class="nav__inner container">
+    <a class="brand" href="index.html">
+      <span class="brand__mark">?</span>
+      <span class="brand__name">Deckforge Arena</span>
+    </a>
+    <div class="nav__right">
+      <div class="chip">User: <b id="meName">—</b></div>
+      <a class="btn" href="decks.html">Decks</a>
+      <a class="btn" href="tutorial.html">Tutorial</a>
+      <a class="btn" href="index.html">Main Menu</a>
+    </div>
+  </div>
+</header>
 
-      <div class="nav__right">
-        <div class="chip">Player: <b id="playerName">—</b></div>
-        <a class="btn" href="index.html">Main Menu</a>
-        <a class="btn" href="decks.html">Decks</a>
-        <button class="btn btn--danger" id="btnLogout">Logout</button>
+<main class="container wrap">
+  <h1>Play</h1>
+  <p class="sub">Story mode is for unranked progression. Ranked is pure PvP — no story unlocks.</p>
+
+  <div class="grid">
+    <section class="panel">
+      <div class="panel__head">
+        <div class="panel__title"><span class="dot"></span> Ranked PvP (Online)</div>
+        <div class="pill">RANKED</div>
       </div>
-    </div>
-  </header>
+      <div class="panel__body">
+        <div class="banner" id="rankedBanner">Loading ranked status…</div>
 
-  <main class="container wrap">
-    <h1>Play</h1>
-    <p class="sub">
-      Unranked lets you explore Story Mode and unlock cards. Ranked is matchmaking-only.
-    </p>
-
-    <div class="grid2">
-      <section class="panel">
-        <div class="panel__head">
-          <div class="panel__title"><span class="dot"></span> Modes</div>
-          <div style="display:flex; gap:10px; flex-wrap:wrap;">
-            <button class="btn btn--primary" id="btnUnranked">Unranked</button>
-            <button class="btn" id="btnRanked">Ranked</button>
-          </div>
+        <div class="row">
+          <button class="btn btn--primary" id="btnFindRanked">Find Ranked Game</button>
+          <button class="btn" id="btnResumeRanked" disabled>Resume Current Lobby</button>
+          <button class="btn" id="btnClearRanked">Clear Saved Lobby</button>
         </div>
 
-        <div class="panel__body">
-          <!-- UNRANKED -->
-          <div id="viewUnranked">
-            <div class="pill">Unranked — Story & Practice</div>
-
-            <div class="note">
-              <b>Story Mode unlocks cards</b>. Ranked does not unlock cards.
-            </div>
-
-            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">
-              <a class="btn" href="tutorial.html">Tutorial</a>
-              <button class="btn btn--primary" id="btnStory">Story Mode</button>
-            </div>
-
-            <div id="viewFactions" style="margin-top:12px;">
-              <div class="pill">Story Mode — Choose a Campaign</div>
-              <div class="tiles" id="factionTiles"></div>
-            </div>
-
-            <div id="viewChapters" style="display:none; margin-top:12px;">
-              <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; align-items:center;">
-                <div class="pill" id="chapTitle">Story Mode — Chapters</div>
-                <button class="btn" id="btnBackToFactions">? Back</button>
-              </div>
-              <div class="tiles" id="chapterTiles"></div>
-            </div>
-
-            <div id="viewStages" style="display:none; margin-top:12px;">
-              <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; align-items:center;">
-                <div class="pill" id="stageTitle">Stages</div>
-                <button class="btn" id="btnBackToChapters">? Back to Chapters</button>
-              </div>
-              <div class="tiles" id="stageTiles"></div>
-            </div>
-          </div>
-
-          <!-- RANKED -->
-          <div id="viewRanked" style="display:none;">
-            <div class="pill">Ranked — Matchmaking</div>
-
-            <div class="note">
-              Clicking <b>Find Ranked Game</b> creates a <b>search lobby</b> in Firebase.
-              The list below shows players searching (debug visibility).
-            </div>
-
-            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">
-              <button class="btn btn--primary" id="btnFindRanked">Find Ranked Game</button>
-              <button class="btn btn--danger" id="btnCancelRanked" disabled>Cancel Search</button>
-            </div>
-
-            <div class="note" style="margin-top:12px;">
-              <div style="font-family:var(--mono); font-size:12px; color:rgba(234,240,255,.8);">
-                Status: <span id="rankedStatus">idle</span>
-              </div>
-            </div>
-
-            <div class="pill" style="margin-top:10px;">Searching Players (live)</div>
-            <div class="smallList" id="searchingList">—</div>
-          </div>
+        <div class="row">
+          <span class="pill">saved lobby: <b id="savedLobby">—</b></span>
+          <span class="pill">status: <b id="savedLobbyStatus">—</b></span>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <aside class="panel">
-        <div class="panel__head">
-          <div class="panel__title"><span class="dot"></span> Your Active Deck</div>
-          <span class="pill" id="deckPill">Loading…</span>
+    <section class="panel">
+      <div class="panel__head">
+        <div class="panel__title"><span class="dot"></span> Unranked Story Mode</div>
+        <div class="pill">UNRANKED</div>
+      </div>
+      <div class="panel__body">
+        <div class="banner">
+Welcome back, tactician.
+Unranked is where you unlock cards and push chapters.
+Ranked is where you *prove* you deserved them.
         </div>
-        <div class="panel__body">
-          <div class="deckList" id="deckList"></div>
 
-          <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">
-            <button class="btn" id="btnRefreshDeck">Refresh Deck</button>
-            <a class="btn" href="decks.html">Edit Deck</a>
-          </div>
-
-          <p class="sub" style="margin-top:10px;">
-            Ranked/Story battles require exactly <b>10 cards</b> in your active deck.
-          </p>
+        <div class="row">
+          <a class="btn btn--primary" href="story.html">Story Chapters</a>
+          <a class="btn" href="battle.html">Quick Unranked Battle</a>
         </div>
-      </aside>
-    </div>
-  </main>
+      </div>
+    </section>
+  </div>
+</main>
 
-  <div class="toast" id="toast"></div>
+<div class="toast" id="toast"></div>
 
-  <script>
-    /* =========================
-       FIREBASE INIT
-       ========================= */
-    const firebaseConfig = {
-      apiKey: "AIzaSyDJHl2yCKbiiinesOZ9R_SROC51knmT9TQ",
-      authDomain: "goamica-7190c.firebaseapp.com",
-      databaseURL: "https://goamica-7190c-default-rtdb.firebaseio.com",
-      projectId: "goamica-7190c",
-      storageBucket: "goamica-7190c.firebasestorage.app",
-      messagingSenderId: "612907093027",
-      appId: "1:612907093027:web:2b7106adc9ba6b7b177596",
-      measurementId: "G-8DE8ST7LXR"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDJHl2yCKbiiinesOZ9R_SROC51knmT9TQ",
+    authDomain: "goamica-7190c.firebaseapp.com",
+    databaseURL: "https://goamica-7190c-default-rtdb.firebaseio.com",
+    projectId: "goamica-7190c",
+    storageBucket: "goamica-7190c.firebasestorage.app",
+    messagingSenderId: "612907093027",
+    appId: "1:612907093027:web:2b7106adc9ba6b7b177596",
+    measurementId: "G-8DE8ST7LXR"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
 
-    function now(){ return Date.now(); }
+  const toastEl = document.getElementById("toast");
+  let toastTimer=null;
+  function toast(msg){
+    toastEl.textContent = msg;
+    toastEl.style.display = "block";
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(()=> toastEl.style.display="none", 2600);
+  }
 
-    /* =========================
-       SESSION
-       ========================= */
-    function getSession(){
-      const id = localStorage.getItem("amica_currentUserId") || sessionStorage.getItem("amica_currentUserId");
-      const user = localStorage.getItem("amica_currentUser") || sessionStorage.getItem("amica_currentUser");
-      return { id, user: user ? JSON.parse(user) : null };
+  function getSession(){
+    const id = localStorage.getItem("amica_currentUserId") || sessionStorage.getItem("amica_currentUserId");
+    const user = localStorage.getItem("amica_currentUser") || sessionStorage.getItem("amica_currentUser");
+    return { id, user: user ? JSON.parse(user) : null };
+  }
+
+  function genLobbyId(){
+    const chars="ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+    let out="";
+    for(let i=0;i<4;i++) out += chars[Math.floor(Math.random()*chars.length)];
+    out += "-";
+    for(let i=0;i<4;i++) out += chars[Math.floor(Math.random()*chars.length)];
+    return out;
+  }
+
+  async function findOpenLobby(){
+    const snap = await db.ref("Lobbies").orderByChild("status").equalTo("open").limitToFirst(40).once("value");
+    const all = snap.val() || {};
+    const list = Object.entries(all).map(([id, l]) => ({ id, l }));
+
+    // pick a lobby that has a host, and NOT already has 2 players
+    for(const item of list){
+      const l = item.l || {};
+      const hostId = String(l?.host?.userId || l?.hostId || "");
+      if(!hostId) continue;
+
+      const players = l.players || {};
+      const ids = Object.keys(players);
+      const hasHostInPlayers = !!players[hostId];
+
+      // allow either: only host in players OR even host not yet written in players, still OK
+      const count = ids.length;
+      if(count >= 2) continue;
+
+      return item.id;
     }
-    function clearSession(){
-      localStorage.removeItem("amica_currentUserId");
-      localStorage.removeItem("amica_currentUser");
-      sessionStorage.removeItem("amica_currentUserId");
-      sessionStorage.removeItem("amica_currentUser");
-    }
-    const session = getSession();
-    if(!session.id || !session.user){ window.location.href = "login.html"; }
-    const userId = String(session.id);
-    document.getElementById("playerName").textContent = session.user?.Username || "—";
-    document.getElementById("btnLogout").addEventListener("click", () => { clearSession(); location.href="login.html"; });
+    return "";
+  }
 
-    /* =========================
-       TOAST
-       ========================= */
-    const toastEl = document.getElementById("toast");
-    let toastTimer = null;
-    function toast(msg){
-      toastEl.textContent = msg;
-      toastEl.style.display = "block";
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => toastEl.style.display = "none", 2800);
-    }
+  function redirectToRankedLobby(lobbyId){
+    localStorage.setItem("amica_lastLobbyId", lobbyId);
+    const url = `rankedbattle.html?lobbyId=${encodeURIComponent(lobbyId)}&matchId=${encodeURIComponent(lobbyId)}`;
+    window.location.href = url;
+  }
 
-    /* =========================
-       MODE SWITCH
-       ========================= */
-    const viewUnranked = document.getElementById("viewUnranked");
-    const viewRanked = document.getElementById("viewRanked");
+  const session = getSession();
+  if(!session.id || !session.user){ window.location.href = "login.html"; }
+  const userId = String(session.id);
+  document.getElementById("meName").textContent = session.user.Username || "—";
 
-    let currentMode = "unranked";
-    function showMode(mode){
-      currentMode = mode;
-      viewUnranked.style.display = (mode === "unranked") ? "block" : "none";
-      viewRanked.style.display = (mode === "ranked") ? "block" : "none";
-    }
-    document.getElementById("btnUnranked").addEventListener("click", () => showMode("unranked"));
-    document.getElementById("btnRanked").addEventListener("click", () => showMode("ranked"));
+  const rankedBanner = document.getElementById("rankedBanner");
+  const savedLobbyEl = document.getElementById("savedLobby");
+  const savedLobbyStatusEl = document.getElementById("savedLobbyStatus");
 
-    /* =========================
-       STORY MODE (UNRANKED)
-       ========================= */
-    const CAMPAIGNS = [
-      { key:"ice", name:"Ice Dwarfs", desc:"Frozen mines, rune engines, and a kingdom that doesn’t do ‘warm welcomes’.", theme:"ICE", chapters:10, stagesPerChapter:10 },
-      { key:"demon", name:"Demons", desc:"Ash storms, infernal knights, and contracts you really shouldn’t sign.", theme:"DEMON", chapters:10, stagesPerChapter:10 }
-    ];
+  const btnFindRanked = document.getElementById("btnFindRanked");
+  const btnResumeRanked = document.getElementById("btnResumeRanked");
+  const btnClearRanked = document.getElementById("btnClearRanked");
 
-    const viewFactions = document.getElementById("viewFactions");
-    const viewChapters = document.getElementById("viewChapters");
-    const viewStages = document.getElementById("viewStages");
-    const factionTiles = document.getElementById("factionTiles");
-    const chapterTiles = document.getElementById("chapterTiles");
-    const stageTiles = document.getElementById("stageTiles");
-    const chapTitle = document.getElementById("chapTitle");
-    const stageTitle = document.getElementById("stageTitle");
+  async function refreshSavedLobbyUI(){
+    const lid = localStorage.getItem("amica_lastLobbyId") || "";
+    savedLobbyEl.textContent = lid || "—";
+    savedLobbyStatusEl.textContent = "—";
+    btnResumeRanked.disabled = !lid;
 
-    let currentStoryView = "factions";
-    let activeCampaignKey = null;
-    let activeChapterIndex = null;
-
-    function showStory(which){
-      currentStoryView = which;
-      viewFactions.style.display = (which==="factions") ? "block" : "none";
-      viewChapters.style.display = (which==="chapters") ? "block" : "none";
-      viewStages.style.display = (which==="stages") ? "block" : "none";
-    }
-    document.getElementById("btnStory").addEventListener("click", () => showStory("factions"));
-    document.getElementById("btnBackToFactions").addEventListener("click", () => showStory("factions"));
-    document.getElementById("btnBackToChapters").addEventListener("click", () => showStory("chapters"));
-
-    async function getProgress(){
-      const snap = await db.ref(`Progress/${userId}/story`).once("value");
-      return snap.val() || {};
-    }
-    function pct(num, den){
-      if(!den) return 0;
-      return Math.max(0, Math.min(100, Math.round((num/den)*100)));
-    }
-    function tileBarHTML(percent){
-      return `<div class="tileBar"><div style="width:${percent}%"></div></div>`;
+    if(!lid){
+      rankedBanner.textContent =
+        "Press 'Find Ranked Game'.\n" +
+        "We will either join an open lobby or create a new one, then move you into the Ready page.";
+      return;
     }
 
-    async function renderFactions(){
-      factionTiles.innerHTML = "";
-      const prog = await getProgress();
+    const snap = await db.ref(`Lobbies/${lid}`).once("value");
+    const l = snap.val();
+    if(!l){
+      savedLobbyStatusEl.textContent = "missing";
+      rankedBanner.textContent = "Saved lobby does not exist anymore.\nPress Find Ranked Game to create a new one.";
+      return;
+    }
+    const st = String(l.status || "open");
+    savedLobbyStatusEl.textContent = st;
 
-      CAMPAIGNS.forEach((c) => {
-        const total = c.chapters * c.stagesPerChapter;
-        let done = 0;
+    rankedBanner.textContent =
+      `Saved lobby found: ${lid}\n` +
+      `Status: ${st}\n` +
+      "Use Resume to re-enter the lobby.";
+  }
 
-        const cProg = prog?.[c.key]?.chapters || {};
-        for(let ci=1; ci<=c.chapters; ci++){
-          const ch = cProg[String(ci)] || {};
-          const stages = ch.stages || {};
-          for(let si=1; si<=c.stagesPerChapter; si++){
-            if(stages[String(si)] === true) done++;
-          }
+  btnResumeRanked.addEventListener("click", async () => {
+    const lid = localStorage.getItem("amica_lastLobbyId") || "";
+    if(!lid) return;
+    redirectToRankedLobby(lid);
+  });
+
+  btnClearRanked.addEventListener("click", async () => {
+    localStorage.removeItem("amica_lastLobbyId");
+    toast("Saved lobby cleared.");
+    await refreshSavedLobbyUI();
+  });
+
+  btnFindRanked.addEventListener("click", async () => {
+    btnFindRanked.disabled = true;
+    rankedBanner.textContent = "Searching for an open lobby…";
+
+    try{
+      let lobbyId = await findOpenLobby();
+
+      if(lobbyId){
+        // join it
+        rankedBanner.textContent = "Joining an open lobby…";
+        const lobbyRef = db.ref(`Lobbies/${lobbyId}`);
+
+        // Write your player record
+        await lobbyRef.child(`players/${userId}`).update({
+          userId,
+          username: session.user.Username || "",
+          ready: false
+        });
+
+        // If lobby doesn't have guest assigned, set guest
+        const snap = await lobbyRef.once("value");
+        const l = snap.val() || {};
+        const hostId = String(l?.host?.userId || l?.hostId || "");
+        if(hostId && String(hostId) !== String(userId)){
+          await lobbyRef.update({
+            guest: { userId, username: session.user.Username || "" }
+          });
         }
-        const percent = pct(done, total);
 
-        const tile = document.createElement("div");
-        tile.className = "tile";
-        tile.innerHTML = `
-          <div class="tileTop">
-            <div class="tileTitle">${c.name}</div>
-            <div class="badge">${done}/${total}</div>
-          </div>
-          <div class="tileMeta">
-            <span class="badge">${c.chapters} chapters</span>
-            <span class="badge">${total} stages</span>
-            <span class="badge">${c.theme}</span>
-          </div>
-          <div style="color:rgba(234,240,255,.78); line-height:1.5; font-size:13px;">
-            ${c.desc}
-          </div>
-          ${tileBarHTML(percent)}
-        `;
-        tile.addEventListener("click", async () => {
-          activeCampaignKey = c.key;
-          activeChapterIndex = null;
-          chapTitle.textContent = `Story Mode — ${c.name} Chapters`;
-          renderChapters(c, prog);
-          showStory("chapters");
-        });
-        factionTiles.appendChild(tile);
-      });
-    }
-
-    function renderChapters(campaign, prog){
-      chapterTiles.innerHTML = "";
-      const cProg = prog?.[campaign.key]?.chapters || {};
-      for(let i=1; i<=campaign.chapters; i++){
-        const ch = cProg[String(i)] || {};
-        const stages = ch.stages || {};
-        let done = 0;
-        for(let s=1; s<=campaign.stagesPerChapter; s++){
-          if(stages[String(s)] === true) done++;
-        }
-        const percent = pct(done, campaign.stagesPerChapter);
-        const completed = (ch.completed === true) || (done === campaign.stagesPerChapter);
-
-        const tile = document.createElement("div");
-        tile.className = "tile";
-        tile.innerHTML = `
-          <div class="tileTop">
-            <div class="tileTitle">Chapter ${i}</div>
-            <div class="badge">${done}/${campaign.stagesPerChapter}</div>
-          </div>
-          <div class="tileMeta">
-            <span class="badge">${completed ? "COMPLETED" : "IN PROGRESS"}</span>
-            <span class="badge">Reward: 1 card</span>
-          </div>
-          <div style="color:rgba(234,240,255,.78); line-height:1.5; font-size:13px;">
-            Clear all 10 stages to unlock the chapter card.
-          </div>
-          ${tileBarHTML(percent)}
-        `;
-        tile.addEventListener("click", () => {
-          activeChapterIndex = i;
-          stageTitle.textContent = `${campaign.name} — Chapter ${i} Stages`;
-          renderStages(campaign, prog, i);
-          showStory("stages");
-        });
-        chapterTiles.appendChild(tile);
-      }
-    }
-
-    function renderStages(campaign, prog, chapterIndex){
-      stageTiles.innerHTML = "";
-      const cProg = prog?.[campaign.key]?.chapters || {};
-      const ch = cProg[String(chapterIndex)] || {};
-      const stages = ch.stages || {};
-
-      for(let s=1; s<=campaign.stagesPerChapter; s++){
-        const done = stages[String(s)] === true;
-
-        const tile = document.createElement("div");
-        tile.className = "tile";
-        tile.innerHTML = `
-          <div class="tileTop">
-            <div class="tileTitle">Stage ${s}</div>
-            <div class="badge">${done ? "COMPLETED" : "IN PROGRESS"}</div>
-          </div>
-          <div class="tileMeta">
-            <span class="badge">${campaign.theme}</span>
-            <span class="badge">Deck: 10 cards</span>
-          </div>
-          <div style="color:rgba(234,240,255,.78); line-height:1.5; font-size:13px;">
-            ${done ? "Cleared. The path forward opens…" : "Battle an enemy patrol themed to this chapter."}
-          </div>
-          ${tileBarHTML(done ? 100 : 0)}
-        `;
-
-        tile.addEventListener("click", async () => {
-          if(!playerDeck || playerDeck.length !== 10){
-            toast("Your active deck must have exactly 10 cards. Fix it in Decks.");
-            return;
-          }
-          const payload = {
-            mode: "unranked_story",
-            userId,
-            deckKey: activeCampaignKey,
-            deckCards: playerDeck,
-            story: {
-              campaign: campaign.key,
-              campaignName: campaign.name,
-              chapter: chapterIndex,
-              stage: s,
-              theme: campaign.theme,
-              background: `images/${campaign.key}chapter${chapterIndex}background.png`
-            }
-          };
-          sessionStorage.setItem("amica_battlePayload", JSON.stringify(payload));
-          window.location.href = "battle.html";
-        });
-
-        stageTiles.appendChild(tile);
-      }
-    }
-
-    /* =========================
-       ACTIVE DECK
-       ========================= */
-    const deckPill = document.getElementById("deckPill");
-    const deckList = document.getElementById("deckList");
-    const btnRefreshDeck = document.getElementById("btnRefreshDeck");
-
-    const CARD_CATALOG = [
-      {id:"HUM_001", name:"Human Warrior", archetype:"Humans", role:"Warrior", rarity:"Common"},
-      {id:"HUM_002", name:"Human Farmer", archetype:"Humans", role:"Farmer", rarity:"Common"},
-      {id:"HUM_003", name:"Human Archer", archetype:"Humans", role:"Archer", rarity:"Uncommon"},
-      {id:"HUM_004", name:"Human Wizard", archetype:"Humans", role:"Wizard", rarity:"Rare"},
-      {id:"HUM_005", name:"Human Elder Wizard", archetype:"Humans", role:"Elder Wizard", rarity:"Epic"},
-      {id:"HUM_006", name:"Human Cleric", archetype:"Humans", role:"Cleric", rarity:"Rare"},
-      {id:"HUM_007", name:"Human Knight", archetype:"Humans", role:"Knight", rarity:"Uncommon"},
-      {id:"HUM_008", name:"Human Lancer", archetype:"Humans", role:"Lancer", rarity:"Uncommon"},
-      {id:"HUM_009", name:"Human Blacksmith", archetype:"Humans", role:"Blacksmith", rarity:"Common"},
-      {id:"HUM_010", name:"Human Astrologer", archetype:"Humans", role:"Astrologer", rarity:"Rare"},
-      {id:"SKL_001", name:"Skeleton Warrior", archetype:"Skeletons", role:"Warrior", rarity:"Common"},
-      {id:"SKL_002", name:"Skeleton Knight", archetype:"Skeletons", role:"Knight", rarity:"Uncommon"},
-      {id:"SKL_003", name:"Skeleton Archer", archetype:"Skeletons", role:"Archer", rarity:"Uncommon"},
-      {id:"SKL_004", name:"Skeleton Wizard", archetype:"Skeletons", role:"Wizard", rarity:"Rare"},
-      {id:"SKL_005", name:"Skeleton Elder Wizard", archetype:"Skeletons", role:"Elder Wizard", rarity:"Epic"},
-      {id:"SKL_006", name:"Skeleton Cleric", archetype:"Skeletons", role:"Cleric", rarity:"Rare"},
-      {id:"SKL_007", name:"Skeleton Lancer", archetype:"Skeletons", role:"Lancer", rarity:"Uncommon"},
-      {id:"SKL_008", name:"Skeleton Blacksmith", archetype:"Skeletons", role:"Blacksmith", rarity:"Common"},
-      {id:"SKL_009", name:"Skeleton Assassin", archetype:"Skeletons", role:"Assassin", rarity:"Rare"},
-      {id:"SKL_010", name:"Skeleton Warden", archetype:"Skeletons", role:"Warden", rarity:"Rare"},
-      {id:"DEM_001", name:"Demon Imp", archetype:"Demons", role:"Imp", rarity:"Common"},
-      {id:"DEM_002", name:"Demon Brute", archetype:"Demons", role:"Brute", rarity:"Uncommon"},
-      {id:"DEM_003", name:"Demon Hellhound", archetype:"Demons", role:"Beast", rarity:"Uncommon"},
-      {id:"DEM_004", name:"Demon Warlock", archetype:"Demons", role:"Warlock", rarity:"Rare"},
-      {id:"DEM_005", name:"Demon Succubus", archetype:"Demons", role:"Enchantress", rarity:"Rare"},
-      {id:"DEM_006", name:"Demon Infernal Knight", archetype:"Demons", role:"Knight", rarity:"Epic"},
-      {id:"DEM_007", name:"Demon Flame Lancer", archetype:"Demons", role:"Lancer", rarity:"Rare"},
-      {id:"DEM_008", name:"Demon Ash Archer", archetype:"Demons", role:"Archer", rarity:"Uncommon"},
-      {id:"DEM_009", name:"Demon Elder Warlock", archetype:"Demons", role:"Elder Warlock", rarity:"Epic"},
-      {id:"DEM_010", name:"Demon Lord’s Herald", archetype:"Demons", role:"Herald", rarity:"Epic"},
-      {id:"ICE_001", name:"Ice Dwarf Miner", archetype:"Ice Dwarfs", role:"Miner", rarity:"Common"},
-      {id:"ICE_002", name:"Ice Dwarf Shieldbearer", archetype:"Ice Dwarfs", role:"Tank", rarity:"Uncommon"},
-      {id:"ICE_003", name:"Ice Dwarf Axeguard", archetype:"Ice Dwarfs", role:"Warrior", rarity:"Uncommon"},
-      {id:"ICE_004", name:"Ice Dwarf Runecaster", archetype:"Ice Dwarfs", role:"Runecaster", rarity:"Rare"},
-      {id:"ICE_005", name:"Ice Dwarf Frost Archer", archetype:"Ice Dwarfs", role:"Archer", rarity:"Uncommon"},
-      {id:"ICE_006", name:"Ice Dwarf Engineer", archetype:"Ice Dwarfs", role:"Engineer", rarity:"Rare"},
-      {id:"ICE_007", name:"Ice Dwarf Hammer Knight", archetype:"Ice Dwarfs", role:"Knight", rarity:"Rare"},
-      {id:"ICE_008", name:"Ice Dwarf Glacier Lancer", archetype:"Ice Dwarfs", role:"Lancer", rarity:"Rare"},
-      {id:"ICE_009", name:"Ice Dwarf Elder Runelord", archetype:"Ice Dwarfs", role:"Elder", rarity:"Epic"},
-      {id:"ICE_010", name:"Ice Dwarf Warden", archetype:"Ice Dwarfs", role:"Warden", rarity:"Epic"},
-    ];
-    const CARD_BY_ID = Object.fromEntries(CARD_CATALOG.map(c => [c.id, c]));
-    const imgPath = (cardName) => `images/${cardName}.png`;
-
-    let activeDeckKey = "humans";
-    let playerDeck = null;
-
-    function deckRow(cardId, idx){
-      const card = CARD_BY_ID[cardId];
-      const name = card ? card.name : cardId;
-      const arche = card ? card.archetype : "Unknown";
-      const role = card ? card.role : "Unknown";
-      const rarity = card ? card.rarity : "Unknown";
-      const img = card ? imgPath(card.name) : "";
-
-      const row = document.createElement("div");
-      row.className = "deckCard";
-      row.innerHTML = `
-        <div class="deckLeft">
-          <div class="thumb"><img alt="" src="${img}"/></div>
-          <div class="deckText">
-            <div class="deckName">${idx+1}. ${name}</div>
-            <div class="rowBadges">
-              <span class="badge">${arche}</span>
-              <span class="badge">${rarity}</span>
-              <span class="badge">${role}</span>
-            </div>
-            <div class="mono">${cardId}</div>
-          </div>
-        </div>
-        <span class="pill">OK</span>
-      `;
-      const imageEl = row.querySelector("img");
-      imageEl.onerror = () => {
-        imageEl.removeAttribute("src");
-        const t = imageEl.closest(".thumb");
-        t.textContent = "—";
-        t.style.fontFamily = "var(--mono)";
-        t.style.color = "rgba(234,240,255,.75)";
-      };
-      return row;
-    }
-
-    async function loadActiveDeck(){
-      deckPill.textContent = "Loading…";
-      deckList.innerHTML = "";
-      const decksSnap = await db.ref(`Decks/${userId}`).once("value");
-      const decks = decksSnap.val() || {};
-      activeDeckKey = decks.selectedDeckKey || decks.defaultDeckKey || "humans";
-      const cards = decks?.[activeDeckKey]?.cards;
-      playerDeck = Array.isArray(cards) ? cards.filter(Boolean).slice(0,10) : null;
-
-      if(!playerDeck || playerDeck.length !== 10){
-        deckPill.textContent = `Deck "${activeDeckKey}" invalid`;
-        deckList.innerHTML = `
-          <div class="deckCard">
-            <div class="deckLeft">
-              <div class="thumb" style="font-family:var(--mono); color:rgba(234,240,255,.75);">!</div>
-              <div class="deckText">
-                <div class="deckName">Deck is not ready</div>
-                <div class="mono">Go to Decks and save exactly 10 cards.</div>
-              </div>
-            </div>
-            <span class="pill" style="border-color: rgba(255,85,119,.35); background: rgba(255,85,119,.10)">FIX</span>
-          </div>
-        `;
-        return false;
-      }
-
-      deckPill.textContent = `Using: ${activeDeckKey} (10 cards)`;
-      playerDeck.forEach((id, idx) => deckList.appendChild(deckRow(id, idx)));
-      return true;
-    }
-
-    btnRefreshDeck.addEventListener("click", async () => {
-      await loadActiveDeck();
-      if(currentMode === "unranked"){
-        await renderFactions();
-      }
-    });
-
-    /* =========================
-       RANKED MATCHMAKING (Lobby list method)
-       + FIX: redirect via URL + localStorage
-       ========================= */
-    const btnFindRanked = document.getElementById("btnFindRanked");
-    const btnCancelRanked = document.getElementById("btnCancelRanked");
-    const rankedStatus = document.getElementById("rankedStatus");
-    const searchingList = document.getElementById("searchingList");
-
-    let myRankedLobbyId = null;
-    let rankedNotifyRef = null;
-    let rankedNotifyListener = null;
-
-    function setRankedStatus(s){ rankedStatus.textContent = s; }
-
-    function stopNotify(){
-      if(rankedNotifyRef && rankedNotifyListener){
-        rankedNotifyRef.off("value", rankedNotifyListener);
-      }
-      rankedNotifyRef = null;
-      rankedNotifyListener = null;
-    }
-
-    async function clearMyNotify(){
-      await db.ref(`RankedNotify/${userId}`).remove();
-    }
-
-    async function startNotify(){
-      stopNotify();
-      rankedNotifyRef = db.ref(`RankedNotify/${userId}`);
-      rankedNotifyListener = (snap) => {
-        const msg = snap.val();
-        if(!msg || !msg.matchId) return;
-
-        setRankedStatus("matched! entering ranked battle…");
-        btnFindRanked.disabled = false;
-        btnCancelRanked.disabled = true;
-
-        // ? IMPORTANT FIX:
-        // - localStorage survives new tab/window
-        // - URL always works
-        const payload = { mode:"ranked_pvp", userId, matchId: msg.matchId };
-        localStorage.setItem("amica_battlePayload", JSON.stringify(payload));
-
-        clearMyNotify().catch(()=>{});
-
-        window.location.href = `rankedbattle.html?mode=ranked&matchId=${encodeURIComponent(msg.matchId)}`;
-      };
-      rankedNotifyRef.on("value", rankedNotifyListener);
-    }
-
-    function startLobbyListListener(){
-      db.ref("RankedLobbies").on("value", (snap) => {
-        const all = snap.val() || {};
-        const rows = [];
-        Object.keys(all).forEach((id) => {
-          const l = all[id];
-          if(l && l.status === "searching"){
-            rows.push(`• ${id} | host=${l.hostName || l.hostId} | deck=${l.hostDeckKey || "?"}`);
-          }
-        });
-        searchingList.textContent = rows.length ? rows.join("\n") : "—";
-      });
-    }
-
-    async function cancelRanked(){
-      setRankedStatus("cancelled");
-      btnFindRanked.disabled = false;
-      btnCancelRanked.disabled = true;
-
-      if(myRankedLobbyId){
-        await db.ref(`RankedLobbies/${myRankedLobbyId}`).remove().catch(()=>{});
-        myRankedLobbyId = null;
-      }
-      await clearMyNotify().catch(()=>{});
-      stopNotify();
-    }
-
-    async function findRanked(){
-      const ok = await loadActiveDeck();
-      if(!ok){
-        toast("Fix your active deck to exactly 10 cards before Ranked.");
+        toast("Joined lobby: " + lobbyId);
+        redirectToRankedLobby(lobbyId);
         return;
       }
 
-      btnFindRanked.disabled = true;
-      btnCancelRanked.disabled = false;
-      setRankedStatus("searching…");
-
-      await clearMyNotify().catch(()=>{});
-      await startNotify();
-
-      // Look for an existing searching lobby (not mine)
-      const lSnap = await db.ref("RankedLobbies").once("value");
-      const lobbies = lSnap.val() || {};
-
-      let foundLobbyId = null;
-
-      for(const id of Object.keys(lobbies)){
-        const l = lobbies[id];
-        if(l && l.status === "searching" && String(l.hostId) !== String(userId)){
-          foundLobbyId = id;
-          break;
-        }
-      }
-
-      if(foundLobbyId){
-        setRankedStatus("found a lobby — joining…");
-        const lobbyRef = db.ref(`RankedLobbies/${foundLobbyId}`);
-
-        const joinTx = await lobbyRef.transaction((current) => {
-          if(!current) return current;
-          if(current.status !== "searching") return; // abort
-          if(current.guestId) return; // already taken
-          current.guestId = userId;
-          current.guestName = session.user.Username || "Guest";
-          current.guestDeckKey = activeDeckKey;
-          current.status = "matched";
-          current.matchedAt = now();
-          return current;
-        });
-
-        if(!joinTx.committed){
-          setRankedStatus("someone joined first — creating new lobby…");
-        } else {
-          const lobby = joinTx.snapshot.val();
-          const matchId = db.ref("RankedMatches").push().key;
-
-          const matchData = {
-            matchId,
-            lobbyId: foundLobbyId,
-            status: "active",
-            createdAt: now(),
-            maxTurns: 10,
-            turn: 1,
-            hostId: lobby.hostId,
-            guestId: lobby.guestId,
-            hostName: lobby.hostName || "Host",
-            guestName: lobby.guestName || "Guest",
-            hostDeckKey: lobby.hostDeckKey || "humans",
-            guestDeckKey: lobby.guestDeckKey || "humans",
-            scoreHost: 0,
-            scoreGuest: 0,
-            picks: {},
-            current: {}
-          };
-
-          const updates = {};
-          updates[`RankedMatches/${matchId}`] = matchData;
-          updates[`RankedLobbies/${foundLobbyId}/matchId`] = matchId;
-          updates[`RankedNotify/${lobby.hostId}`] = { matchId, ts: now() };
-          updates[`RankedNotify/${lobby.guestId}`] = { matchId, ts: now() };
-
-          await db.ref().update(updates);
-
-          setRankedStatus("match created — launching…");
-          return;
-        }
-      }
-
-      // Create my own searching lobby
-      setRankedStatus("creating lobby…");
-
-      const newLobbyId = db.ref("RankedLobbies").push().key;
-      myRankedLobbyId = newLobbyId;
+      // else create
+      rankedBanner.textContent = "No open lobbies. Creating a new lobby…";
+      lobbyId = genLobbyId();
 
       const lobbyData = {
-        lobbyId: newLobbyId,
-        status: "searching",
-        createdAt: now(),
-        hostId: userId,
-        hostName: session.user.Username || "Host",
-        hostDeckKey: activeDeckKey
+        lobbyId,
+        createdAt: Date.now(),
+        status: "open",
+        host: {
+          userId,
+          username: session.user.Username || "",
+          deckKey: "" // filled when Ready locks deck
+        }
       };
 
-      await db.ref(`RankedLobbies/${newLobbyId}`).set(lobbyData);
+      await db.ref(`Lobbies/${lobbyId}`).set(lobbyData);
+      await db.ref(`Lobbies/${lobbyId}/players/${userId}`).set({
+        userId,
+        username: session.user.Username || "",
+        ready: false
+      });
 
-      db.ref(`RankedLobbies/${newLobbyId}`).onDisconnect().remove();
+      toast("Created lobby: " + lobbyId);
+      redirectToRankedLobby(lobbyId);
 
-      setRankedStatus("waiting for opponent…");
+    } catch(e){
+      console.error(e);
+      alert("Ranked matchmaking error: " + (e?.message || e));
+      btnFindRanked.disabled = false;
+      await refreshSavedLobbyUI();
     }
+  });
 
-    btnFindRanked.addEventListener("click", findRanked);
-    btnCancelRanked.addEventListener("click", cancelRanked);
-
-    /* =========================
-       INIT
-       ========================= */
-    async function init(){
-      showMode("unranked");
-      showStory("factions");
-      await loadActiveDeck();
-      await renderFactions();
-      startLobbyListListener();
-      await clearMyNotify().catch(()=>{});
-    }
-    init();
-  </script>
+  refreshSavedLobbyUI();
+</script>
 </body>
 </html>

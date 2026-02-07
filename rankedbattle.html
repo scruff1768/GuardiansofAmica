@@ -3,28 +3,21 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Deckforge Arena — Ranked Battle</title>
+  <title>Deckforge Arena — Ranked Lobby</title>
 
   <style>
     :root{
-      --bg0:#070a12;
-      --bg1:#0b1020;
-      --text:#eaf0ff;
-      --muted: rgba(234,240,255,.72);
-      --primary:#7c5cff;
-      --primary2:#23d5ff;
-      --good:#3dffb7;
+      --bg0:#070a12; --bg1:#0b1020; --text:#eaf0ff; --muted: rgba(234,240,255,.72);
+      --primary:#7c5cff; --primary2:#23d5ff; --good:#3dffb7; --bad:#ff4d6d;
       --shadow: 0 18px 60px rgba(0,0,0,.45);
-      --r26: 26px;
-      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --r14:14px; --r26:26px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
       --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-      --max: 1280px;
+      --max: 1100px;
     }
     *{ box-sizing:border-box; }
     body{
-      margin:0;
-      font-family: var(--sans);
-      color: var(--text);
+      margin:0; font-family:var(--sans); color:var(--text);
       background:
         radial-gradient(1200px 800px at 25% 10%, rgba(124,92,255,.16), transparent 55%),
         radial-gradient(1200px 800px at 80% 20%, rgba(35,213,255,.13), transparent 55%),
@@ -32,132 +25,87 @@
       overflow-x:hidden;
     }
     .container{ width:min(var(--max), calc(100% - 40px)); margin-inline:auto; }
-
-    .nav{
-      position:sticky; top:0; z-index:10;
-      backdrop-filter: blur(14px);
-      background: rgba(7,10,18,.45);
-      border-bottom: 1px solid rgba(255,255,255,.08);
-    }
-    .nav__inner{
-      display:flex; align-items:center; justify-content:space-between;
-      padding: 16px 0; gap: 14px; flex-wrap:wrap;
-    }
-    .brand{ display:flex; align-items:center; gap: 12px; text-decoration:none; color:inherit; }
+    .nav{ position:sticky; top:0; z-index:10; backdrop-filter: blur(14px); background: rgba(7,10,18,.45); border-bottom: 1px solid rgba(255,255,255,.08); }
+    .nav__inner{ display:flex; align-items:center; justify-content:space-between; padding: 16px 0; gap: 14px; flex-wrap:wrap; }
+    .brand{ display:flex; align-items:center; gap:12px; text-decoration:none; color:inherit; }
     .brand__mark{
-      width:36px; height:36px; border-radius:12px;
-      display:grid; place-items:center; font-weight:1000;
+      width:36px; height:36px; border-radius:12px; display:grid; place-items:center; font-weight:1000;
       background: linear-gradient(135deg, rgba(124,92,255,.9), rgba(35,213,255,.75));
       box-shadow: 0 10px 28px rgba(124,92,255,.22);
     }
-    .brand__name{ font-weight:1000; letter-spacing:.2px; }
+    .brand__name{ font-weight:1000; }
     .nav__right{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
-
     .chip{
-      padding: 8px 12px;
-      border-radius: 999px;
+      padding: 8px 12px; border-radius: 999px;
       border: 1px solid rgba(255,255,255,.12);
       background: rgba(255,255,255,.05);
-      color: rgba(234,240,255,.88);
-      font-weight: 800;
-      font-size: 13px;
-      display:inline-flex;
-      gap: 8px;
-      align-items:center;
+      font-weight: 900; font-size: 13px;
+      display:inline-flex; gap:8px; align-items:center;
     }
-    .chip b{ font-family: var(--mono); font-weight: 1000; }
+    .chip b{ font-family: var(--mono); }
 
     .btn{
       border: 1px solid rgba(255,255,255,.14);
       background: rgba(255,255,255,.06);
       color: var(--text);
       padding: 10px 14px;
-      border-radius: 14px;
+      border-radius: var(--r14);
       font-weight: 1000;
       cursor:pointer;
-      transition: transform .15s ease, background .15s ease, border-color .15s ease;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap: 8px;
+      transition: transform .15s ease, background .15s ease;
       text-decoration:none;
-      user-select:none;
+      display:inline-flex; align-items:center; gap:10px;
     }
-    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.09); }
+    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.10); }
+    .btn:disabled{ opacity:.55; cursor:not-allowed; transform:none; }
     .btn--primary{
       border-color: rgba(124,92,255,.55);
       background: linear-gradient(135deg, rgba(124,92,255,.95), rgba(35,213,255,.70));
       box-shadow: 0 16px 46px rgba(124,92,255,.22);
     }
-    .btn:disabled{ opacity:.55; cursor:not-allowed; transform:none; }
 
-    .wrap{ padding: 18px 0 46px; }
-    h1{ margin:0; font-size: clamp(22px, 3vw, 36px); letter-spacing:-.6px; }
-    .sub{ margin: 10px 0 0; color: var(--muted); line-height:1.6; max-width: 110ch; }
+    .wrap{ padding: 18px 0 52px; }
+    h1{ margin:0; font-size: clamp(22px, 3vw, 34px); letter-spacing:-.7px; }
+    .sub{ margin: 10px 0 0; color: var(--muted); line-height:1.6; }
 
     .panel{
-      margin-top: 14px;
       border: 1px solid rgba(255,255,255,.12);
       background: rgba(255,255,255,.04);
       border-radius: var(--r26);
       box-shadow: var(--shadow);
       overflow:hidden;
+      margin-top: 14px;
     }
     .panel__head{
       padding: 12px 14px;
       border-bottom: 1px solid rgba(255,255,255,.08);
-      display:flex; align-items:center; justify-content:space-between; gap: 10px;
+      display:flex; align-items:center; justify-content:space-between; gap: 10px; flex-wrap:wrap;
       background: rgba(0,0,0,.12);
-      flex-wrap:wrap;
     }
     .panel__title{ font-weight: 1000; display:flex; align-items:center; gap: 10px; }
-    .dot{ width:10px; height:10px; border-radius:999px; background: var(--good); box-shadow: 0 0 0 5px rgba(61,255,183,.10); }
+    .dot{ width:10px; height:10px; border-radius:999px; background: #3dffb7; box-shadow: 0 0 0 5px rgba(61,255,183,.10); }
     .panel__body{ padding: 12px 14px 14px; }
 
-    .pill{
-      font-family: var(--mono);
-      font-size: 12px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(7,10,18,.25);
-      color: rgba(234,240,255,.90);
-      display:inline-flex;
-      align-items:center;
-      gap: 8px;
-      user-select:none;
-    }
+    .grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 900px){ .grid{ grid-template-columns: 1fr; } }
 
     .banner{
-      padding: 10px 12px;
-      border-radius: 18px;
+      padding: 10px 12px; border-radius: 18px;
       border: 1px solid rgba(255,255,255,.12);
       background: rgba(255,255,255,.05);
-      color: rgba(234,240,255,.86);
       line-height: 1.5;
-    }
-
-    .row{
-      display:flex; gap: 10px; flex-wrap:wrap; align-items:center;
-    }
-
-    .toast{
-      position:fixed;
-      left:50%;
-      transform: translateX(-50%);
-      bottom: 18px;
-      padding: 10px 14px;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(15,18,30,.92);
-      backdrop-filter: blur(14px);
-      box-shadow: var(--shadow);
-      color: rgba(234,240,255,.92);
-      display:none;
-      z-index:200;
-      max-width: min(980px, calc(100% - 40px));
       white-space:pre-wrap;
     }
+    .row{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-top: 12px; }
+    select{
+      background: rgba(0,0,0,.22);
+      border: 1px solid rgba(255,255,255,.14);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 14px;
+      font-weight: 900;
+    }
+    .small{ font-family: var(--mono); font-size: 12px; color: rgba(234,240,255,.75); }
   </style>
 
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -171,49 +119,66 @@
       <span class="brand__mark">?</span>
       <span class="brand__name">Deckforge Arena</span>
     </a>
-
     <div class="nav__right">
       <div class="chip">You: <b id="meName">—</b></div>
-      <div class="chip">Match: <b id="matchIdLabel">—</b></div>
-      <a class="btn" href="play.html">Back to Play</a>
+      <div class="chip">Lobby: <b id="lobbyLabel">—</b></div>
+      <div class="chip">Role: <b id="roleLabel">—</b></div>
+      <a class="btn" href="play.html">Back</a>
     </div>
   </div>
 </header>
 
 <main class="container wrap">
-  <h1>Ranked Battle Lobby</h1>
-  <p class="sub" id="subLine">Connecting…</p>
+  <h1>Ranked Lobby</h1>
+  <p class="sub">
+    Ranked pulls decks from: <span class="small">Decks/&lt;userId&gt;/&lt;deckKey&gt;/cards</span>
+  </p>
 
-  <div class="panel">
+  <section class="panel">
     <div class="panel__head">
-      <div class="panel__title"><span class="dot"></span> Lobby Ready Check</div>
-      <div class="row">
-        <span class="pill" id="phasePill">Phase: —</span>
-        <span class="pill" id="rolePill">role: —</span>
+      <div class="panel__title"><span class="dot"></span> Lobby Status</div>
+      <div class="row" style="margin:0;">
+        <button class="btn" id="btnResync">Resync</button>
       </div>
     </div>
     <div class="panel__body">
-      <div class="banner" id="statusBanner">Loading lobby state…</div>
+      <div class="banner" id="banner">Loading…</div>
+      <div class="row"><span class="small" id="debugLine">—</span></div>
+    </div>
+  </section>
 
-      <div class="row" style="margin-top:12px;">
-        <button class="btn btn--primary" id="btnReady" disabled>Ready</button>
-        <button class="btn" id="btnForceStart" disabled>Start Match (Host)</button>
-      </div>
-
-      <div class="row" style="margin-top:12px;">
-        <span class="pill" id="hostReadyPill">host ready: false</span>
-        <span class="pill" id="guestReadyPill">guest ready: false</span>
+  <section class="panel">
+    <div class="panel__head"><div class="panel__title"><span class="dot"></span> Players</div></div>
+    <div class="panel__body">
+      <div class="grid">
+        <div class="banner" id="hostBox">Host: —</div>
+        <div class="banner" id="guestBox">Guest: —</div>
       </div>
     </div>
-  </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel__head"><div class="panel__title"><span class="dot"></span> Your Actions</div></div>
+    <div class="panel__body">
+      <div class="row">
+        <label style="font-weight:1000;">Deck:</label>
+        <select id="deckSelect">
+          <option value="humans">Humans</option>
+          <option value="skeletons">Skeletons</option>
+        </select>
+        <button class="btn btn--primary" id="btnLock">Lock Deck</button>
+        <button class="btn" id="btnReady">Ready</button>
+        <button class="btn btn--primary" id="btnStart" disabled>Start Match (Host)</button>
+      </div>
+      <div class="row">
+        <span class="small" id="yourDeckLine">deck not locked</span>
+      </div>
+    </div>
+  </section>
 </main>
 
-<div class="toast" id="toast"></div>
-
 <script>
-  /* =========================
-     FIREBASE INIT
-     ========================= */
+  // Firebase
   const firebaseConfig = {
     apiKey: "AIzaSyDJHl2yCKbiiinesOZ9R_SROC51knmT9TQ",
     authDomain: "goamica-7190c.firebaseapp.com",
@@ -227,168 +192,255 @@
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
 
-  /* =========================
-     SESSION + MATCH ID
-     ========================= */
-  function getParam(name){
-    const url = new URL(window.location.href);
-    return url.searchParams.get(name);
-  }
+  function getParam(name){ return new URL(window.location.href).searchParams.get(name); }
   function getSession(){
     const id = localStorage.getItem("amica_currentUserId") || sessionStorage.getItem("amica_currentUserId");
     const user = localStorage.getItem("amica_currentUser") || sessionStorage.getItem("amica_currentUser");
     return { id, user: user ? JSON.parse(user) : null };
   }
 
-  const session = getSession();
-  if(!session.id || !session.user){
-    window.location.href = "login.html";
+  function normalizeToArray(raw){
+    let arr = [];
+    if(Array.isArray(raw)) arr = raw.slice();
+    else if(raw && typeof raw === "object"){
+      const keys = Object.keys(raw);
+      const numeric = keys.every(k => String(parseInt(k,10)) === k);
+      if(numeric){
+        keys.sort((a,b)=>parseInt(a,10)-parseInt(b,10));
+        arr = keys.map(k => raw[k]);
+      } else {
+        arr = Object.values(raw);
+      }
+    }
+    arr = arr
+      .map(x => (x===undefined || x===null) ? "" : String(x).trim())
+      .filter(x => x && x.toUpperCase() !== "HID");
+    if(arr.length > 10) arr = arr.slice(0,10);
+    return arr;
   }
 
+  // ? Correct table: Decks/<userId>/<deckKey>/cards
+  async function loadDeckCardsFromDecksTable(uid, deckKey){
+    // direct
+    let snap = await db.ref(`Decks/${uid}/${deckKey}/cards`).once("value");
+    let raw = snap.val();
+    let cards = normalizeToArray(raw);
+    if(cards.length) return { path:`Decks/${uid}/${deckKey}/cards`, cards };
+
+    // fallback: selectedDeckKey
+    snap = await db.ref(`Decks/${uid}/selectedDeckKey`).once("value");
+    const sel = (snap.val() || "").toString();
+    if(sel){
+      const snap2 = await db.ref(`Decks/${uid}/${sel}/cards`).once("value");
+      raw = snap2.val();
+      cards = normalizeToArray(raw);
+      if(cards.length) return { path:`Decks/${uid}/${sel}/cards`, cards, usedKey: sel };
+    }
+
+    // fallback: defaultDeckKey
+    snap = await db.ref(`Decks/${uid}/defaultDeckKey`).once("value");
+    const def = (snap.val() || "").toString();
+    if(def){
+      const snap2 = await db.ref(`Decks/${uid}/${def}/cards`).once("value");
+      raw = snap2.val();
+      cards = normalizeToArray(raw);
+      if(cards.length) return { path:`Decks/${uid}/${def}/cards`, cards, usedKey: def };
+    }
+
+    return { path:"", cards:[] };
+  }
+
+  // Session
+  const session = getSession();
+  if(!session.id || !session.user){ window.location.href = "login.html"; }
   const userId = String(session.id);
   document.getElementById("meName").textContent = session.user.Username || "—";
 
-  const matchId = String(getParam("matchId") || "");
-  if(!matchId){
-    alert("Missing matchId.");
-    window.location.href = "play.html";
-  }
-  document.getElementById("matchIdLabel").textContent = matchId;
+  // Lobby id
+  const lobbyId = String(getParam("lobbyId") || getParam("matchId") || localStorage.getItem("amica_lastLobbyId") || "");
+  if(!lobbyId){ alert("Missing lobby id."); window.location.href = "play.html"; }
+  localStorage.setItem("amica_lastLobbyId", lobbyId);
+  document.getElementById("lobbyLabel").textContent = lobbyId;
 
-  const matchRef = db.ref(`RankedMatches/${matchId}`);
+  const lobbyRef = db.ref(`Lobbies/${lobbyId}`);
 
-  /* =========================
-     UI
-     ========================= */
-  const toastEl = document.getElementById("toast");
-  let toastTimer = null;
-  function toast(msg){
-    toastEl.textContent = msg;
-    toastEl.style.display = "block";
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => toastEl.style.display = "none", 2600);
-  }
-
+  const banner = document.getElementById("banner");
+  const debugLine = document.getElementById("debugLine");
+  const hostBox = document.getElementById("hostBox");
+  const guestBox = document.getElementById("guestBox");
+  const roleLabel = document.getElementById("roleLabel");
+  const deckSelect = document.getElementById("deckSelect");
+  const btnLock = document.getElementById("btnLock");
   const btnReady = document.getElementById("btnReady");
-  const btnForceStart = document.getElementById("btnForceStart");
+  const btnStart = document.getElementById("btnStart");
+  const yourDeckLine = document.getElementById("yourDeckLine");
 
-  const phasePill = document.getElementById("phasePill");
-  const rolePill = document.getElementById("rolePill");
-  const hostReadyPill = document.getElementById("hostReadyPill");
-  const guestReadyPill = document.getElementById("guestReadyPill");
-  const statusBanner = document.getElementById("statusBanner");
-  const subLine = document.getElementById("subLine");
+  let live=null;
+  let hostId="", guestId="", isHost=false;
 
-  function setPhase(p){ phasePill.textContent = `Phase: ${p}`; }
-  function setRole(r){ rolePill.textContent = `role: ${r}`; }
-  function setBanner(t){ statusBanner.textContent = t; }
+  async function ensureHostIsSetOnce(){
+    await lobbyRef.child("host").transaction((cur) => {
+      if(cur && cur.userId !== undefined && cur.userId !== null && String(cur.userId).length){
+        return cur;
+      }
+      return { userId: userId, username: session.user.Username || "" };
+    });
+  }
+  async function ensurePlayerNode(){
+    await lobbyRef.child(`players/${userId}`).update({ userId, username: session.user.Username || "" });
+  }
+  async function ensureGuestIsSetIfNeeded(){
+    const snap = await lobbyRef.once("value");
+    const l = snap.val() || {};
+    const hid = String(l?.host?.userId || "");
+    if(!hid) return;
+    const gid = String(l?.guest?.userId || "");
+    if(gid) return;
+    if(String(userId) === String(hid)) return;
+    await lobbyRef.child("guest").set({ userId, username: session.user.Username || "" });
+  }
 
-  /* =========================
-     READY MODEL (explicit)
-     ========================= */
-  let hostId = null;
-  let guestId = null;
-  let isHost = false;
+  function computeRoles(l){
+    hostId = String(l?.host?.userId || "");
+    const gFromGuest = String(l?.guest?.userId || "");
+    let gCandidate = gFromGuest;
 
-  async function pressReady(){
-    btnReady.disabled = true;
+    const p = l?.players || {};
+    const ids = Object.keys(p);
+    const other = ids.find(id => String(id) !== String(hostId));
+    if(!gCandidate && other) gCandidate = String(other);
 
-    if(isHost){
-      await matchRef.update({ readyHost: true });
-      toast("Host ready ?");
-    } else {
-      await matchRef.update({ readyGuest: true });
-      toast("Guest ready ?");
+    guestId = gCandidate || "";
+    isHost = (String(userId) === String(hostId));
+    roleLabel.textContent = isHost ? "host" : "guest";
+  }
+
+  function render(){
+    if(!live){ banner.textContent="Loading…"; return; }
+    computeRoles(live);
+
+    const hostName = live?.players?.[hostId]?.username || live?.host?.username || "—";
+    const guestName = guestId ? (live?.players?.[guestId]?.username || live?.guest?.username || "—") : "waiting…";
+
+    const hostReady = !!live?.players?.[hostId]?.ready;
+    const guestReady = guestId ? !!live?.players?.[guestId]?.ready : false;
+
+    const hostDeck = live?.players?.[hostId]?.deck;
+    const guestDeck = guestId ? live?.players?.[guestId]?.deck : null;
+
+    const hostDeckOk = !!hostDeck?.deckKey && Array.isArray(hostDeck?.cards) && hostDeck.cards.length === 10;
+    const guestDeckOk = !!guestDeck?.deckKey && Array.isArray(guestDeck?.cards) && guestDeck.cards.length === 10;
+
+    hostBox.textContent = `Host: ${hostName}\nID: ${hostId}\nDeck locked: ${hostDeckOk ? "YES" : "NO"}\nReady: ${hostReady ? "YES" : "NO"}`;
+    guestBox.textContent = `Guest: ${guestName}\nID: ${guestId || "—"}\nDeck locked: ${guestDeckOk ? "YES" : "NO"}\nReady: ${guestReady ? "YES" : "NO"}`;
+
+    const myDeck = live?.players?.[userId]?.deck;
+    const myDeckOk = !!myDeck?.deckKey && Array.isArray(myDeck?.cards) && myDeck.cards.length === 10;
+    yourDeckLine.textContent = myDeckOk ? `locked: ${myDeck.deckKey} (10 cards)` : "deck not locked";
+
+    btnStart.disabled = !(isHost && guestId && hostReady && guestReady && hostDeckOk && guestDeckOk);
+
+    debugLine.textContent = `hostId=${hostId} guestId=${guestId||"-"} me=${userId} isHost=${isHost}`;
+
+    banner.textContent = !guestId
+      ? "Waiting for opponent to join…"
+      : `Lobby synced.\nBoth players must Lock Deck and Ready.\n${isHost ? "Then you can Start." : "Wait for host to start."}`;
+
+    if(String(live?.status || "") === "inBattle"){
+      window.location.href = `rankedbattle_play.html?lobbyId=${encodeURIComponent(lobbyId)}&matchId=${encodeURIComponent(lobbyId)}`;
     }
+  }
+
+  async function lockDeck(){
+    const wantedKey = String(deckSelect.value || "");
+    btnLock.disabled = true;
+
+    try{
+      const result = await loadDeckCardsFromDecksTable(userId, wantedKey);
+
+      if(result.cards.length !== 10){
+        alert(
+          `Deck not found or not exactly 10 cards.\n\n` +
+          `Wanted: ${wantedKey}\n` +
+          `Tried: Decks/${userId}/${wantedKey}/cards\n` +
+          `Fallbacks: Decks/${userId}/selectedDeckKey, defaultDeckKey\n\n` +
+          `Found path: ${result.path || "NOT FOUND"}\n` +
+          `Cards found: ${result.cards.length}`
+        );
+        return;
+      }
+
+      // save locked deck into lobby (so rankedbattle_play reads from lobby, not from Decks)
+      await lobbyRef.child(`players/${userId}/deck`).set({
+        deckKey: wantedKey,
+        cards: result.cards
+      });
+
+      // keep selectedDeckKey updated
+      await db.ref(`Decks/${userId}/selectedDeckKey`).set(wantedKey);
+
+      alert(`Deck locked ?\nLoaded from: ${result.path}`);
+    } catch(e){
+      console.error(e);
+      alert("Lock deck error: " + (e?.message || e));
+    } finally {
+      btnLock.disabled = false;
+    }
+  }
+
+  async function toggleReady(){
+    const cur = !!live?.players?.[userId]?.ready;
+    await lobbyRef.child(`players/${userId}/ready`).set(!cur);
   }
 
   async function startMatch(){
     if(!isHost) return;
 
-    // only allow if both ready
-    const snap = await matchRef.once("value");
-    const m = snap.val() || {};
-    const readyHost = !!m.readyHost;
-    const readyGuest = !!m.readyGuest;
+    const hDeck = live?.players?.[hostId]?.deck;
+    const gDeck = live?.players?.[guestId]?.deck;
 
-    if(!(readyHost && readyGuest)){
-      toast("Both players must be ready first.");
-      return;
-    }
+    const hostDeckOk = !!hDeck?.deckKey && Array.isArray(hDeck?.cards) && hDeck.cards.length === 10;
+    const guestDeckOk = !!gDeck?.deckKey && Array.isArray(gDeck?.cards) && gDeck.cards.length === 10;
 
-    // move into actual battle page now
-    // IMPORTANT: your real ranked battle gameplay page can be "rankedbattle_play.html" later.
-    // For now, we keep rankedbattle.html as lobby; so we redirect into "rankedbattle_play.html".
-    // If you want to keep the same filename, tell me and I’ll merge lobby+battle.
-    window.location.href = `rankedbattle_play.html?matchId=${encodeURIComponent(matchId)}`;
-  }
+    if(!hostDeckOk){ alert("Host has not locked a 10-card deck."); return; }
+    if(!guestDeckOk){ alert("Guest has not locked a 10-card deck."); return; }
+    if(!live?.players?.[hostId]?.ready || !live?.players?.[guestId]?.ready){ alert("Both must be Ready."); return; }
 
-  btnReady.addEventListener("click", pressReady);
-  btnForceStart.addEventListener("click", startMatch);
-
-  /* =========================
-     INIT / LISTEN
-     ========================= */
-  async function init(){
-    const snap = await matchRef.once("value");
-    const m = snap.val();
-
-    if(!m){
-      alert("Match not found.");
-      window.location.href = "play.html";
-      return;
-    }
-
-    hostId = String(m.hostId);
-    guestId = String(m.guestId);
-    isHost = (userId === hostId);
-
-    setRole(isHost ? "host" : "guest");
-    subLine.textContent = "Lobby connected. Waiting for readiness…";
-
-    // Ensure explicit ready fields exist
-    const updates = {};
-    if(typeof m.readyHost === "undefined") updates.readyHost = false;
-    if(typeof m.readyGuest === "undefined") updates.readyGuest = false;
-    if(typeof m.phase === "undefined") updates.phase = "lobby";
-    if(Object.keys(updates).length) await matchRef.update(updates);
-
-    // Live listener
-    matchRef.on("value", (snap2) => {
-      const live = snap2.val() || {};
-      const phase = live.phase || "lobby";
-      setPhase(phase);
-
-      const readyHost = !!live.readyHost;
-      const readyGuest = !!live.readyGuest;
-
-      hostReadyPill.textContent = `host ready: ${readyHost}`;
-      guestReadyPill.textContent = `guest ready: ${readyGuest}`;
-
-      // Button rules:
-      // - ready is enabled if I haven't ready'd yet AND phase is lobby
-      // - host can start match only if both ready
-      if(isHost){
-        btnReady.disabled = readyHost || (phase !== "lobby");
-        btnForceStart.disabled = !(readyHost && readyGuest) || (phase !== "lobby");
-      } else {
-        btnReady.disabled = readyGuest || (phase !== "lobby");
-        btnForceStart.disabled = true;
-      }
-
-      if(readyHost && readyGuest){
-        setBanner("Both players ready ? Host can start the match.");
-      } else if(readyHost && !readyGuest){
-        setBanner("Host is ready ? Waiting for guest…");
-      } else if(!readyHost && readyGuest){
-        setBanner("Guest is ready ? Waiting for host…");
-      } else {
-        setBanner("Waiting for both players to press Ready…");
-      }
+    await lobbyRef.child("battle").update({
+      state: "picking",
+      turn: 1,
+      maxTurns: 10,
+      startedAt: Date.now(),
+      score: { host: 0, guest: 0 }
     });
+
+    await lobbyRef.update({ status: "inBattle" });
   }
 
-  init();
+  btnLock.addEventListener("click", lockDeck);
+  btnReady.addEventListener("click", toggleReady);
+  btnStart.addEventListener("click", startMatch);
+  document.getElementById("btnResync").addEventListener("click", async () => {
+    const snap = await lobbyRef.once("value");
+    live = snap.val() || null;
+    render();
+  });
+
+  (async function init(){
+    await ensureHostIsSetOnce();
+    await ensurePlayerNode();
+    await ensureGuestIsSetIfNeeded();
+
+    lobbyRef.on("value", (snap) => {
+      live = snap.val() || null;
+      if(!live){
+        banner.textContent = "Lobby not found. Returning to Play…";
+        setTimeout(()=> window.location.href="play.html", 900);
+        return;
+      }
+      render();
+    });
+  })();
 </script>
 </body>
 </html>

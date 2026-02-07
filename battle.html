@@ -7,30 +7,17 @@
 
   <style>
     :root{
-      --bg0:#070a12;
-      --bg1:#0b1020;
-      --text:#eaf0ff;
-      --muted: rgba(234,240,255,.72);
-      --stroke: rgba(255,255,255,.14);
-      --card: rgba(255,255,255,.06);
-      --primary:#7c5cff;
-      --primary2:#23d5ff;
-      --good:#3dffb7;
-      --warn:#ffcc66;
-      --bad:#ff5577;
-      --shadow: 0 18px 60px rgba(0,0,0,.55);
-      --r18: 18px;
-      --r22: 22px;
-      --r26: 26px;
+      --bg0:#070a12; --bg1:#0b1020; --text:#eaf0ff; --muted: rgba(234,240,255,.72);
+      --primary:#7c5cff; --primary2:#23d5ff; --good:#3dffb7; --bad:#ff4d6d; --warn:#ffd166;
+      --shadow: 0 18px 60px rgba(0,0,0,.45);
+      --r14:14px; --r18:18px; --r22:22px; --r26:26px;
       --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
       --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
       --max: 1280px;
     }
     *{ box-sizing:border-box; }
     body{
-      margin:0;
-      font-family: var(--sans);
-      color: var(--text);
+      margin:0; font-family:var(--sans); color:var(--text);
       background:
         radial-gradient(1200px 800px at 25% 10%, rgba(124,92,255,.16), transparent 55%),
         radial-gradient(1200px 800px at 80% 20%, rgba(35,213,255,.13), transparent 55%),
@@ -49,44 +36,118 @@
       display:flex; align-items:center; justify-content:space-between;
       padding: 14px 0; gap: 12px; flex-wrap:wrap;
     }
-    .brand{ display:flex; align-items:center; gap: 12px; text-decoration:none; color:inherit; }
-    .mark{
-      width:36px; height:36px; border-radius:12px;
-      display:grid; place-items:center; font-weight:1000;
+    .brand{ display:flex; align-items:center; gap:12px; text-decoration:none; color:inherit; }
+    .brand__mark{
+      width:34px; height:34px; border-radius:12px; display:grid; place-items:center; font-weight:1000;
       background: linear-gradient(135deg, rgba(124,92,255,.9), rgba(35,213,255,.75));
       box-shadow: 0 10px 28px rgba(124,92,255,.22);
     }
-    .brandName{ font-weight:1000; letter-spacing:.2px; }
-    .right{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .brand__name{ font-weight:1000; }
+    .nav__right{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+
+    .chip{
+      padding: 7px 11px; border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      font-weight: 900; font-size: 13px;
+      display:inline-flex; gap:8px; align-items:center;
+      white-space:nowrap;
+    }
+    .chip b{ font-family:var(--mono); }
 
     .btn{
       border: 1px solid rgba(255,255,255,.14);
       background: rgba(255,255,255,.06);
       color: var(--text);
       padding: 10px 14px;
-      border-radius: 14px;
+      border-radius: var(--r14);
       font-weight: 1000;
       cursor:pointer;
       transition: transform .15s ease, background .15s ease;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap: 8px;
       text-decoration:none;
-      user-select:none;
+      display:inline-flex; align-items:center; gap:10px;
     }
-    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.09); }
-    .btn--primary{
-      border-color: rgba(124,92,255,.55);
-      background: linear-gradient(135deg, rgba(124,92,255,.95), rgba(35,213,255,.70));
-      box-shadow: 0 16px 46px rgba(124,92,255,.22);
-    }
-    .btn--danger{
-      border-color: rgba(255,85,119,.35);
-      background: rgba(255,85,119,.10);
-    }
+    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.10); }
     .btn:disabled{ opacity:.55; cursor:not-allowed; transform:none; }
 
+    .wrap{ padding: 18px 0 46px; }
+    h1{ margin:0; font-size: clamp(22px, 3vw, 34px); letter-spacing:-.6px; }
+    .sub{ margin: 10px 0 0; color: var(--muted); line-height:1.6; }
+
+    .panel{
+      margin-top: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      border-radius: var(--r26);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .panelHead{
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.12);
+      display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
+    }
+    .panelTitle{ display:flex; align-items:center; gap:10px; font-weight: 1000; }
+    .dot{
+      width:10px; height:10px; border-radius:999px;
+      background: var(--primary2);
+      box-shadow: 0 0 0 5px rgba(35,213,255,.10);
+    }
+    .panelBody{ padding: 14px; }
+
+    .arenaLayout{
+      display:grid;
+      grid-template-columns: 1.5fr .9fr;
+      gap: 14px;
+      align-items:start;
+    }
+    @media (max-width: 980px){ .arenaLayout{ grid-template-columns: 1fr; } }
+
+    .arena{
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: var(--r26);
+      overflow:hidden;
+      box-shadow: var(--shadow);
+      position:relative;
+      background: rgba(0,0,0,.18);
+      min-height: 560px;
+    }
+    .arena::before{
+      content:"";
+      position:absolute; inset:0;
+      background: var(--arenaBg);
+      background-size: cover;
+      background-position:center;
+      opacity:.35;
+      filter: saturate(1.05) contrast(1.05);
+      pointer-events:none;
+    }
+    .arenaInner{
+      position:relative;
+      padding: 14px;
+      display:grid;
+      gap: 12px;
+    }
+
+    .scoreRow{
+      display:flex; gap: 10px; flex-wrap:wrap; align-items:center; justify-content:space-between;
+    }
+    .scoreBox{
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.18);
+      border-radius: 18px;
+      padding: 10px 12px;
+      display:flex; align-items:center; gap: 10px;
+      min-width: 220px;
+      flex: 1 1 220px;
+    }
+    .scoreBox .name{ font-weight:1000; }
+    .scoreBox .score{ margin-left:auto; font-family: var(--mono); font-weight:1000; font-size: 18px; }
+
+    .turnRow{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+    }
     .pill{
       font-family: var(--mono);
       font-size: 12px;
@@ -94,105 +155,70 @@
       border-radius: 999px;
       border: 1px solid rgba(255,255,255,.12);
       background: rgba(7,10,18,.25);
-      color: rgba(234,240,255,.90);
-      display:inline-flex;
-      align-items:center;
-      gap: 8px;
+      display:inline-flex; align-items:center; gap: 8px;
       user-select:none;
     }
 
-    .wrap{ padding: 18px 0 48px; }
-    h1{ margin:0; font-size: clamp(20px, 3vw, 34px); letter-spacing:-.6px; }
-    .sub{ margin: 10px 0 0; color: var(--muted); line-height:1.6; max-width: 110ch; }
-
-    .stageBanner{
-      margin-top: 14px;
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: var(--r26);
-      overflow:hidden;
-      box-shadow: var(--shadow);
-      position:relative;
-      background: rgba(255,255,255,.03);
-    }
-    .stageBg{
-      position:absolute; inset:0;
-      background-size: cover;
-      background-position: center;
-      filter: saturate(1.05) contrast(1.02);
-      opacity: .55;
-    }
-    .stageOverlay{
-      position:absolute; inset:0;
-      background: linear-gradient(180deg, rgba(7,10,18,.65), rgba(7,10,18,.85));
-    }
-    .stageTop{
-      position:relative;
-      padding: 14px 14px 10px;
-      display:flex; justify-content:space-between; align-items:center; gap: 10px; flex-wrap:wrap;
-      border-bottom: 1px solid rgba(255,255,255,.08);
-    }
-    .stageInfo{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-    .scoreRow{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
-
-    .battleGrid{
-      position:relative;
+    .cardsRow{
       display:grid;
       grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      padding: 14px;
-    }
-    @media (max-width: 980px){ .battleGrid{ grid-template-columns: 1fr; } }
-
-    .panel{
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.04);
-      border-radius: var(--r22);
-      box-shadow: 0 18px 60px rgba(0,0,0,.25);
-      overflow:hidden;
-    }
-    .panelHead{
-      padding: 12px 12px;
-      border-bottom: 1px solid rgba(255,255,255,.08);
-      background: rgba(0,0,0,.12);
-      display:flex; justify-content:space-between; align-items:center; gap: 10px; flex-wrap:wrap;
-    }
-    .panelTitle{ font-weight:1000; display:flex; align-items:center; gap: 10px; }
-    .dot{ width:10px; height:10px; border-radius:999px; background: var(--good); box-shadow: 0 0 0 5px rgba(61,255,183,.10); }
-    .panelBody{ padding: 12px; }
-
-    .cardBig{
-      display:grid;
-      grid-template-columns: 140px 1fr;
       gap: 12px;
-      align-items:center;
     }
-    @media (max-width: 520px){ .cardBig{ grid-template-columns: 1fr; } }
+    @media (max-width: 980px){ .cardsRow{ grid-template-columns:1fr; } }
 
-    .imgBox{
-      width: 140px; height: 140px;
-      border-radius: 22px;
+    .cardStage{
       border: 1px solid rgba(255,255,255,.12);
       background: rgba(0,0,0,.18);
+      border-radius: 22px;
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      min-height: 420px;
+    }
+    .cardStageTop{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px; padding: 10px 12px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.16);
+    }
+    .who{ font-weight:1000; }
+
+    .imgBox{
+      height: 300px;
+      background: rgba(0,0,0,.22);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      position:relative;
       overflow:hidden;
       display:grid;
       place-items:center;
     }
-    .imgBox img{ width:100%; height:100%; object-fit: cover; }
-    .name{ font-weight:1000; font-size: 18px; letter-spacing:-.3px; }
-    .meta{ display:flex; gap:6px; flex-wrap:wrap; margin-top: 6px; }
-    .badge{
-      font-family: var(--mono);
-      font-size: 11px;
-      padding: 5px 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.10);
-      color: rgba(234,240,255,.9);
-      white-space:nowrap;
+    .imgBox img{
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display:block;
+      filter: saturate(1.02) contrast(1.02);
     }
 
+    .veil{
+      position:absolute; inset:0;
+      display:grid; place-items:center;
+      background:
+        radial-gradient(700px 400px at 50% 0%, rgba(124,92,255,.20), transparent 60%),
+        linear-gradient(180deg, rgba(0,0,0,.62), rgba(0,0,0,.78));
+      color: rgba(234,240,255,.90);
+      text-align:center;
+      padding: 16px;
+    }
+    .veil small{ display:block; margin-top:8px; color: rgba(234,240,255,.70); }
+
+    .stats{
+      padding: 12px;
+      display:grid;
+      gap: 10px;
+    }
     .statGrid{
-      margin-top: 10px;
       display:grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
@@ -200,79 +226,65 @@
     @media (max-width: 520px){ .statGrid{ grid-template-columns: 1fr; } }
 
     .statBtn{
-      padding: 10px 12px;
-      border-radius: 16px;
       border: 1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.05);
+      background: rgba(0,0,0,.16);
       color: var(--text);
+      border-radius: 16px;
+      padding: 12px 12px;
       cursor:pointer;
-      font-weight:1000;
       display:flex;
-      justify-content:space-between;
       align-items:center;
-      gap: 10px;
-      transition: transform .15s ease, background .15s ease;
-      user-select:none;
+      justify-content:space-between;
+      gap: 12px;
+      transition: transform .12s ease, background .12s ease;
+      min-height: 52px;
     }
-    .statBtn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.08); }
+    .statBtn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.10); }
     .statBtn:disabled{ opacity:.55; cursor:not-allowed; transform:none; }
 
+    .statBtn .k{
+      text-transform: uppercase;
+      letter-spacing: .9px;
+      font-size: 12px;
+      color: rgba(234,240,255,.74);
+    }
+    .statBtn .v{
+      font-family: var(--mono);
+      font-weight: 1000;
+      font-size: 16px;
+    }
+
+    .banner{
+      padding: 10px 12px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.16);
+      line-height: 1.5;
+      white-space:pre-wrap;
+    }
+
     .log{
-      border: 1px solid rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.10);
       background: rgba(0,0,0,.14);
       border-radius: 18px;
       padding: 10px;
       max-height: 220px;
       overflow:auto;
       font-family: var(--mono);
-      font-size: 12px;
-      color: rgba(234,240,255,.82);
-      line-height: 1.55;
+      font-size: 11px;
+      color: rgba(234,240,255,.80);
+      white-space: pre-wrap;
+      line-height: 1.45;
     }
 
     .toast{
-      position:fixed;
-      left:50%;
-      transform: translateX(-50%);
-      bottom: 18px;
-      padding: 10px 14px;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(15,18,30,.92);
-      backdrop-filter: blur(14px);
-      box-shadow: var(--shadow);
-      color: rgba(234,240,255,.92);
-      display:none;
-      z-index:200;
-      max-width: min(980px, calc(100% - 40px));
+      position:fixed; left:50%; transform: translateX(-50%); bottom: 18px;
+      padding: 10px 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,.14);
+      background: rgba(15,18,30,.92); backdrop-filter: blur(14px);
+      box-shadow: var(--shadow); color: rgba(234,240,255,.92);
+      display:none; z-index:200; max-width: min(980px, calc(100% - 40px));
       white-space:pre-wrap;
     }
-
-    .resultOverlay{
-      position:fixed; inset:0;
-      background: rgba(0,0,0,.65);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      padding: 20px;
-      z-index: 999;
-    }
-    .resultCard{
-      width:min(760px, 100%);
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(15,18,30,.92);
-      border-radius: 26px;
-      box-shadow: var(--shadow);
-      overflow:hidden;
-    }
-    .resultHead{
-      padding: 14px;
-      border-bottom: 1px solid rgba(255,255,255,.08);
-      display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap: 10px;
-    }
-    .resultBody{ padding: 14px; }
-    .bigWin{ font-weight: 1000; font-size: 24px; letter-spacing:-.4px; }
-    .resultActions{ display:flex; gap:10px; flex-wrap:wrap; margin-top: 12px; }
   </style>
 
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -280,541 +292,573 @@
 </head>
 
 <body>
-  <header class="nav">
-    <div class="nav__inner container">
-      <a class="brand" href="play.html">
-        <span class="mark">?</span>
-        <span class="brandName">Deckforge Arena</span>
-      </a>
-
-      <div class="right">
-        <span class="pill" id="pillStage">Loading…</span>
-        <a class="btn" id="btnBackChapters" href="play.html">Back to Chapters</a>
-        <a class="btn" href="mainmenu.html">Main Menu</a>
-      </div>
-    </div>
-  </header>
-
-  <main class="container wrap">
-    <h1 id="title">Battle</h1>
-    <p class="sub" id="subtitle">Loading battle…</p>
-
-    <section class="stageBanner">
-      <div class="stageBg" id="stageBg"></div>
-      <div class="stageOverlay"></div>
-
-      <div class="stageTop">
-        <div class="stageInfo">
-          <span class="pill" id="pillCampaign">—</span>
-          <span class="pill" id="pillChapter">—</span>
-          <span class="pill" id="pillTurn">Turn 1 / 10</span>
-        </div>
-        <div class="scoreRow">
-          <span class="pill">You: <b id="scoreYou">0</b></span>
-          <span class="pill">Enemy: <b id="scoreEnemy">0</b></span>
-        </div>
-      </div>
-
-      <div class="battleGrid">
-        <section class="panel">
-          <div class="panelHead">
-            <div class="panelTitle"><span class="dot"></span> Your Card</div>
-            <span class="pill" id="pillDeck">Deck: —</span>
-          </div>
-          <div class="panelBody">
-            <div class="cardBig">
-              <div class="imgBox" id="youImgBox"><img id="youImg" alt=""/></div>
-              <div>
-                <div class="name" id="youName">—</div>
-                <div class="meta" id="youMeta"></div>
-                <div class="statGrid" id="statButtons"></div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section class="panel">
-          <div class="panelHead">
-            <div class="panelTitle"><span class="dot"></span> Enemy Card</div>
-            <span class="pill" id="pillEnemy">—</span>
-          </div>
-          <div class="panelBody">
-            <div class="cardBig">
-              <div class="imgBox" id="enemyImgBox"><img id="enemyImg" alt=""/></div>
-              <div>
-                <div class="name" id="enemyName">—</div>
-                <div class="meta" id="enemyMeta"></div>
-                <div class="sub" style="margin-top:10px;">
-                  Choose a stat on your card. Highest stat wins the round.
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section class="panel" style="grid-column: 1 / -1;">
-          <div class="panelHead">
-            <div class="panelTitle"><span class="dot"></span> Battle Log</div>
-            <div style="display:flex; gap:10px; flex-wrap:wrap;">
-              <button class="btn btn--primary" id="btnNextRound" disabled>Next Round</button>
-            </div>
-          </div>
-          <div class="panelBody">
-            <div class="log" id="log"></div>
-          </div>
-        </section>
-      </div>
-    </section>
-  </main>
-
-  <div class="toast" id="toast"></div>
-
-  <div class="resultOverlay" id="resultOverlay">
-    <div class="resultCard">
-      <div class="resultHead">
-        <div class="bigWin" id="resultTitle">Result</div>
-        <span class="pill" id="resultPill">—</span>
-      </div>
-      <div class="resultBody">
-        <div class="sub" id="resultText"></div>
-        <div class="resultActions">
-          <button class="btn btn--primary" id="btnReturnToPlay">Return to Chapters</button>
-          <a class="btn" href="mainmenu.html">Main Menu</a>
-        </div>
-      </div>
+<header class="nav">
+  <div class="nav__inner container">
+    <a class="brand" href="index.html">
+      <span class="brand__mark">?</span>
+      <span class="brand__name">Deckforge Arena</span>
+    </a>
+    <div class="nav__right">
+      <div class="chip">You: <b id="meName">—</b></div>
+      <div class="chip">Mode: <b id="modeLabel">—</b></div>
+      <div class="chip">Chapter: <b id="chapterLabel">—</b></div>
+      <div class="chip">Stage: <b id="stageLabel">—</b></div>
+      <a class="btn" href="story.html">Back to Story</a>
+      <a class="btn" href="play.html">Back to Play</a>
     </div>
   </div>
+</header>
 
-  <audio id="sfxWin" src="images/sfx_win.mp3" preload="auto"></audio>
-  <audio id="sfxLose" src="images/sfx_lose.mp3" preload="auto"></audio>
+<main class="container wrap">
+  <h1 id="title">Battle</h1>
+  <p class="sub" id="subLine">Loading battle…</p>
 
-  <script>
-    /* =========================
-       FIREBASE INIT
-       ========================= */
-    const firebaseConfig = {
-      apiKey: "AIzaSyDJHl2yCKbiiinesOZ9R_SROC51knmT9TQ",
-      authDomain: "goamica-7190c.firebaseapp.com",
-      databaseURL: "https://goamica-7190c-default-rtdb.firebaseio.com",
-      projectId: "goamica-7190c",
-      storageBucket: "goamica-7190c.firebasestorage.app",
-      messagingSenderId: "612907093027",
-      appId: "1:612907093027:web:2b7106adc9ba6b7b177596",
-      measurementId: "G-8DE8ST7LXR"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+  <div class="arenaLayout">
+    <section class="arena" id="arena" style="--arenaBg: linear-gradient(180deg, rgba(0,0,0,.2), rgba(0,0,0,.2));">
+      <div class="arenaInner">
 
-    /* =========================
-       HELPERS
-       ========================= */
-    const toastEl = document.getElementById("toast");
-    let toastTimer = null;
-    function toast(msg){
-      toastEl.textContent = msg;
-      toastEl.style.display = "block";
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(()=> toastEl.style.display="none", 2600);
+        <div class="scoreRow">
+          <div class="scoreBox"><span class="name" id="playerName">Player</span><span class="score" id="playerScore">0</span></div>
+          <div class="scoreBox"><span class="name" id="enemyName">Enemy</span><span class="score" id="enemyScore">0</span></div>
+        </div>
+
+        <div class="turnRow">
+          <span class="pill" id="turnPill">Turn 1/10</span>
+          <span class="pill" id="deckPill">Deck: —</span>
+          <span class="pill" id="enemyPill">Enemy: —</span>
+        </div>
+
+        <div class="banner" id="statusBanner">Preparing the battlefield…</div>
+
+        <div class="cardsRow">
+          <!-- Your side -->
+          <div class="cardStage">
+            <div class="cardStageTop">
+              <div class="who">You</div>
+              <span class="pill" id="youCardLabel">card: —</span>
+            </div>
+            <div class="imgBox">
+              <img id="youImg" alt="Your card"/>
+              <div class="veil" id="youVeil">
+                your card is hidden
+                <small>pick a stat to reveal</small>
+              </div>
+            </div>
+            <div class="stats" id="youStats"></div>
+          </div>
+
+          <!-- Enemy side -->
+          <div class="cardStage">
+            <div class="cardStageTop">
+              <div class="who">Enemy</div>
+              <span class="pill" id="enemyCardLabel">card: hidden</span>
+            </div>
+            <div class="imgBox">
+              <img id="enemyImg" alt="Enemy card"/>
+              <div class="veil" id="enemyVeil">
+                enemy card is hidden
+                <small>reveals after the round resolves</small>
+              </div>
+            </div>
+            <div class="stats" id="enemyStats"></div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <aside class="panel">
+      <div class="panelHead">
+        <div class="panelTitle"><span class="dot"></span> Battle Log</div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+          <button class="btn" id="btnRestart">Restart Stage</button>
+        </div>
+      </div>
+      <div class="panelBody">
+        <div class="log" id="logBox">—</div>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ---------------- Firebase ----------------
+  const firebaseConfig = {
+    apiKey: "AIzaSyDJHl2yCKbiiinesOZ9R_SROC51knmT9TQ",
+    authDomain: "goamica-7190c.firebaseapp.com",
+    databaseURL: "https://goamica-7190c-default-rtdb.firebaseio.com",
+    projectId: "goamica-7190c",
+    storageBucket: "goamica-7190c.firebasestorage.app",
+    messagingSenderId: "612907093027",
+    appId: "1:612907093027:web:2b7106adc9ba6b7b177596",
+    measurementId: "G-8DE8ST7LXR"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  // ---------------- Helpers ----------------
+  function getParam(name){ return new URL(window.location.href).searchParams.get(name); }
+  function getSession(){
+    const id = localStorage.getItem("amica_currentUserId") || sessionStorage.getItem("amica_currentUserId");
+    const user = localStorage.getItem("amica_currentUser") || sessionStorage.getItem("amica_currentUser");
+    return { id, user: user ? JSON.parse(user) : null };
+  }
+  const toastEl = document.getElementById("toast");
+  let toastTimer=null;
+  function toast(msg){
+    toastEl.textContent = msg;
+    toastEl.style.display = "block";
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(()=> toastEl.style.display="none", 2800);
+  }
+
+  function shuffleWithSeed(arr, seed){
+    let h = 2166136261;
+    for(let i=0;i<seed.length;i++){
+      h ^= seed.charCodeAt(i);
+      h = Math.imul(h, 16777619);
     }
-    function pad2(n){ n = parseInt(n,10); return (n<10 ? "0"+n : ""+n); }
-    function imgPath(cardName){ return `images/${cardName}.png`; }
-
-    /* =========================
-       CARD CATALOG (must match your IDs)
-       Stats: power, defense, speed, magic
-       ========================= */
-    const CARDS = [
-      // Humans (starter)
-      {id:"HUM_001", name:"Human Warrior", archetype:"Humans", role:"Warrior", rarity:"Common", stats:{power:78, defense:62, speed:55, magic:20}},
-      {id:"HUM_002", name:"Human Farmer", archetype:"Humans", role:"Farmer", rarity:"Common", stats:{power:35, defense:45, speed:42, magic:15}},
-      {id:"HUM_003", name:"Human Archer", archetype:"Humans", role:"Archer", rarity:"Uncommon", stats:{power:58, defense:42, speed:72, magic:18}},
-      {id:"HUM_004", name:"Human Wizard", archetype:"Humans", role:"Wizard", rarity:"Rare", stats:{power:40, defense:35, speed:52, magic:80}},
-      {id:"HUM_005", name:"Human Elder Wizard", archetype:"Humans", role:"Elder Wizard", rarity:"Epic", stats:{power:52, defense:44, speed:49, magic:92}},
-      {id:"HUM_006", name:"Human Cleric", archetype:"Humans", role:"Cleric", rarity:"Rare", stats:{power:42, defense:60, speed:48, magic:76}},
-      {id:"HUM_007", name:"Human Knight", archetype:"Humans", role:"Knight", rarity:"Uncommon", stats:{power:68, defense:76, speed:46, magic:24}},
-      {id:"HUM_008", name:"Human Lancer", archetype:"Humans", role:"Lancer", rarity:"Uncommon", stats:{power:66, defense:56, speed:62, magic:20}},
-      {id:"HUM_009", name:"Human Blacksmith", archetype:"Humans", role:"Blacksmith", rarity:"Common", stats:{power:54, defense:64, speed:40, magic:10}},
-      {id:"HUM_010", name:"Human Astrologer", archetype:"Humans", role:"Astrologer", rarity:"Rare", stats:{power:38, defense:40, speed:50, magic:84}},
-
-      // Skeletons (starter)
-      {id:"SKL_001", name:"Skeleton Warrior", archetype:"Skeletons", role:"Warrior", rarity:"Common", stats:{power:70, defense:55, speed:58, magic:18}},
-      {id:"SKL_002", name:"Skeleton Knight", archetype:"Skeletons", role:"Knight", rarity:"Uncommon", stats:{power:64, defense:78, speed:45, magic:18}},
-      {id:"SKL_003", name:"Skeleton Archer", archetype:"Skeletons", role:"Archer", rarity:"Uncommon", stats:{power:54, defense:38, speed:74, magic:16}},
-      {id:"SKL_004", name:"Skeleton Wizard", archetype:"Skeletons", role:"Wizard", rarity:"Rare", stats:{power:36, defense:34, speed:50, magic:82}},
-      {id:"SKL_005", name:"Skeleton Elder Wizard", archetype:"Skeletons", role:"Elder Wizard", rarity:"Epic", stats:{power:48, defense:42, speed:48, magic:94}},
-      {id:"SKL_006", name:"Skeleton Cleric", archetype:"Skeletons", role:"Cleric", rarity:"Rare", stats:{power:40, defense:58, speed:46, magic:78}},
-      {id:"SKL_007", name:"Skeleton Lancer", archetype:"Skeletons", role:"Lancer", rarity:"Uncommon", stats:{power:62, defense:54, speed:60, magic:16}},
-      {id:"SKL_008", name:"Skeleton Blacksmith", archetype:"Skeletons", role:"Blacksmith", rarity:"Common", stats:{power:52, defense:62, speed:38, magic:10}},
-      {id:"SKL_009", name:"Skeleton Assassin", archetype:"Skeletons", role:"Assassin", rarity:"Rare", stats:{power:60, defense:40, speed:86, magic:20}},
-      {id:"SKL_010", name:"Skeleton Warden", archetype:"Skeletons", role:"Warden", rarity:"Rare", stats:{power:58, defense:72, speed:44, magic:26}},
-
-      // Demons (story)
-      {id:"DEM_01", name:"Demon Imp", archetype:"Demons", role:"Imp", rarity:"Common", stats:{power:46, defense:34, speed:70, magic:44}},
-      {id:"DEM_02", name:"Demon Brute", archetype:"Demons", role:"Brute", rarity:"Uncommon", stats:{power:86, defense:60, speed:42, magic:20}},
-      {id:"DEM_03", name:"Demon Hellhound", archetype:"Demons", role:"Beast", rarity:"Uncommon", stats:{power:72, defense:44, speed:78, magic:24}},
-      {id:"DEM_04", name:"Demon Warlock", archetype:"Demons", role:"Warlock", rarity:"Rare", stats:{power:52, defense:38, speed:50, magic:88}},
-      {id:"DEM_05", name:"Demon Succubus", archetype:"Demons", role:"Enchantress", rarity:"Rare", stats:{power:48, defense:40, speed:66, magic:84}},
-      {id:"DEM_06", name:"Demon Infernal Knight", archetype:"Demons", role:"Knight", rarity:"Epic", stats:{power:78, defense:86, speed:50, magic:42}},
-      {id:"DEM_07", name:"Demon Flame Lancer", archetype:"Demons", role:"Lancer", rarity:"Rare", stats:{power:74, defense:56, speed:70, magic:36}},
-      {id:"DEM_08", name:"Demon Ash Archer", archetype:"Demons", role:"Archer", rarity:"Uncommon", stats:{power:60, defense:40, speed:84, magic:30}},
-      {id:"DEM_09", name:"Demon Elder Warlock", archetype:"Demons", role:"Elder Warlock", rarity:"Epic", stats:{power:60, defense:48, speed:52, magic:96}},
-      {id:"DEM_10", name:"Demon Lord’s Herald", archetype:"Demons", role:"Herald", rarity:"Epic", stats:{power:70, defense:60, speed:58, magic:88}},
-
-      // Ice Dwarfs (story)
-      {id:"ICE_01", name:"Ice Dwarf Miner", archetype:"Ice Dwarfs", role:"Miner", rarity:"Common", stats:{power:44, defense:56, speed:38, magic:18}},
-      {id:"ICE_02", name:"Ice Dwarf Shieldbearer", archetype:"Ice Dwarfs", role:"Tank", rarity:"Uncommon", stats:{power:52, defense:86, speed:34, magic:16}},
-      {id:"ICE_03", name:"Ice Dwarf Axeguard", archetype:"Ice Dwarfs", role:"Warrior", rarity:"Uncommon", stats:{power:74, defense:70, speed:40, magic:12}},
-      {id:"ICE_04", name:"Ice Dwarf Runecaster", archetype:"Ice Dwarfs", role:"Runecaster", rarity:"Rare", stats:{power:50, defense:54, speed:44, magic:82}},
-      {id:"ICE_05", name:"Ice Dwarf Frost Archer", archetype:"Ice Dwarfs", role:"Archer", rarity:"Uncommon", stats:{power:56, defense:42, speed:78, magic:28}},
-      {id:"ICE_06", name:"Ice Dwarf Engineer", archetype:"Ice Dwarfs", role:"Engineer", rarity:"Rare", stats:{power:48, defense:60, speed:46, magic:74}},
-      {id:"ICE_07", name:"Ice Dwarf Hammer Knight", archetype:"Ice Dwarfs", role:"Knight", rarity:"Rare", stats:{power:72, defense:82, speed:40, magic:22}},
-      {id:"ICE_08", name:"Ice Dwarf Glacier Lancer", archetype:"Ice Dwarfs", role:"Lancer", rarity:"Rare", stats:{power:68, defense:62, speed:60, magic:26}},
-      {id:"ICE_09", name:"Ice Dwarf Elder Runelord", archetype:"Ice Dwarfs", role:"Elder", rarity:"Epic", stats:{power:58, defense:66, speed:48, magic:94}},
-      {id:"ICE_10", name:"Ice Dwarf Warden", archetype:"Ice Dwarfs", role:"Warden", rarity:"Epic", stats:{power:64, defense:84, speed:38, magic:36}},
-    ];
-
-    const CARD_BY_ID = Object.fromEntries(CARDS.map(c => [c.id, c]));
-
-    /* =========================
-       LOAD PAYLOAD FROM PLAY PAGE
-       ========================= */
-    const payloadRaw = sessionStorage.getItem("amica_battlePayload");
-    const payload = payloadRaw ? JSON.parse(payloadRaw) : null;
-
-    if(!payload || !payload.userId || !payload.deckCards || !payload.story){
-      document.getElementById("subtitle").textContent = "Battle payload missing. Go back to Play and pick a stage.";
-      toast("Missing battle payload. Returning to Play…");
-      setTimeout(() => window.location.href = "play.html?refresh="+Date.now(), 1200);
-      throw new Error("Missing payload");
+    function rand(){
+      h += 0x6D2B79F5;
+      let t = Math.imul(h ^ (h >>> 15), 1 | h);
+      t ^= t + Math.imul(t ^ (t >>> 7), 61 | t);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     }
+    const a = arr.slice();
+    for(let i=a.length-1;i>0;i--){
+      const j = Math.floor(rand() * (i+1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
 
-    const userId = String(payload.userId);
-    const deckKey = payload.deckKey || "humans";
-    const playerDeckIds = payload.deckCards; // MUST be 10 IDs
-    const story = payload.story;
+  // Your card catalog names (for image path)
+  const ID_TO_NAME = {
+    "HUM_001":"Human Warrior","HUM_002":"Human Farmer","HUM_003":"Human Archer","HUM_004":"Human Wizard","HUM_005":"Human Elder Wizard",
+    "HUM_006":"Human Cleric","HUM_007":"Human Knight","HUM_008":"Human Lancer","HUM_009":"Human Blacksmith","HUM_010":"Human Astrologer",
 
-    // UI labels
-    document.getElementById("pillDeck").textContent = `Deck: ${deckKey}`;
-    document.getElementById("pillCampaign").textContent = story.campaignName || story.campaign;
-    document.getElementById("pillChapter").textContent = `Chapter ${story.chapter} • Stage ${story.stage}`;
-    document.getElementById("pillStage").textContent = `${(story.campaignName || story.campaign)} — C${story.chapter} S${story.stage}`;
-    document.getElementById("title").textContent = `${story.campaignName} — Chapter ${story.chapter}, Stage ${story.stage}`;
-    document.getElementById("subtitle").textContent =
-      `A patrol blocks your path. Choose your best stat each round. Win more rounds than the enemy to clear this stage.`;
+    "SKL_001":"Skeleton Warrior","SKL_002":"Skeleton Knight","SKL_003":"Skeleton Archer","SKL_004":"Skeleton Wizard","SKL_005":"Skeleton Elder Wizard",
+    "SKL_006":"Skeleton Cleric","SKL_007":"Skeleton Lancer","SKL_008":"Skeleton Blacksmith","SKL_009":"Skeleton Assassin","SKL_010":"Skeleton Warden",
 
-    // Background
-    const stageBg = document.getElementById("stageBg");
-    stageBg.style.backgroundImage = `url("${story.background || ""}")`;
-    // If missing, fallback to themed gradient look
-    stageBg.onerror = () => {};
+    "ICE_001":"Ice Dwarf Miner","ICE_002":"Ice Dwarf Shieldbearer","ICE_003":"Ice Dwarf Axeguard","ICE_004":"Ice Dwarf Runecaster","ICE_005":"Ice Dwarf Frost Archer",
+    "ICE_006":"Ice Dwarf Engineer","ICE_007":"Ice Dwarf Hammer Knight","ICE_008":"Ice Dwarf Glacier Lancer","ICE_009":"Ice Dwarf Elder Runelord","ICE_010":"Ice Dwarf Warden",
 
-    // Make Back to Chapters always reload play page
-    document.getElementById("btnBackChapters").href = `play.html?refresh=${Date.now()}`;
-    document.getElementById("btnReturnToPlay").addEventListener("click", () => {
-      window.location.href = `play.html?refresh=${Date.now()}`;
+    "DEM_001":"Demon Imp","DEM_002":"Demon Brute","DEM_003":"Demon Hellhound","DEM_004":"Demon Warlock","DEM_005":"Demon Succubus",
+    "DEM_006":"Demon Infernal Knight","DEM_007":"Demon Flame Lancer","DEM_008":"Demon Ash Archer","DEM_009":"Demon Elder Warlock","DEM_010":"Demon Lord’s Herald",
+  };
+
+  function imgPathById(cardId){
+    const name = ID_TO_NAME[cardId] || cardId;
+    return `images/${name}.png`;
+  }
+
+  // ---------------- UI refs ----------------
+  const session = getSession();
+  if(!session.id || !session.user){ window.location.href = "login.html"; }
+  const userId = String(session.id);
+
+  document.getElementById("meName").textContent = session.user.Username || "—";
+  document.getElementById("playerName").textContent = session.user.Username || "Player";
+
+  const mode = String(getParam("mode") || "story");
+  const chapterKey = String(getParam("chapter") || "ice"); // ice|demon expected
+  const stage = Number(getParam("stage") || 1);
+
+  document.getElementById("modeLabel").textContent = mode;
+  document.getElementById("chapterLabel").textContent = chapterKey;
+  document.getElementById("stageLabel").textContent = String(stage);
+
+  const arenaEl = document.getElementById("arena");
+  const statusBanner = document.getElementById("statusBanner");
+  const logBox = document.getElementById("logBox");
+
+  const youImg = document.getElementById("youImg");
+  const enemyImg = document.getElementById("enemyImg");
+  const youVeil = document.getElementById("youVeil");
+  const enemyVeil = document.getElementById("enemyVeil");
+
+  const youStatsWrap = document.getElementById("youStats");
+  const enemyStatsWrap = document.getElementById("enemyStats");
+
+  const youCardLabel = document.getElementById("youCardLabel");
+  const enemyCardLabel = document.getElementById("enemyCardLabel");
+
+  const turnPill = document.getElementById("turnPill");
+  const deckPill = document.getElementById("deckPill");
+  const enemyPill = document.getElementById("enemyPill");
+
+  const playerScoreEl = document.getElementById("playerScore");
+  const enemyScoreEl = document.getElementById("enemyScore");
+
+  // Theme backgrounds (you can drop real images in /images and it will use them automatically)
+  // If you have: images/icedwarfchapter1background.png etc, we will try them.
+  function setArenaTheme(){
+    if(chapterKey === "ice"){
+      // Try your file name first
+      arenaEl.style.setProperty("--arenaBg", `url('images/icedwarfchapter1background.png')`);
+      document.getElementById("title").textContent = "Story Battle — Ice Dwarfs";
+      document.getElementById("enemyName").textContent = "Ice Dwarf Vanguard";
+      enemyPill.textContent = "Enemy: Ice Dwarfs";
+    } else if(chapterKey === "demon"){
+      arenaEl.style.setProperty("--arenaBg", `url('images/demonchapter1background.png')`);
+      document.getElementById("title").textContent = "Story Battle — Demons";
+      document.getElementById("enemyName").textContent = "Demon Raidpack";
+      enemyPill.textContent = "Enemy: Demons";
+    } else {
+      arenaEl.style.setProperty("--arenaBg", `linear-gradient(180deg, rgba(124,92,255,.18), rgba(0,0,0,.2))`);
+      document.getElementById("enemyName").textContent = "Enemy";
+      enemyPill.textContent = "Enemy: —";
+    }
+  }
+
+  // ---------------- Fixed 9 stats (Firebase source) ----------------
+  const STAT_KEYS = ["ATK","AP","CRIT","HP","DEF","RES","SPD","ACC","EVA"];
+  const statsCache = new Map(); // cardId -> stats object
+
+  function normalizeStats(raw){
+    const out = {};
+    for(const k of STAT_KEYS){
+      const v = raw && raw[k];
+      out[k] = Number.isFinite(Number(v)) ? Number(v) : 0;
+    }
+    return out;
+  }
+
+  async function getCardStats(cardId){
+    if(statsCache.has(cardId)) return statsCache.get(cardId);
+
+    try{
+      const snap = await db.ref(`Cards/${cardId}/stats`).once("value");
+      const raw = snap.val();
+      const stats = normalizeStats(raw);
+      statsCache.set(cardId, stats);
+      return stats;
+    } catch(e){
+      // Safety fallback: prevent hard-crash if DB read fails
+      const stats = normalizeStats(null);
+      statsCache.set(cardId, stats);
+      return stats;
+    }
+  }
+
+  // ---------------- Battle State ----------------
+  const MAX_TURNS = 10;
+  let turn = 1;
+  let playerScore = 0;
+  let enemyScore = 0;
+
+  let playerDeckKey = null;
+  let playerDeck = []; // 10 card IDs
+  let enemyDeck = [];  // 10 card IDs
+  let playerShuffled = [];
+  let enemyShuffled = [];
+
+  let chosenStat = null;
+  let locked = false;
+
+  function log(line){
+    const prev = logBox.textContent === "—" ? "" : logBox.textContent;
+    logBox.textContent = (prev ? prev + "\n" : "") + line;
+    logBox.scrollTop = logBox.scrollHeight;
+  }
+
+  function revealYou(show){ youVeil.style.display = show ? "none" : "grid"; }
+  function revealEnemy(show){ enemyVeil.style.display = show ? "none" : "grid"; }
+
+  async function renderStatsButtons(cardId){
+    const stats = await getCardStats(cardId);
+    youStatsWrap.innerHTML = "";
+
+    const grid = document.createElement("div");
+    grid.className = "statGrid";
+
+    STAT_KEYS.forEach((k)=>{
+      const btn = document.createElement("button");
+      btn.className = "statBtn";
+      btn.disabled = locked;
+      btn.innerHTML = `<span class="k">${k}</span><span class="v">${stats[k]}</span>`;
+      btn.addEventListener("click", ()=> onPickStat(k));
+      grid.appendChild(btn);
     });
 
-    /* =========================
-       BUILD ENEMY DECK (themed)
-       ========================= */
-    function buildEnemyDeck(){
-      const ch = parseInt(story.chapter,10);
-      const stage = parseInt(story.stage,10);
+    youStatsWrap.appendChild(grid);
+  }
 
-      // Use campaign-specific pool
-      const pool = [];
-      if(story.campaign === "ice"){
-        for(let i=1;i<=10;i++) pool.push(`ICE_${pad2(i)}`);
-      }else if(story.campaign === "demon"){
-        for(let i=1;i<=10;i++) pool.push(`DEM_${pad2(i)}`);
-      }else{
-        // fallback: skeletons
-        for(let i=1;i<=10;i++) pool.push(`SKL_${pad2(i)}`);
-      }
+  async function renderEnemyStats(cardId){
+    const stats = await getCardStats(cardId);
+    enemyStatsWrap.innerHTML = "";
 
-      // Make it feel like it escalates: bias towards higher IDs later chapters/stages
-      const bias = Math.min(9, Math.floor((ch-1) + (stage-1)/2));
-      const weighted = pool.flatMap((id, idx) => {
-        const w = 1 + Math.max(0, idx - (4 - bias)); // later cards appear more often
-        return Array(w).fill(id);
-      });
+    const grid = document.createElement("div");
+    grid.className = "statGrid";
 
-      // Create 10 enemy cards
-      const enemy = [];
-      while(enemy.length < 10){
-        enemy.push(weighted[Math.floor(Math.random()*weighted.length)]);
-      }
-      return enemy;
-    }
-
-    const enemyDeckIds = buildEnemyDeck();
-
-    /* =========================
-       SHUFFLE + DRAW
-       ========================= */
-    function shuffle(arr){
-      const a = arr.slice();
-      for(let i=a.length-1;i>0;i--){
-        const j = Math.floor(Math.random()*(i+1));
-        [a[i], a[j]] = [a[j], a[i]];
-      }
-      return a;
-    }
-
-    let playerDraw = shuffle(playerDeckIds);
-    let enemyDraw = shuffle(enemyDeckIds);
-
-    let turn = 1;
-    const maxTurns = 10;
-
-    let scoreYou = 0;
-    let scoreEnemy = 0;
-
-    let currentPlayerCard = null;
-    let currentEnemyCard = null;
-
-    let awaitingNext = false;
-
-    const youImg = document.getElementById("youImg");
-    const enemyImg = document.getElementById("enemyImg");
-    const youName = document.getElementById("youName");
-    const enemyName = document.getElementById("enemyName");
-    const youMeta = document.getElementById("youMeta");
-    const enemyMeta = document.getElementById("enemyMeta");
-    const statButtons = document.getElementById("statButtons");
-    const log = document.getElementById("log");
-
-    const pillTurn = document.getElementById("pillTurn");
-    const scoreYouEl = document.getElementById("scoreYou");
-    const scoreEnemyEl = document.getElementById("scoreEnemy");
-    const btnNextRound = document.getElementById("btnNextRound");
-
-    const sfxWin = document.getElementById("sfxWin");
-    const sfxLose = document.getElementById("sfxLose");
-
-    function safePlay(audio){
-      try{ audio.currentTime = 0; audio.play(); }catch(e){}
-    }
-
-    function setCardUI(card, side){
-      const metaHtml = `
-        <span class="badge">${card.archetype}</span>
-        <span class="badge">${card.rarity}</span>
-        <span class="badge">${card.role}</span>
-      `;
-      if(side === "you"){
-        youName.textContent = card.name;
-        youMeta.innerHTML = metaHtml;
-        const src = imgPath(card.name);
-        youImg.src = src;
-        youImg.onerror = () => {
-          youImg.removeAttribute("src");
-          document.getElementById("youImgBox").textContent = "—";
-          document.getElementById("youImgBox").style.fontFamily = "var(--mono)";
-          document.getElementById("youImgBox").style.color = "rgba(234,240,255,.75)";
-        };
-      }else{
-        enemyName.textContent = card.name;
-        enemyMeta.innerHTML = metaHtml;
-        const src = imgPath(card.name);
-        enemyImg.src = src;
-        enemyImg.onerror = () => {
-          enemyImg.removeAttribute("src");
-          document.getElementById("enemyImgBox").textContent = "—";
-          document.getElementById("enemyImgBox").style.fontFamily = "var(--mono)";
-          document.getElementById("enemyImgBox").style.color = "rgba(234,240,255,.75)";
-        };
-      }
-    }
-
-    function renderStatButtons(card){
-      statButtons.innerHTML = "";
-
-      const stats = card.stats;
-      const labels = [
-        {k:"power", name:"Power"},
-        {k:"defense", name:"Defense"},
-        {k:"speed", name:"Speed"},
-        {k:"magic", name:"Magic"}
-      ];
-
-      labels.forEach(({k,name}) => {
-        const btn = document.createElement("button");
-        btn.className = "statBtn";
-        btn.innerHTML = `<span>${name}</span><span class="pill">${stats[k]}</span>`;
-        btn.addEventListener("click", () => chooseStat(k, name));
-        statButtons.appendChild(btn);
-      });
-    }
-
-    function setButtonsLocked(locked){
-      const btns = statButtons.querySelectorAll("button.statBtn");
-      btns.forEach(b => b.disabled = locked);
-    }
-
-    function appendLog(line){
-      log.textContent += line + "\n";
-      log.scrollTop = log.scrollHeight;
-    }
-
-    function drawTurn(){
-      pillTurn.textContent = `Turn ${turn} / ${maxTurns}`;
-      btnNextRound.disabled = true;
-      awaitingNext = false;
-
-      const pid = playerDraw.shift();
-      const eid = enemyDraw.shift();
-
-      currentPlayerCard = CARD_BY_ID[pid];
-      currentEnemyCard = CARD_BY_ID[eid];
-
-      if(!currentPlayerCard){
-        toast("Player card missing in catalog: " + pid);
-        currentPlayerCard = {id:pid, name:pid, archetype:"Unknown", rarity:"?", role:"?", stats:{power:50,defense:50,speed:50,magic:50}};
-      }
-      if(!currentEnemyCard){
-        toast("Enemy card missing in catalog: " + eid);
-        currentEnemyCard = {id:eid, name:eid, archetype:"Unknown", rarity:"?", role:"?", stats:{power:50,defense:50,speed:50,magic:50}};
-      }
-
-      setCardUI(currentPlayerCard, "you");
-      setCardUI(currentEnemyCard, "enemy");
-      renderStatButtons(currentPlayerCard);
-
-      setButtonsLocked(false);
-
-      appendLog(`— Turn ${turn}: ${currentPlayerCard.name} vs ${currentEnemyCard.name}`);
-      appendLog(`Choose a stat…`);
-    }
-
-    function chooseStat(key, label){
-      if(awaitingNext) return;
-
-      // lock stat buttons for this round only
-      setButtonsLocked(true);
-
-      const p = currentPlayerCard.stats[key];
-      const e = currentEnemyCard.stats[key];
-
-      appendLog(`You chose ${label}: You ${p} vs Enemy ${e}`);
-
-      if(p > e){
-        scoreYou++;
-        appendLog(`Result: YOU WIN the round.`);
-      }else if(e > p){
-        scoreEnemy++;
-        appendLog(`Result: ENEMY wins the round.`);
-      }else{
-        appendLog(`Result: DRAW.`);
-      }
-
-      scoreYouEl.textContent = scoreYou;
-      scoreEnemyEl.textContent = scoreEnemy;
-
-      awaitingNext = true;
-      btnNextRound.disabled = false;
-    }
-
-    btnNextRound.addEventListener("click", async () => {
-      if(!awaitingNext) return;
-
-      turn++;
-      if(turn <= maxTurns){
-        drawTurn();
-        return;
-      }
-
-      // Battle ends after 10 turns
-      await endBattle();
+    STAT_KEYS.forEach((k)=>{
+      const box = document.createElement("div");
+      box.className = "statBtn";
+      box.style.cursor = "default";
+      box.innerHTML = `<span class="k">${k}</span><span class="v">${stats[k]}</span>`;
+      grid.appendChild(box);
     });
 
-    /* =========================
-       STAGE COMPLETE -> SAVE PROGRESS
-       ========================= */
-    async function markStageComplete(){
-      const campaignKey = story.campaign;
-      const chapter = String(story.chapter);
-      const stage = String(story.stage);
+    enemyStatsWrap.appendChild(grid);
+  }
 
-      const stageRef = db.ref(`Progress/${userId}/story/${campaignKey}/chapters/${chapter}/stages/${stage}`);
-      await stageRef.set(true);
+  function updateTopUI(){
+    turnPill.textContent = `Turn ${turn}/${MAX_TURNS}`;
+    playerScoreEl.textContent = String(playerScore);
+    enemyScoreEl.textContent = String(enemyScore);
+  }
 
-      // After writing current stage, check if chapter is complete (all 10 true)
-      const stagesSnap = await db.ref(`Progress/${userId}/story/${campaignKey}/chapters/${chapter}/stages`).once("value");
-      const stages = stagesSnap.val() || {};
+  function currentPlayerCard(){
+    return playerShuffled[turn-1];
+  }
+  function currentEnemyCard(){
+    return enemyShuffled[turn-1];
+  }
 
-      let allDone = true;
-      for(let i=1;i<=10;i++){
-        if(stages[String(i)] !== true){ allDone = false; break; }
-      }
+  function enemyDeckForChapter(){
+    if(chapterKey === "ice"){
+      return ["ICE_001","ICE_002","ICE_003","ICE_004","ICE_005","ICE_006","ICE_007","ICE_008","ICE_009","ICE_010"];
+    }
+    if(chapterKey === "demon"){
+      return ["DEM_001","DEM_002","DEM_003","DEM_004","DEM_005","DEM_006","DEM_007","DEM_008","DEM_009","DEM_010"];
+    }
+    // fallback (just in case)
+    return ["SKL_001","SKL_002","SKL_003","SKL_004","SKL_005","SKL_006","SKL_007","SKL_008","SKL_009","SKL_010"];
+  }
 
-      if(allDone){
-        await db.ref(`Progress/${userId}/story/${campaignKey}/chapters/${chapter}/completed`).set(true);
-
-        // unlock 1 card per chapter (ICE_0n or DEM_0n)
-        const unlockId = (campaignKey === "ice")
-          ? `ICE_${pad2(parseInt(chapter,10))}`
-          : `DEM_${pad2(parseInt(chapter,10))}`;
-
-        await db.ref(`Collection/${userId}/${unlockId}`).set(true);
-        appendLog(`Chapter cleared! Unlocked card: ${unlockId}`);
-      }
+  async function loadPlayerDeck(){
+    // Decks/<uid>/selectedDeckKey, then Decks/<uid>/<deckKey>/cards
+    const deckRoot = await db.ref(`Decks/${userId}`).once("value");
+    const decks = deckRoot.val();
+    if(!decks){
+      throw new Error(`Decks/${userId} not found.`);
     }
 
-    async function endBattle(){
-      const won = scoreYou > scoreEnemy;
+    const selected = decks.selectedDeckKey || decks.defaultDeckKey;
+    if(!selected){
+      throw new Error("No selectedDeckKey/defaultDeckKey found in Decks/<uid>.");
+    }
+    playerDeckKey = String(selected);
 
-      // Show result overlay
-      const overlay = document.getElementById("resultOverlay");
-      const resultTitle = document.getElementById("resultTitle");
-      const resultPill = document.getElementById("resultPill");
-      const resultText = document.getElementById("resultText");
-
-      overlay.style.display = "flex";
-
-      if(won){
-        safePlay(sfxWin);
-        resultTitle.textContent = "Stage Cleared!";
-        resultPill.textContent = `WIN • ${scoreYou}–${scoreEnemy}`;
-        resultText.textContent =
-          `You drive the enemy back. The village breathes again.\n\n`+
-          `Progress is being recorded. Return to Chapters to see your stage marked as cleared.`;
-
-        try{
-          await markStageComplete();
-        }catch(err){
-          console.error(err);
-          toast("Could not save stage progress (check rules/console).");
-          resultText.textContent =
-            `You won, but progress could not be saved.\n`+
-            `Check Firebase rules / console errors, then try again.`;
-        }
-
-      }else{
-        safePlay(sfxLose);
-        resultTitle.textContent = "Defeat…";
-        resultPill.textContent = `LOSE • ${scoreYou}–${scoreEnemy}`;
-        resultText.textContent =
-          `The enemy overpowers you this time. Regroup, sharpen your deck, and return stronger.\n\n`+
-          `No progress was recorded for this stage.`;
-      }
-
-      // Return button always refreshes play page so it re-renders progress
-      document.getElementById("btnReturnToPlay").onclick = () => {
-        window.location.href = `play.html?refresh=${Date.now()}`;
-      };
+    const cards = decks?.[playerDeckKey]?.cards;
+    if(!Array.isArray(cards)){
+      throw new Error(`Decks/${userId}/${playerDeckKey}/cards is missing or not an array.`);
+    }
+    if(cards.length !== 10){
+      throw new Error(`Your deck '${playerDeckKey}' must contain exactly 10 cards (found ${cards.length}).`);
     }
 
-    /* =========================
-       START
-       ========================= */
-    appendLog(`Battle begins…`);
-    appendLog(`Campaign: ${story.campaignName} | Chapter ${story.chapter} | Stage ${story.stage}`);
-    appendLog(`Your deck: ${deckKey} (10 cards)`);
-    appendLog("");
+    playerDeck = cards.slice();
+  }
 
-    // initial draw
-    drawTurn();
-  </script>
+  function setupShuffles(){
+    enemyDeck = enemyDeckForChapter();
+    const seed = `${userId}|${chapterKey}|${stage}|seedv1`;
+    playerShuffled = shuffleWithSeed(playerDeck, "P|" + seed);
+    enemyShuffled  = shuffleWithSeed(enemyDeck, "E|" + seed);
+  }
+
+  async function renderTurn(){
+    locked = false;
+    chosenStat = null;
+
+    const pCard = currentPlayerCard();
+    const eCard = currentEnemyCard();
+
+    // Your card is hidden until you pick
+    youImg.src = imgPathById(pCard);
+    enemyImg.src = imgPathById(eCard);
+
+    revealYou(false);
+    revealEnemy(false);
+
+    youCardLabel.textContent = `card: ${ID_TO_NAME[pCard] || pCard}`;
+    enemyCardLabel.textContent = "card: hidden";
+
+    enemyStatsWrap.innerHTML = "";
+    await renderStatsButtons(pCard);
+
+    statusBanner.textContent = `Turn ${turn}: Choose a stat to battle.\nYour card is hidden until you commit. Enemy reveals after the clash.`;
+    updateTopUI();
+  }
+
+  async function decideEnemyStat(enemyCardId){
+    // Enemy chooses its best stat (simple AI)
+    const s = await getCardStats(enemyCardId);
+    let bestKey = STAT_KEYS[0];
+    let bestVal = -Infinity;
+    for(const k of STAT_KEYS){
+      if(s[k] > bestVal){ bestVal = s[k]; bestKey = k; }
+    }
+    return bestKey;
+  }
+
+  function beep(type){
+    // quick, tiny sound effect (no external files)
+    try{
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type = "sine";
+      const now = ctx.currentTime;
+
+      if(type === "win"){ o.frequency.setValueAtTime(740, now); o.frequency.exponentialRampToValueAtTime(980, now + .12); }
+      else if(type === "lose"){ o.frequency.setValueAtTime(220, now); o.frequency.exponentialRampToValueAtTime(140, now + .18); }
+      else { o.frequency.setValueAtTime(440, now); }
+
+      g.gain.setValueAtTime(0.08, now);
+      g.gain.exponentialRampToValueAtTime(0.001, now + .20);
+      o.start(now);
+      o.stop(now + .22);
+      setTimeout(()=> ctx.close(), 350);
+    } catch(e){}
+  }
+
+  async function onPickStat(statKey){
+    if(locked) return;
+    locked = true;
+    chosenStat = statKey;
+
+    // reveal your card immediately when you pick
+    revealYou(true);
+
+    const pCard = currentPlayerCard();
+    const eCard = currentEnemyCard();
+
+    const pStats = await getCardStats(pCard);
+    const eStats = await getCardStats(eCard);
+
+    // Enemy chooses a stat too (but we compare YOUR chosen stat)
+    const enemyPick = await decideEnemyStat(eCard);
+
+    const pVal = pStats[statKey];
+    const eVal = eStats[statKey];
+
+    // reveal enemy card after pick
+    revealEnemy(true);
+    enemyCardLabel.textContent = `card: ${ID_TO_NAME[eCard] || eCard}`;
+    await renderEnemyStats(eCard);
+
+    let outcome = "draw";
+    if(pVal > eVal) outcome = "win";
+    else if(eVal > pVal) outcome = "lose";
+
+    if(outcome === "win"){ playerScore++; beep("win"); }
+    else if(outcome === "lose"){ enemyScore++; beep("lose"); }
+    else { beep("draw"); }
+
+    log(`[turn ${turn}] You picked ${statKey.toUpperCase()} (${pVal}) vs Enemy (${eVal}) => ${outcome.toUpperCase()}`);
+    statusBanner.textContent =
+      `You chose ${statKey.toUpperCase()}.\nEnemy secretly preferred ${enemyPick.toUpperCase()}... but the clash uses YOUR stat.\nResult: ${outcome.toUpperCase()}.\nAdvancing...`;
+
+    updateTopUI();
+
+    setTimeout(async ()=>{
+      if(turn < MAX_TURNS){
+        turn++;
+        await renderTurn();
+      } else {
+        await endStage();
+      }
+    }, 1400);
+  }
+
+  // ? IMPORTANT: Your unlock truth source is Collection/<uid>/<CARD_ID>: true|false
+  async function unlockCardInCollection(cardId){
+    await db.ref(`Collection/${userId}/${cardId}`).set(true);
+  }
+
+  async function endStage(){
+    // STRICT: must WIN (not tie) to complete the stage
+    const win = playerScore > enemyScore;
+
+    statusBanner.textContent =
+      `STAGE COMPLETE!\nFinal Score: You ${playerScore} — Enemy ${enemyScore}\n` +
+      (win ? "? Victory! Progress saved." : "? Defeat. No progress saved. Win to complete this stage.");
+
+    log(`--- FINAL --- You ${playerScore} vs Enemy ${enemyScore} => ${win ? "VICTORY" : "DEFEAT"}`);
+
+    // Save progress ONLY if win
+    if(win && mode === "story"){
+      // Progress/<uid>/<chapterKey>/<stage> = "completed"
+      await db.ref(`Progress/${userId}/${chapterKey}/${stage}`).set("completed");
+
+      // Chapter reward ONLY when stage is 10/20/30/.../100 AND player won
+      const chapterNum = Math.ceil(Number(stage)/10);
+      const rewardId = (chapterKey === "ice")
+        ? `ICE_${String(chapterNum).padStart(3,"0")}`
+        : `DEM_${String(chapterNum).padStart(3,"0")}`;
+
+      if(Number(stage) % 10 === 0){
+        await db.ref(`Progress/${userId}/Rewards/${chapterKey}/${rewardId}`).set(true);
+
+        // ? This is the real unlock path your deck editor uses
+        await unlockCardInCollection(rewardId);
+
+        log(`[reward] Unlocked in Collection: ${rewardId} (chapter ${chapterNum})`);
+        toast(`Unlocked: ${rewardId} ??`);
+      } else {
+        toast("Progress saved ?");
+      }
+
+    } else {
+      toast("No progress saved — you must win ?");
+    }
+
+    // Lock buttons at end
+    youStatsWrap.querySelectorAll("button").forEach(b => b.disabled = true);
+  }
+
+  // Restart stage button
+  document.getElementById("btnRestart").addEventListener("click", ()=>{
+    // Simple reload keeps it deterministic because our shuffle seed is stable per stage
+    window.location.reload();
+  });
+
+  async function init(){
+    setArenaTheme();
+    document.getElementById("modeLabel").textContent = mode;
+    document.getElementById("chapterLabel").textContent = chapterKey;
+    document.getElementById("stageLabel").textContent = String(stage);
+
+    // Validate params
+    if(mode !== "story"){
+      statusBanner.textContent = "This battle.html is currently configured for Story Mode.\n(Mode param was not 'story'.)";
+    }
+    if(!chapterKey || !stage || stage < 1){
+      statusBanner.textContent = "Missing or invalid battle parameters.\nExpected: battle.html?mode=story&chapter=ice|demon&stage=1..100";
+      return;
+    }
+
+    // Load deck
+    statusBanner.textContent = "Loading your deck from Firebase…";
+    await loadPlayerDeck();
+    deckPill.textContent = `Deck: ${playerDeckKey}`;
+    document.getElementById("subLine").textContent = `Story battle loaded. Your deck: ${playerDeckKey}. Chapter: ${chapterKey}. Stage: ${stage}.`;
+
+    // Setup shuffles
+    setupShuffles();
+    log(`[system] Loaded deck '${playerDeckKey}' (10 cards).`);
+    log(`[system] Enemy deck '${chapterKey}' (10 cards).`);
+    log(`[system] Stage ${stage} begins. 10 turns. Choose wisely.`);
+
+    // Start
+    playerScore = 0;
+    enemyScore = 0;
+    turn = 1;
+    updateTopUI();
+    await renderTurn();
+  }
+
+  init().catch(err=>{
+    console.error(err);
+    statusBanner.textContent = "? Battle failed to load.\n\n" + (err?.message || err);
+    toast("Battle load error ?");
+    log(`[error] ${err?.message || err}`);
+  });
+</script>
 </body>
 </html>

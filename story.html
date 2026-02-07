@@ -1,0 +1,588 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Deckforge Arena — Story</title>
+
+  <style>
+    :root{
+      --bg0:#070a12; --bg1:#0b1020; --text:#eaf0ff; --muted: rgba(234,240,255,.72);
+      --primary:#7c5cff; --primary2:#23d5ff; --good:#3dffb7; --bad:#ff4d6d; --warn:#ffd166;
+      --shadow: 0 18px 60px rgba(0,0,0,.45);
+      --r14:14px; --r18:18px; --r22:22px; --r26:26px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      --max: 1280px;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0; font-family:var(--sans); color:var(--text);
+      background:
+        radial-gradient(1200px 800px at 25% 10%, rgba(124,92,255,.16), transparent 55%),
+        radial-gradient(1200px 800px at 80% 20%, rgba(35,213,255,.13), transparent 55%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      overflow-x:hidden;
+    }
+    .container{ width:min(var(--max), calc(100% - 40px)); margin-inline:auto; }
+
+    .nav{
+      position:sticky; top:0; z-index:10;
+      backdrop-filter: blur(14px);
+      background: rgba(7,10,18,.45);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .nav__inner{
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 14px 0; gap: 12px; flex-wrap:wrap;
+    }
+    .brand{ display:flex; align-items:center; gap:12px; text-decoration:none; color:inherit; }
+    .brand__mark{
+      width:34px; height:34px; border-radius:12px; display:grid; place-items:center; font-weight:1000;
+      background: linear-gradient(135deg, rgba(124,92,255,.9), rgba(35,213,255,.75));
+      box-shadow: 0 10px 28px rgba(124,92,255,.22);
+    }
+    .brand__name{ font-weight:1000; }
+    .nav__right{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .chip{
+      padding: 7px 11px; border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      font-weight: 900; font-size: 13px;
+      display:inline-flex; gap:8px; align-items:center;
+      white-space:nowrap;
+    }
+    .chip b{ font-family:var(--mono); }
+    .btn{
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: var(--r14);
+      font-weight: 1000;
+      cursor:pointer;
+      transition: transform .15s ease, background .15s ease;
+      text-decoration:none;
+      display:inline-flex; align-items:center; gap:10px;
+    }
+    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.10); }
+
+    .wrap{ padding: 18px 0 46px; }
+    h1{ margin:0; font-size: clamp(22px, 3vw, 34px); letter-spacing:-.6px; }
+    .sub{ margin: 10px 0 0; color: var(--muted); line-height:1.6; }
+
+    .view{ display:none; }
+    .view.active{ display:block; }
+
+    .panel{
+      margin-top: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      border-radius: var(--r26);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .panelHead{
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.12);
+      display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
+    }
+    .panelTitle{ display:flex; align-items:center; gap:10px; font-weight: 1000; }
+    .dot{
+      width:10px; height:10px; border-radius:999px;
+      background: var(--primary2);
+      box-shadow: 0 0 0 5px rgba(35,213,255,.10);
+    }
+    .panelBody{ padding: 14px; }
+
+    .worldGrid{ display:grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
+    @media (max-width: 980px){ .worldGrid{ grid-template-columns: 1fr; } }
+
+    .worldTile{
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      border-radius: var(--r26);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      cursor:pointer;
+      transition: transform .14s ease, background .14s ease;
+      position:relative;
+      min-height: 220px;
+    }
+    .worldTile:hover{ transform: translateY(-2px); background: rgba(255,255,255,.06); }
+    .worldTop{
+      padding: 14px;
+      display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.12);
+    }
+    .worldName{ font-weight:1000; font-size: 18px; letter-spacing:-.2px; }
+    .worldMeta{ font-family: var(--mono); font-size: 12px; opacity:.9; }
+    .worldBody{ padding: 14px; color: rgba(234,240,255,.82); line-height:1.55; }
+
+    .badgePill{
+      padding: 7px 10px; border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.18);
+      font-weight: 1000;
+      font-size: 12px;
+      display:inline-flex; gap:8px; align-items:center;
+      white-space:nowrap;
+    }
+    .badgePill b{ font-family: var(--mono); }
+
+    .grid{ display:grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+    @media (max-width: 900px){ .grid{ grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 620px){ .grid{ grid-template-columns: repeat(2, 1fr); } }
+
+    .tile{
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 16px;
+      background: rgba(0,0,0,.16);
+      padding: 12px;
+      cursor:pointer;
+      transition: transform .12s ease, background .12s ease;
+      display:flex; flex-direction:column; gap:8px;
+      min-height: 108px;
+    }
+    .tile:hover{ transform: translateY(-1px); background: rgba(255,255,255,.08); }
+    .tile.locked{ opacity:.55; cursor:not-allowed; }
+
+    .tile .k{ font-family: var(--mono); font-weight: 1000; }
+    .tile .desc{ font-size: 12px; color: rgba(234,240,255,.74); line-height:1.3; }
+
+    .statusRow{ margin-top:auto; display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    .status{
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 1000;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.22);
+      width: fit-content;
+      white-space:nowrap;
+    }
+    .status.done{ color: var(--good); }
+    .status.progress{ color: var(--warn); }
+    .status.locked{ color: rgba(234,240,255,.55); }
+
+    .storyText{
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 18px;
+      background: rgba(0,0,0,.14);
+      padding: 12px;
+      color: rgba(234,240,255,.82);
+      line-height:1.55;
+      margin-bottom: 12px;
+      white-space:pre-wrap;
+    }
+
+    .rewardBox{
+      margin-top: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.14);
+      border-radius: 18px;
+      padding: 12px;
+      display:grid;
+      grid-template-columns: 120px 1fr;
+      gap: 12px;
+      align-items:center;
+    }
+    @media (max-width: 620px){ .rewardBox{ grid-template-columns: 1fr; } }
+    .rewardImg{
+      width:120px; height:120px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      overflow:hidden;
+      cursor:pointer;
+    }
+    .rewardImg img{ width:100%; height:100%; object-fit: cover; display:block; }
+    .rewardTitle{ font-weight:1000; }
+    .rewardSub{ margin-top:6px; color: rgba(234,240,255,.72); line-height:1.45; }
+    .linkish{ color: rgba(35,213,255,.92); text-decoration: underline; cursor:pointer; font-weight:900; }
+
+    .toast{
+      position:fixed; left:50%; transform: translateX(-50%); bottom: 18px;
+      padding: 10px 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,.14);
+      background: rgba(15,18,30,.92); backdrop-filter: blur(14px);
+      box-shadow: var(--shadow); color: rgba(234,240,255,.92);
+      display:none; z-index:200; max-width: min(980px, calc(100% - 40px));
+      white-space:pre-wrap;
+    }
+  </style>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+</head>
+
+<body>
+<header class="nav">
+  <div class="nav__inner container">
+    <a class="brand" href="index.html">
+      <span class="brand__mark">?</span>
+      <span class="brand__name">Deckforge Arena</span>
+    </a>
+    <div class="nav__right">
+      <div class="chip">You: <b id="meName">—</b></div>
+      <a class="btn" href="play.html">Back to Play</a>
+    </div>
+  </div>
+</header>
+
+<main class="container wrap">
+  <h1>Story Mode</h1>
+  <p class="sub">World ? Chapter ? Stage. Battles launch with <span style="font-family:var(--mono)">battle.html?mode=story&chapter=ice|demon&stage=1..100</span>.</p>
+
+  <section id="viewWorlds" class="view active">
+    <div class="worldGrid">
+      <div class="worldTile" id="worldIce">
+        <div class="worldTop">
+          <div>
+            <div class="worldName">Ice Dwarfs</div>
+            <div class="worldMeta">10 chapters • 10 stages each</div>
+          </div>
+          <div class="badgePill">Chapters <b id="iceWorldProg">0/10</b></div>
+        </div>
+        <div class="worldBody">Frostfront halls. Rune-forged gates. A deck trial carved into ice itself.</div>
+      </div>
+
+      <div class="worldTile" id="worldDemon">
+        <div class="worldTop">
+          <div>
+            <div class="worldName">Demons</div>
+            <div class="worldMeta">10 chapters • 10 stages each</div>
+          </div>
+          <div class="badgePill">Chapters <b id="demWorldProg">0/10</b></div>
+        </div>
+        <div class="worldBody">Scorchlands. Ash storms. The enemy doesn’t want your deck — they want your choices.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="viewChapters" class="view">
+    <div class="panel">
+      <div class="panelHead">
+        <div class="panelTitle"><span class="dot"></span> <span id="chaptersTitle">World Chapters</span></div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+          <span class="chip">Progress <b id="chaptersProg">0/10</b></span>
+          <button class="btn" id="btnBackToWorlds">Back to Worlds</button>
+        </div>
+      </div>
+      <div class="panelBody">
+        <div class="storyText" id="chaptersStory">Loading…</div>
+        <div class="grid" id="chaptersGrid"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="viewStages" class="view">
+    <div class="panel">
+      <div class="panelHead">
+        <div class="panelTitle"><span class="dot"></span> <span id="stagesTitle">Chapter Stages</span></div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+          <span class="chip">Progress <b id="stagesProg">0/10</b></span>
+          <button class="btn" id="btnBackToChapters">Back to Chapters</button>
+        </div>
+      </div>
+      <div class="panelBody">
+        <div class="storyText" id="stagesStory">Loading…</div>
+        <div class="grid" id="stagesGrid"></div>
+
+        <div class="rewardBox">
+          <div class="rewardImg" id="rewardClick">
+            <img id="rewardImg" alt="Reward card"/>
+          </div>
+          <div>
+            <div class="rewardTitle" id="rewardTitle">Reward: —</div>
+            <div class="rewardSub" id="rewardSub">Clear all 10 stages to unlock.</div>
+            <div class="rewardSub" style="margin-top:10px;">
+              <span class="linkish" id="openInDecks">open in deck editor</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDJHl2yCKbiiinesOZ9R_SROC51knmT9TQ",
+    authDomain: "goamica-7190c.firebaseapp.com",
+    databaseURL: "https://goamica-7190c-default-rtdb.firebaseio.com",
+    projectId: "goamica-7190c",
+    storageBucket: "goamica-7190c.firebasestorage.app",
+    messagingSenderId: "612907093027",
+    appId: "1:612907093027:web:2b7106adc9ba6b7b177596",
+    measurementId: "G-8DE8ST7LXR"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  function getSession(){
+    const id = localStorage.getItem("amica_currentUserId") || sessionStorage.getItem("amica_currentUserId");
+    const user = localStorage.getItem("amica_currentUser") || sessionStorage.getItem("amica_currentUser");
+    return { id, user: user ? JSON.parse(user) : null };
+  }
+  const session = getSession();
+  if(!session.id || !session.user){ window.location.href = "login.html"; }
+  const userId = String(session.id);
+  document.getElementById("meName").textContent = session.user.Username || "—";
+
+  const toastEl = document.getElementById("toast");
+  let toastTimer=null;
+  function toast(msg){
+    toastEl.textContent = msg;
+    toastEl.style.display = "block";
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(()=> toastEl.style.display="none", 2600);
+  }
+
+  const viewWorlds = document.getElementById("viewWorlds");
+  const viewChapters = document.getElementById("viewChapters");
+  const viewStages = document.getElementById("viewStages");
+  function showView(which){
+    [viewWorlds, viewChapters, viewStages].forEach(v => v.classList.remove("active"));
+    which.classList.add("active");
+  }
+
+  let currentWorld=null;
+  let currentChapter=null;
+
+  // Data caches
+  let progressRoot={};     // Progress/<uid>/...
+  let collectionRoot={};   // Collection/<uid>/CARD_ID -> true/false
+
+  const ID_TO_NAME = {
+    "ICE_001":"Ice Dwarf Miner","ICE_002":"Ice Dwarf Shieldbearer","ICE_003":"Ice Dwarf Axeguard","ICE_004":"Ice Dwarf Runecaster",
+    "ICE_005":"Ice Dwarf Frost Archer","ICE_006":"Ice Dwarf Engineer","ICE_007":"Ice Dwarf Hammer Knight","ICE_008":"Ice Dwarf Glacier Lancer",
+    "ICE_009":"Ice Dwarf Elder Runelord","ICE_010":"Ice Dwarf Warden",
+
+    "DEM_001":"Demon Imp","DEM_002":"Demon Brute","DEM_003":"Demon Hellhound","DEM_004":"Demon Warlock","DEM_005":"Demon Succubus",
+    "DEM_006":"Demon Infernal Knight","DEM_007":"Demon Flame Lancer","DEM_008":"Demon Ash Archer","DEM_009":"Demon Elder Warlock","DEM_010":"Demon Lord’s Herald",
+  };
+
+  function imgPathByCardId(cardId){
+    const name = ID_TO_NAME[cardId] || cardId;
+    return `images/${name}.png`;
+  }
+
+  function rewardCardId(worldKey, chapterNum){
+    const n = String(chapterNum).padStart(3,"0");
+    return (worldKey === "ice") ? `ICE_${n}` : `DEM_${n}`;
+  }
+
+  function globalStage(chapterNum, stageNum){
+    return (Number(chapterNum)-1)*10 + Number(stageNum);
+  }
+
+  async function loadProgress(){
+    const snap = await db.ref(`Progress/${userId}`).once("value");
+    progressRoot = snap.val() || {};
+  }
+
+  async function loadCollection(){
+    const snap = await db.ref(`Collection/${userId}`).once("value");
+    collectionRoot = snap.val() || {};
+  }
+
+  function isCardUnlocked(cardId){
+    const v = collectionRoot?.[cardId];
+    return (v === true || v === 1 || v === "1");
+  }
+
+  function stageDone(worldKey, chapterNum, stageNum){
+    const gs = String(globalStage(chapterNum, stageNum));
+    const v = progressRoot?.[worldKey]?.[gs];
+    return (v === true || v === 1 || v === "1" || v === "completed");
+  }
+
+  function chapterDone(worldKey, chapterNum){
+    for(let s=1;s<=10;s++) if(!stageDone(worldKey, chapterNum, s)) return false;
+    return true;
+  }
+
+  function chapterProgressCount(worldKey, chapterNum){
+    let d=0;
+    for(let s=1;s<=10;s++) if(stageDone(worldKey, chapterNum, s)) d++;
+    return d;
+  }
+
+  function worldDoneCount(worldKey){
+    let d=0;
+    for(let c=1;c<=10;c++) if(chapterDone(worldKey, c)) d++;
+    return d;
+  }
+
+  function chapterUnlocked(worldKey, chapterNum){
+    if(chapterNum===1) return true;
+    return chapterDone(worldKey, chapterNum-1);
+  }
+
+  function stageUnlocked(worldKey, chapterNum, stageNum){
+    if(stageNum===1) return true;
+    return stageDone(worldKey, chapterNum, stageNum-1);
+  }
+
+  function renderWorlds(){
+    document.getElementById("iceWorldProg").textContent = `${worldDoneCount("ice")}/10`;
+    document.getElementById("demWorldProg").textContent = `${worldDoneCount("demon")}/10`;
+    showView(viewWorlds);
+  }
+
+  function renderChapters(worldKey){
+    currentWorld = worldKey;
+    currentChapter = null;
+
+    document.getElementById("chaptersTitle").textContent = (worldKey==="ice") ? "Ice Dwarfs — Chapters" : "Demons — Chapters";
+    document.getElementById("chaptersStory").textContent =
+      (worldKey==="ice")
+        ? "You arrive at the Frostfront — where breath turns to crystal.\n\nClear chapters to push deeper into the glacier halls."
+        : "You cross into the Scorchlands — where ash falls like cursed snow.\n\nClear chapters to steal victories from the Demon war vaults.";
+
+    document.getElementById("chaptersProg").textContent = `${worldDoneCount(worldKey)}/10`;
+
+    const grid = document.getElementById("chaptersGrid");
+    grid.innerHTML = "";
+
+    for(let c=1;c<=10;c++){
+      const done = chapterDone(worldKey, c);
+      const unlocked = chapterUnlocked(worldKey, c);
+      const stageCount = chapterProgressCount(worldKey, c);
+
+      const tile = document.createElement("div");
+      tile.className = "tile" + (unlocked ? "" : " locked");
+
+      const status = document.createElement("div");
+      status.className = "status " + (done ? "done" : (unlocked ? "progress" : "locked"));
+      status.textContent = done ? "COMPLETED" : (unlocked ? "IN PROGRESS" : "LOCKED");
+
+      tile.innerHTML = `
+        <div class="k">Chapter ${c}</div>
+        <div class="desc">${done ? "All stages cleared." : `Stages: ${stageCount}/10`}</div>
+        <div class="statusRow"></div>
+      `;
+      tile.querySelector(".statusRow").appendChild(status);
+
+      tile.addEventListener("click", ()=>{
+        if(!unlocked) return;
+        renderStages(worldKey, c);
+      });
+
+      grid.appendChild(tile);
+    }
+
+    showView(viewChapters);
+  }
+
+  function renderStages(worldKey, chapterNum){
+    currentWorld = worldKey;
+    currentChapter = chapterNum;
+
+    document.getElementById("stagesTitle").textContent =
+      `${worldKey==="ice" ? "Ice Dwarfs" : "Demons"} — Chapter ${chapterNum} Stages`;
+
+    document.getElementById("stagesStory").textContent =
+      `CHAPTER ${chapterNum}\n\nWin each stage to advance.\nClear all 10 stages to earn the reward card.`;
+
+    const doneStages = chapterProgressCount(worldKey, chapterNum);
+    document.getElementById("stagesProg").textContent = `${doneStages}/10`;
+
+    const grid = document.getElementById("stagesGrid");
+    grid.innerHTML = "";
+
+    for(let s=1;s<=10;s++){
+      const done = stageDone(worldKey, chapterNum, s);
+      const unlocked = stageUnlocked(worldKey, chapterNum, s);
+      const gs = globalStage(chapterNum, s);
+
+      const tile = document.createElement("div");
+      tile.className = "tile" + (unlocked ? "" : " locked");
+
+      const status = document.createElement("div");
+      status.className = "status " + (done ? "done" : (unlocked ? "progress" : "locked"));
+      status.textContent = done ? "COMPLETED" : (unlocked ? "IN PROGRESS" : "LOCKED");
+
+      tile.innerHTML = `
+        <div class="k">Stage ${s}</div>
+        <div class="desc">Global stage: ${gs}</div>
+        <div class="statusRow"></div>
+      `;
+      tile.querySelector(".statusRow").appendChild(status);
+
+      tile.addEventListener("click", ()=>{
+        if(!unlocked) return;
+        window.location.href = `battle.html?mode=story&chapter=${encodeURIComponent(worldKey)}&stage=${gs}`;
+      });
+
+      grid.appendChild(tile);
+    }
+
+    // Reward preview + correct unlock truth (Collection/<uid>/<CARD_ID>)
+    const rewardId = rewardCardId(worldKey, chapterNum);
+    const rewardName = ID_TO_NAME[rewardId] || rewardId;
+
+    document.getElementById("rewardTitle").textContent = `Reward Card: ${rewardName}`;
+    document.getElementById("rewardImg").src = imgPathByCardId(rewardId);
+
+    const isComplete = chapterDone(worldKey, chapterNum);
+    const unlockedInCollection = isCardUnlocked(rewardId);
+
+    if(isComplete && unlockedInCollection){
+      document.getElementById("rewardSub").textContent =
+        `? Chapter cleared! Reward unlocked in your Collection: ${rewardId}.`;
+    } else if(isComplete && !unlockedInCollection){
+      document.getElementById("rewardSub").textContent =
+        `?? Chapter cleared, but this reward is NOT unlocked in Collection yet.\nIt should be written as Collection/${userId}/${rewardId} = true when you win stage ${chapterNum*10}.`;
+    } else {
+      document.getElementById("rewardSub").textContent =
+        "Clear all 10 stages in this chapter to unlock this card.";
+    }
+
+    const openDecks = ()=>{
+      // Keep it simple: focus param so deck editor can auto-highlight
+      window.location.href = `decks.html?focus=${encodeURIComponent(rewardId)}`;
+    };
+    document.getElementById("rewardClick").onclick = openDecks;
+    document.getElementById("openInDecks").onclick = openDecks;
+
+    showView(viewStages);
+  }
+
+  document.getElementById("btnBackToWorlds").addEventListener("click", async ()=>{
+    await reloadAll();
+    renderWorlds();
+  });
+
+  document.getElementById("btnBackToChapters").addEventListener("click", async ()=>{
+    await reloadAll();
+    renderChapters(currentWorld);
+  });
+
+  document.getElementById("worldIce").addEventListener("click", async ()=>{
+    await reloadAll();
+    renderChapters("ice");
+  });
+
+  document.getElementById("worldDemon").addEventListener("click", async ()=>{
+    await reloadAll();
+    renderChapters("demon");
+  });
+
+  async function reloadAll(){
+    await Promise.all([loadProgress(), loadCollection()]);
+  }
+
+  (async ()=>{
+    await reloadAll();
+    renderWorlds();
+    toast("Story progress loaded ?");
+  })();
+</script>
+</body>
+</html>
